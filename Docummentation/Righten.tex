@@ -607,9 +607,10 @@ indywidualnych.}
 DataGrid \cite{DataGrid}. Aplikacja Visual Studio Code \cite{VSCode} posłuży do
  pisania kodu w Python \cite{Python} oraz dokumentacji w LaTeX \cite{LaTeX}. Do 
 rozwoju dokumentacji oraz kodu aplikacji posłuży system kontroli źródła GIT 
-\cite{GIT}, a oba kody źródłowe przechowywane będą w osobnych projektach 
-\cite[DatabaseShenanigans]{GITBudgeterApp} oraz \cite[budgeter]{GITBudgeterDoc}
- na platformie GitHub \cite{GitHub}.}
+\cite{GIT}, a kod źródłowy przechowywany będzie w projekcie \cite[Righten]{GITRighten}
+ na platformie GitHub \cite{GitHub}. Poprzednio aplikację rozwijano jako 
+ projekt Budgeter w ramach repozytoriów \cite[DatabaseShenanigans]{GITBudgeterApp} 
+ oraz \cite[budgeter]{GITBudgeterDoc}.}
 
 \section{\customstylesection{Techniki}}
 {W trakcie tworzeznia projektu wykorzystano model przyrostowy 
@@ -661,7 +662,7 @@ powinno ograniczyć nakład pracy wymagany do wdrożenia dodatkowych funkcji.}
     \caption{Klasy warstwy bazy danych - tabele}
     \label{fig:Klasy warstwy bazy danych - tabele}
     \centering  
-    \includegraphics[width=12cm]{figures/Budgeter_Finances-db_Tables_DataGrid.png}
+    \includegraphics[width=12cm]{figures/Righten_Finances-db_Tables_DataGrid.png}
 \end{figure}
 
 %-----------------------------TABLES--------------------------------------------
@@ -825,7 +826,7 @@ Expenditures\_transitory.}
     \caption{Klasy warstwy bazy danych - widoki}
     \label{fig:Klasy warstwy bazy danych - widoki}
     \centering  
-    \includegraphics[width=12cm]{figures/Budgeter_Finances-db_Views_DataGrid.png}
+    \includegraphics[width=12cm]{figures/Righten_Finances-db_Views_DataGrid.png}
 \end{figure}
 
 \begin{minipage}{\textwidth}
@@ -1371,7 +1372,7 @@ zależnie od potrzeb. Funkcje opisane są w dalszej części w sekcji
 %{Jego iteracyjny rozwój zaprezentowano na przykładzie zakładki Visualizations.} %TODO: optional
 \begin{figure}[H]           %requires float package
     \caption{Wizualizacja danych}
-    \label{fig:Wizualizacja danych}
+    \label{fig:Wizualizacja_danych}    %TODO: fix duplicate name
     \centering  
     \includegraphics[width=12cm]{figures/Interface_Visualizations_v0.3.png}
 \end{figure}
@@ -1392,7 +1393,7 @@ zależnie od potrzeb. Funkcje opisane są w dalszej części w sekcji
 
 \begin{figure}[H]           %requires float package
     \caption{Dodawanie rekordu}
-    \label{fig:Dodawanie rekordu}
+    \label{fig:Dodawanie_rekordu}   %TODO: fix duplicate name
     \centering  
     \includegraphics[width=12cm]{figures/Interface_Browse_AddRecord_v0.3.png}
 \end{figure}
@@ -1624,10 +1625,10 @@ wymagane pliki projektu. Jeśli środowisko Python jest skonfigurowano w systemi
 użytkownika prawidłowo do uruchomienia aplikacji wystarczy w katalogu 
 aplikacji kliknąć prawym przyciskiem myszki na pustą przestrzeń, wybrać opcję 
 Otwórz w terminalu. W terminalu wydanie polecenia 
-\inlinecode{python .\\Budgeter.py} spowoduje uruchomienie aplikacji.}
+\inlinecode{python .\\Righten.py} spowoduje uruchomienie aplikacji.}
 
 {Alternatywnie użytkownik moze uruchomić terminal i wydać polecenie 
-uruchamiające aplikację podając w pełni kwalifikowaną nazwę pliku Budgeter.py z 
+uruchamiające aplikację podając w pełni kwalifikowaną nazwę pliku Righten.py z 
 dowolnego miejsca w systemie.}
 
 %TODO: after PyInstaller prepare section
@@ -1749,8 +1750,8 @@ prywatności użytkowników i poufności informacji.}
 \chapter{\customstylechapter{Podręcznik użytkownika}}
 
 %original Przeznaczenie i główne możliwości systemu
-\section{\customstylesection{Budgeter: Co, jak i właściwie to po co?}}
-{Drogi użytkowniku, aplikacja Budgeter jest Twoim prywatnym doradcą finansowym. 
+\section{\customstylesection{Righten: Co, jak i właściwie to po co?}}
+{Drogi użytkowniku, aplikacja Righten jest Twoim prywatnym doradcą finansowym. 
 Pomoże Ci zarządzać domowym budżetem, planować wydatki i wskaże gdzie szukać 
 oszczędności, a także poinformuje na jakie kategorie produktów pochłaniają 
 największą część Twojego budżetu domowego. Te kilka prostych informacji pozwoli 
@@ -1768,7 +1769,7 @@ przenieść je kilkoma klinięciami dziśki możliwości importu danych z pliku 
 jednym z najszerzej wykorzystywanych standardów na świecie.}
 
 {Jeśli cenisz sobie możliwość dostosowania narzędzia do własnych potrzeb, nie 
-mogłeś trafić lepiej - Budgeter jest narzędziem elastycznym, dopasowującym się 
+mogłeś trafić lepiej - Righten jest narzędziem elastycznym, dopasowującym się 
 do użytkownika. Ty sam możesz wprowadzić nazwy produktów których będziesz używał
 w aplikacji. Dodatkowo możesz definiować także Typu które pozwalają grupować 
 kaetegorie produktów. Dla zbiory informacji możesz dowoli personalizować, lub 
@@ -1777,7 +1778,7 @@ skorzystać z dopracowanego przez naszych ekspertów szablonu co pozwoli Ci skup
  dlatwgo wygląd okna aplikacji także możesz dopasować do siebie i swoich 
  oczekiwań.}
 
- {Aby dotrzeć do szerszego grona odbiorcó obecnie aplikacja Budgeter jest w 
+ {Aby dotrzeć do szerszego grona odbiorcó obecnie aplikacja Righten jest w 
  pełni w języku angielskim.}
 
 \section{\customstylesection{Wymagania}}
@@ -1795,7 +1796,7 @@ już dziś wystarczy:}
 
 \section{\customstylesection{Uruchamianie aplikacji}}
 {Instalacja składa się z kilku prostych kroków. Po pobraniu aplikacji otwórz 
-folder do Pobrane - znajdziesz tam plik Budgeter.zip który możesz przenieść do 
+folder do Pobrane - znajdziesz tam plik Righten.zip który możesz przenieść do 
 dowolnego folderu na twoim komputarze. Kiedy umieścisz już archiwum tam gdzie Ci
  wygodnie kliknij prawym przyciskiem myszy i wybierz opcję Wyodrębnij wszystkie.}
 
@@ -1803,7 +1804,7 @@ dowolnego folderu na twoim komputarze. Kiedy umieścisz już archiwum tam gdzie 
     \caption{Wypakuj archiwum}
     \label{fig:Wypakuj archiwum}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_01_unzip-archive.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_01_unzip-archive.png}
 \end{figure}
 
 {Po otwarciu archiwum wskaż folder do którego chcesz wypakować aplikację.}
@@ -1812,43 +1813,43 @@ dowolnego folderu na twoim komputarze. Kiedy umieścisz już archiwum tam gdzie 
     \caption{Wskaż folder}
     \label{fig:Wskaż folder}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_01_unzip-archive_p2.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_01_unzip-archive_p2.png}
 \end{figure}
 
 {Po wykakowaniu archiwum w wybranym miejscu pojawi się folder w którym znajduje 
 się aplikacja, pozostaje otworzyć ją jak każdy inny program klikając dwukrotnie 
-lewym przciskiem myszki i możesz już zacząć swoją przygodę z aplikacją Budgeter.}
+lewym przciskiem myszki i możesz już zacząć swoją przygodę z aplikacją Righten.}
 
 \begin{figure}[H]           %requires float package
     \caption{Otwórz katalog}
     \label{fig:Otwórz katalog}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_02_open.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_02_open.png}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
     \caption{Otwóż aplikację}
     \label{fig:Otwóż aplikację}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_02_open_p2.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_02_open_p2.png}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
     \caption{Ekran powitalny aplikacji}
     \label{fig:Ekran powitalny aplikacji}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_03_splashscreen.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_03_splashscreen.png}
 \end{figure}
 
 \section{\customstylesection{Funkcje i instruykcja obsługi}}
-{Przygodę z aplikacją Budgeter warto zacząć od dodania kilku typów produktów, 
+{Przygodę z aplikacją Righten warto zacząć od dodania kilku typów produktów, 
 w tym celu wejdź w zakładkę Browse Data, następnie wybierz opcję Types.}
 
 \begin{figure}[H]           %requires float package
     \caption{Przeglądanie i edycja danych}
     \label{fig:Przeglądanie i edycja danych}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_04_browse_p1.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_04_browse_p1.png}
 \end{figure}
 
 {Po otwarciu tabela pokazuje Ci typy które już są w bazie, dodaj swój typ 
@@ -1858,7 +1859,7 @@ naciskając przycisk Add row.}
     \caption{Dodawanie rekordu}
     \label{fig:Dodawanie rekordu}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_04_browse_p2_add_data.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_04_browse_p2_add_data.png}
 \end{figure}
 
 {Dodany rekord pojawia się w wyświetlanej tabeli.}
@@ -1867,7 +1868,7 @@ naciskając przycisk Add row.}
     \caption{Rekord dodany}
     \label{fig:Rekord dodany}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_04_browse_p3_add_data_success.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_04_browse_p3_add_data_success.png}
 \end{figure}
 
 {W ten sam sposób dodaj produkty, to pozwoli Ci dodać pierwsze wydatki.}
@@ -1882,13 +1883,13 @@ zostaną zapisane w aplikacji.}
     \caption{Dodawanie wydatków}
     \label{fig:Dodawanie wydatków}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_04_browse_p4_espenditures.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_04_browse_p4_espenditures.png}
 \end{figure}
 
 {Teraz już wiesz jak dodawać dane do wszystkich zbiorów danych. Czasami jednak 
 przyda się możliwośc dodania całego zbioru. Dodawanie całego zestawy przez 
 wpisywanie każdego rekordu zajmie sporo czasu. Czas jest najcenniejszym z Twoich
- zasobów i Budgeter to szanuje, dlatego możesz także dodać dane importując plik 
+ zasobów i Righten to szanuje, dlatego możesz także dodać dane importując plik 
 w formacie CSV (Comma Separated Values, pliki oddzielane przecinkami). Jeśli 
 posiadasz taki plik - a można napisać go ręcznie, wyeksportować z innych 
 narzędzi jak chociażby Microsoft Excel - użyj opcji Import data. Pojawi się okno
@@ -1904,7 +1905,7 @@ może działać nieprawidłowo.}
     \caption{Import danych z pliku}
     \label{fig:Import danych z pliku}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_05_import-from-csv.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_05_import-from-csv.png}
 \end{figure}
 
 {Teraz pora na najciekawszą funkcję aplikacji - wizualizacje. Dzięki 
@@ -1931,28 +1932,28 @@ dostosować wygląd aplikacji do swoich upodobań.}
     \caption{Opcje - zmiana interfejsu}
     \label{fig:Opcje - zmiana interfejsu}
     \centering
-    \includegraphics[width=12cm]{figures/Guide/Budgeter_Instruction_06_Options_Change-theme.png}
+    \includegraphics[width=12cm]{figures/Guide/Righten_Instruction_06_Options_Change-theme.png}
 \end{figure}
 
 \section{\customstylesection{Spostrzeżenia i zalecenia do użytkowania projektu}}
-{Obecnie projekt aplikacji Budgeter jest w fazie prototypu, w wyniku tego 
+{Obecnie projekt aplikacji Righten jest w fazie prototypu, w wyniku tego 
 obecnie składa się wyłacznie z głównego modułu analitycznego i wymaganych 
 funkcji podstawowych. Drogi użytkowniiku, miej to na uwadze korzystając z 
-aplikacji Budgeter - wprowadzaj dane uważnie żeby zapewnić sobie komfort 
+aplikacji Righten - wprowadzaj dane uważnie żeby zapewnić sobie komfort 
 korzystania z aplikacji, i rozważ proszę zgłoszenie wszelkich zauważonych 
 błędów, co pozwoli dopracować projekt do Twoich oczekiwań. Projekt rozwijany 
 będzie na bieżąco dlatego sprawdzaj okresowo czy w repozytorium pojawiła się 
 nowa wersja, w ten sposób zyskasz dostęp do nowych funkcji wprowadzonych w 
-kolejnych wersjach. Fakt że używasz aplikacji Budgeter oznacza że Twoje dane są 
+kolejnych wersjach. Fakt że używasz aplikacji Righten oznacza że Twoje dane są 
 dla Ciebie ważne, dlatego pamiętaj żeby okresowo zabezpieczać swoje dane żeby 
 nie stracić miesięcy wprowadzanych wydatków, przychodów, dopieszczonych 
 produktów i ich typów.}
 
 {Przedewszystkim najważniesze zalecenie: czerp przyjemność korzystając z 
-aplikacji Budgeter!}
+aplikacji Righten!}
 
 \section{\customstylesection{Potencjalne błędy}}
-{Jak każdy program aplikacja Budgeter nie jest wolna od błędów. Należy jednak 
+{Jak każdy program aplikacja Righten nie jest wolna od błędów. Należy jednak 
 pamiętać że obecnie jest to prototyp, dlatego z pewnością znajdziesz w niej 
 wiele możliwych usprawnień warto je zgłosić autorowi projektu, co stwarza szansę
  wyeliminowania błędu w kolejnej wersji oprogramowania.}
@@ -2043,6 +2044,8 @@ znane jednak przed kilkoma z nich możesz się ustrzec. Tego typu błędami są:
     https://github.com/MarcinNowak94/DatabaseShenanigans}
 \bibitem{GITBudgeterDoc} github.com MarcinNowak94, budgeter \raggedright\url{
     https://github.com/MarcinNowak94/budgeter}
+\bibitem{GITRighten} github.com MarcinNowak94, Righten \raggedright\url{
+    https://github.com/MarcinNowak94/Righten}
 
 \end{thebibliography}
 
