@@ -2,7 +2,7 @@
 % - https://www.latex-project.org/help/documentation/
 % - https://docs.w3cub.com/latex/
 % - https://tex.stackexchange.com/questions/455993/formatting-sql-code
-%   https://www.overleaf.com/learn/latex/Code_listing#Code_styles_and_colours
+% - https://www.overleaf.com/learn/latex/Code_listing#Code_styles_and_colours
 
 %--------------------------------------------------------------------------------
 %-----------------------------------   TODO   ----------------------------------
@@ -34,7 +34,9 @@
 
 \makeindex
 \graphicspath{ {./} }       %Was ./figures/ changed so i can peek in VS Code
-
+%Widow and orphan control as per https://tex.stackexchange.com/questions/4152/how-do-i-prevent-widow-orphan-lines/4167#4167?newreg=87e476a8b11e44e2bd285df0190a69e0
+\widowpenalty10000          
+\clubpenalty10000
 
 % Code listings
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -203,8 +205,12 @@
 
 % ---------------------------------- Content ----------------------------------
 
+
+% 3.1. Wstęp <-[Wprowadzenie do tematyki projektu, Zamierzony cel projektu]
+%http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/wstep/
+
 % [REQUIREMENT] 3. Wprowadzenie do tematyki projektu
-\chapter{\customstylechapter{Wprowadzenie do tematyki projektu}}
+\chapter{\customstylechapter{Wstęp}}
 {Finanse są dziedziną nauki ekonomicznej któa zajmuje się rozporządzaniem 
 pieniędzmi \cite{wiki_ekonomia}. Nauka ta w podobnym zakresie a różnej skali 
 dotyczy państw, przedsiębiorstw jak i zwykłych obywateli - w efekcie jest to 
@@ -220,21 +226,30 @@ doświadczeniem, rzadko jeśi wogóle wspomagając się jakimikolwiek narzędzia
 które ułatwiałyby to zadanie.}
 %
 % [REQUIREMENT] 4. Zamierzony cel projektu
-\chapter{\customstylechapter{Zamierzony cel projektu}}
-{Celem projektu jest utworzenie modułu analitycznego aplikacji któa ułatwi 
-zarządzanie budżetem domowym dostarczając użytkownikowi narzędzia do analizy 
-wpływów i wydatków, wizualizacji trendów oraz automatycznie kategoryzujące 
-wpływy i wydatki.} 
+{Celem projektu jest zaprojektowanie i realizacja modułu analitycznego aplikacji 
+która ułatwi zarządzanie budżetem domowym dostarczając użytkownikowi narzędzia 
+do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
+kategoryzujące wpływy i wydatki. Będzie to aplikacja przeglądarkowa napisana w 
+języku Python z wykorzystaniem biblioteki PySimpleGUI\cite{PySimpleGUI}.}
+
+{Rozdział drugi zawiera rozwinięcie charakterystyki i motywacji problemu krótko 
+zaznaczonej we wstępie pracy. Rozdział trzeci Analiza istniejących rozwiązań. }
+
+% 3.2. Charakterystyka/analiza problemu
+%http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/charakterystykaanaliza-problemu/
+\chapter{\customstylechapter{Charakterystyka i analiza problemu}}
+
+
 
 {Docelowymi odbiorcami aplikacji są użytkownicy domowi, możliwe że w miarę 
 rozwoju w późniejszych fazach projektu także średnie lub małe przedsiębiorstwa. 
 Użytkownik po wprowadzeniu danych uzyska dostęp do możliwie czytelnego obrazu 
-sytuacji finansowej co uwidoczni trendy wydatków i przychodów, pozwoli bardziej
- świadomie podejmować dalsze decyzje finansowe, planować budżet a także łatwo
- identyfikować obszary które wymagają usprawnień. W efekcie uwidocznione przez
- aplikację informacje i wyciągnięte z nich wnioski ułatwią użytkownikowi poprawę
- sytuacji finansowej swojego domostwa poprzez bardziej efektywne zarządzanie
- budżetem.}
+sytuacji finansowej co uwidoczni trendy wydatków i przychodów, pozwoli bardziej 
+świadomie podejmować dalsze decyzje finansowe, planować budżet a także łatwo 
+identyfikować obszary które wymagają usprawnień. W efekcie uwidocznione przez 
+aplikację informacje i wyciągnięte z nich wnioski ułatwią użytkownikowi poprawę 
+sytuacji finansowej swojego domostwa poprzez bardziej efektywne zarządzanie 
+budżetem.}
 %
 % [REQUIREMENT] 5. Wstępne założenia i uwarunkowania, w których 
 % projekt będzie powstawał  -----------------------
@@ -2115,10 +2130,11 @@ znane jednak przed kilkoma z nich możesz się ustrzec. Tego typu błędami są:
 % 0. [SELF] Rename projects
 % 1. [SELF] Change repository so code and docummentation are in one project
 % 2. [SELF] Add Licence
+% 3.1. Wstęp <-[sections moved here: Motywacja, cel i plan działania]
+
 % [TODO]:
 % 3. [Initial review] Change structure to adhere to rules described here:
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/
-% 3.1. Wstęp <-[sections moved here]
 % 3.2. Charakterystyka/analiza problemu
 % 3.3. Analiza istniejących rozwiązań
 % 3.4. Koncepcja własnego rozwiązania
@@ -2131,3 +2147,6 @@ znane jednak przed kilkoma z nich możesz się ustrzec. Tego typu błędami są:
 % 3.11.Spis rysunków
 % 3.12.Spis tabel
 % 3.13.Ewentualne załączniki
+
+
+%rate this feature
