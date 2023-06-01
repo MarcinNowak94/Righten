@@ -1,17 +1,20 @@
 # Required package to install
-# pip install matplotlib first y'all via: python -m pip install -U matplotlib
+# python -m pip install -U matplotlib pandas
 
 #https://stackabuse.com/converting-strings-to-datetime-in-python/
 #https://matplotlib.org/gallery/style_sheets/fivethirtyeight.html#sphx-glr-gallery-style-sheets-fivethirtyeight-py
 #https://github.com/PySimpleGUI/PySimpleGUI/blob/master/DemoPrograms/Demo_Matplotlib.py
 import sqlite3
 import csv
+import json
 import time
 import datetime
 import base64
 import PySimpleGUI as sg    #Naming convention recommended by the author
+#import PySimpleGUIWeb as sg    #Naming convention recommended by the author
 import pandas
 from enum import Enum
+
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -25,6 +28,15 @@ app_version='0.1'
 app_name='Budgeter'
 import Config
 chosentheme=Config.theme
+language=Config.language
+localisation={}
+
+def localize(language):
+    import importlib
+    with open(Config.lanuguages[language], 'r', encoding='utf8') as file:
+        localisation = json.load(file)
+    return localisation
+localisation=localize(language)
 
 visibleelement=Config.startlayout
 #------- Class definitions -----------------------------------------------------
@@ -75,7 +87,6 @@ class CellEdition():
                  self.field, 
                  self.newvalue,
                  self.oldvalue)
-
 
 edited_cells=[]     #Collection of editted cells
 
@@ -189,7 +200,7 @@ top_type=GetFromDB(Finances.fullpath, Finances.selects['MostCommonProduct'])
 if len(top_type):           #In case database is empty
     top_type=top_type[0][0] #Access value directly
 else:
-    top_type='none'
+    top_type=localisation['none']
 type_monthly= Finances.selects['GivenType'].replace(Config.placeholder, top_type)
 
 def PrepareCharts():
@@ -206,7 +217,7 @@ def PrepareCharts():
 
     mostcommonproducts= Chart(
         selects=productselects,
-        caption='Products'
+        caption=localisation['Products']
     )
     
     global top_type
@@ -220,42 +231,42 @@ def PrepareCharts():
             label=top_type
             )
         },
-    caption=top_type+' products across time'
+    caption=top_type+localisation[' products across time']
     )
     monthlyincome=Chart(
         selects={
             ChartSelect(
             database=Finances.fullpath,
             select=Finances.selects["MonthlyIncome"],
-            label="Monthly income (label)"                          #TODO: (label) added for testing
+            label=localisation["Income"]
             )
         },
-        caption='Monthly income'
+        caption=localisation['Monthly income']
     )
     monthlybilance=Chart(
         selects={
             ChartSelect(
                 database=Finances.fullpath,
                 select=Finances.selects['MonthlyIncome'],
-                label='Income'
+                label=localisation['Income']
             ),
             ChartSelect(
                 database=Finances.fullpath,
                 select=Finances.selects['MonthlyBills'],
-                label='Bills'
+                label=localisation['Bills']
             ),
             ChartSelect(
                 database=Finances.fullpath,
                 select=Finances.selects['MonthlyExpenditures'],
-                label='Expenditures'
+                label=localisation['Expenditures']
             ),
             ChartSelect(
                 database=Finances.fullpath,
                 select=Finances.selects['MonthlyBilance'],
-                label='Bilance'
+                label=localisation['Bilance']
             )
             },
-        caption='Bilance'
+        caption=localisation['Bilance']
     )
 
     prepared_charts = {
@@ -275,7 +286,7 @@ def GivenProduct(product):
             label=product
             )
         },
-        caption=product+' across time'
+        caption=product+localisation[' across time']
     )
     product_stats=GetCollectionFromDB(chart)
     return Prepare_plot(product_stats, chart.caption)
@@ -288,7 +299,8 @@ def GivenType(type):
             label=type
             )
         },
-        caption=type+' across time'
+
+        caption=type+localisation[" across time"]
     )
     #TODO: Check if Visualize can do
     product_stats=GetCollectionFromDB(chart)
@@ -315,18 +327,18 @@ def GenerateTableEditor(table):
     global Finances
     #Edgecase - displaying view for user convenience
     displaytable="Expenditures_Enriched" if table=='Expenditures' else table
-    editor=[ [sg.Text(table+' Editor'), 
-             sg.Button(key=table+'Import',
-                    button_text='Import data',
-                    tooltip='Import data from properly formatted CSV file. Example provided in resources directory.'),
+    editor=[ [sg.Text(table+localisation["Editor_text"]), 
+             sg.Button(key=table+'import',
+                    button_text=localisation["Editor_Import_buton"],
+                    tooltip=localisation["Editor_Import_tooltip"]),
              sg.Button(key=table+'AddRecord',
-                        button_text='Add record',
-                        tooltip='Add single record to '+table+' table')],
+                        button_text=localisation["Editor_AddRecord_button"],
+                        tooltip=localisation["Editor_AddRecord_tooltip"].replace("TBL", table))],
             [TableToLayout(Finances.schema[displaytable])]]
     return editor
 def TableInputWindow(name):
     global Finances
-    layout=[[sg.Text(key='Info', text="Input desired data")]]
+    layout=[[sg.Text(key='Info', text=localisation["Table_Input_info"])]]
     #List slicing, bypass 1st element (usually ID)
     for column in Finances.schema[name]['columns'][1:]:
         #for *ID columns change to dropdown list
@@ -350,7 +362,7 @@ def TableInputWindow(name):
             layout.append([sg.Text(column), sg.DropDown(key=column, values=objects, expand_x=True)])
 
     layout.append([sg.Ok(), sg.Cancel()])
-    window=sg.Window(title="Add row to "+str(name), 
+    window=sg.Window(title=localisation["Table_Input_window_title"]+str(name), 
                      layout=layout,
                      icon=Config.icon,
                      modal=True,
@@ -432,31 +444,31 @@ def PrepareWindow(theme=chosentheme):
     global editcell
     editcell=False
     sg.theme(theme)
-    menu = [['Visualizations', 
-                ['Most common products', 
-                 'Income summary',
-                 'Monthly Bilance',
-                 'TopTypeMonthly',
-                 'Type'
+    menu = [[localisation["Menu_visualizations"], 
+                [localisation["Menu_Most_Common_Products"], 
+                 localisation["Menu_Income_Summary"],
+                 localisation["Menu_Monthly_Bilance"],
+                 localisation["Menu_TopTypeMonthly"],
+                 localisation["Menu_Type"]
                     ,[types],
-                 'Product'
+                 localisation["Menu_Product"]
                     ,[products]]],
-            ['Browse data',
+            [localisation["Menu_Browse_data"],
                 #TODO: Add views as uneditable
-                ['Expenditures',
-                 'Bills',
-                 'Income',
-                 'Types' ,
-                 'Products',]],
-            ['Options',                         #TODO
-                [#'Configure',                  #TODO: Stretch - config
-                 'Change Theme',
+                [localisation["Menu_Expenditures"],
+                 localisation["Menu_Bills"],
+                 localisation["Menu_Income"],
+                 localisation["Menu_Types"],
+                 localisation["Menu_Products"]]],
+            [localisation["Menu_Options"],              #TODO
+                [#localisation["Menu_Configure"],       #TODO: Stretch - config
+                 localisation["Menu_ChangeTheme"],
                     [themes],
-                'About...',
-                'Manual']]                      #TODO: Wishful thinking - built in manual
+                localisation["Menu_About"],
+                localisation["Menu_Manual"]]]           #TODO: Wishful thinking - built in manual
             ]
 
-    Visualization=[ [sg.Text('Visualizations')],
+    Visualization=[ [sg.Text(localisation["Visualizations_text"])],
                     [sg.Canvas(key='canvas',
                         size=(Config.plot_width, Config.plot_height-160),
                         expand_x=True, 
@@ -469,22 +481,24 @@ def PrepareWindow(theme=chosentheme):
     ProductsEdition=GenerateTableEditor('Products')
     Splashscreen=[[sg.Column([[sg.Image(key='Logo', source=Config.logo)]], justification='center')],
                   [sg.Column([[sg.Text( key='App info',
-                                        text='Project '+app_name+' v'+app_version+'. Poland, 2023.',
+                                        #TODO: preprocess app_info_info
+                                        text=localisation["Splashscreen_Info"].replace("APP_NAME", app_name).replace("APP_VERSION",app_version),
                                         justification='center',
                                         auto_size_text=True)]], justification='center')],
                   [sg.Column([[sg.Text( key='Authors',
-                                        text='Authors: Nowak Marcin',
+                                        text=localisation["Splashscreen_Authors"],
                                         justification='center',
                                         auto_size_text=True)]], justification='center')],
                   [sg.Column([[sg.Text( key='Versions',
-                                        text='Used technologies:\n'+sg.get_versions(),
+                                        text=localisation["Splashscreen_Technologies"]+'\n'+sg.get_versions(),
                                         justification='center',
                                         auto_size_text=True)]], justification='center')]
                 ]
     UserManual=[[sg.Column([[sg.Text(key='Manual message',
-                                     text='Section under construction. Please come back soon ...',
+                                     text=localisation["Manual_Message"],
                                      auto_size_text=True)],
-                            #TODO: figure out how text could wrap correctly itself
+                            
+                            #TODO: figure out how text could wrap correctly itself------------------------------------------------------
                             [sg.Text(key='Explaination_1',
                                      text=app_name+' is a simple application \
 designed to aid users with managing their home budgets. After filling data user \
@@ -538,7 +552,7 @@ def main():
     global chosentheme
     sg.theme(chosentheme)
     sg.popup_animated(sg.DEFAULT_BASE64_LOADING_GIF, 
-                        message='Welcome to '+app_name, 
+                        message=localisation["Popup_Welcome"]+app_name, 
                         title=app_name+' v'+app_version,
                         no_titlebar=False,
                         time_between_frames=100)
@@ -598,7 +612,7 @@ def main():
         if event in (popups):
             table=event.partition("Import")[0]
             filename=sg.popup_get_file(title='Import CSV', 
-                                        message='Document to open', 
+                                        message=localisation["Import_popup_message"], 
                                         icon=Config.icon)
             if filename not in (None, ''):                      #TODO: Validate propper path
                 data=GetDataFromCSV(filename)

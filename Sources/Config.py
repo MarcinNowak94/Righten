@@ -8,11 +8,12 @@ plot_height = window_height-10
 limit=5 #top n products graphed
 placeholder="placeholder"
 startlayout="About..."
-icon=".\Resources\Graphics\Icon.ico"
-logo=".\Resources\Graphics\Logo.png"
+icon=".\Sources\Resources\Graphics\Icon.ico"
+logo=".\Sources\Resources\Graphics\Logo.png"
 theme='DarkAmber'
+language="English"
 
-fullpath="E:\Projects\Bazy Danych\Personal\Finances.sqlite3"
+fullpath="E:\Projects\Budgeter_personal\Finances.sqlite3"
 selects={
     "AnyTable"              : "SELECT * FROM ["+placeholder+"]",
     "Expenditures"          : "SELECT * FROM [Expenditures_Enriched];",
@@ -23,7 +24,7 @@ selects={
     "MonthlyProducts"       : "SELECT * FROM [Monthly_common_products];",
     "MostCommonProduct"     : "SELECT [Type] FROM [ProductTypeSummary] LIMIT 1;",
     "Comparison"            : "SELECT * FROM [Ledger_comparison];",
-    "TypeSummary"           : "SELECT * FROM [TypeSummary];",
+    "TypeSummary"           : "SELECT * FROM [TypeSummary] ORDER BY [Bought Times] DESC;",
     "GivenProduct"          : "SELECT SUBSTR([Datetime],1,7) AS [Month] \
                                         ,SUM([Amount])         AS [Amount] \
                                 FROM [Expenditures_Enriched] \
@@ -34,7 +35,7 @@ selects={
                                 FROM [Expenditures_Enriched] \
                                 WHERE [Type] LIKE '%"+placeholder+"%' \
                                 GROUP BY SUBSTR([Datetime],1,7);",
-    "ProductSummary"        : "SELECT * FROM [ProductSummary];",
+    "ProductSummary"        : "SELECT * FROM [ProductSummary] ORDER BY [Bought Times] DESC;",
     
     #Common database selects
     "GetTables"             : "SELECT [name] FROM sqlite_schema WHERE [type]='table' OR [name]='Expenditures_Enriched';",
@@ -51,4 +52,8 @@ inserts={
     "Expenditures"          : "INSERT INTO [Expenditures]  (DateTime, Product, Amount, Comment) VALUES ",
     "Products"              : "INSERT INTO [Products]  (Product, TypeID, Comment) VALUES ",
     "ProductTypes"          : "INSERT INTO [ProductTypes]  (Type, Comment) VALUES "        
+}
+
+lanuguages={
+    "English"               : ".\Sources\Resources\Locale\Righten_en_US.json"
 }
