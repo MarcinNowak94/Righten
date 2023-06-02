@@ -10,8 +10,8 @@ placeholder="placeholder"
 startlayout="About..."
 icon=".\Sources\Resources\Graphics\Icon.ico"
 logo=".\Sources\Resources\Graphics\Logo.png"
-theme='DarkAmber'
-language="English"
+theme="DarkAmber"
+language="English (US)"
 
 fullpath="E:\Projects\Budgeter_personal\Finances.sqlite3"
 selects={
@@ -55,5 +55,12 @@ inserts={
 }
 
 lanuguages={
-    "English"               : ".\Sources\Resources\Locale\Righten_en_US.json"
+    "English (US)"          : ".\Sources\Resources\Locale\Righten_en_US.json",
+    "Polish"                : ".\Sources\Resources\Locale\Righten_pl_PL.json"
 }
+
+#TODO: Fix workaround - need only to exstract keys from above
+menu_languages=[
+    "English (US)",
+    "Polish"
+]

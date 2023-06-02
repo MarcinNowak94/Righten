@@ -28,6 +28,7 @@ app_version='0.1'
 app_name='Budgeter'
 import Config
 chosentheme=Config.theme
+available_languages=Config.menu_languages
 language=Config.language
 localisation={}
 
@@ -200,7 +201,7 @@ top_type=GetFromDB(Finances.fullpath, Finances.selects['MostCommonProduct'])
 if len(top_type):           #In case database is empty
     top_type=top_type[0][0] #Access value directly
 else:
-    top_type=localisation['none']
+    top_type=localisation["Toptype_none"]
 type_monthly= Finances.selects['GivenType'].replace(Config.placeholder, top_type)
 
 def PrepareCharts():
@@ -217,7 +218,7 @@ def PrepareCharts():
 
     mostcommonproducts= Chart(
         selects=productselects,
-        caption=localisation['Products']
+        caption=localisation["Mostcommonproducts_caption"]
     )
     
     global top_type
@@ -231,42 +232,42 @@ def PrepareCharts():
             label=top_type
             )
         },
-    caption=top_type+localisation[' products across time']
+    caption=top_type+localisation["Toptypemonthly_caption"]
     )
     monthlyincome=Chart(
         selects={
             ChartSelect(
             database=Finances.fullpath,
             select=Finances.selects["MonthlyIncome"],
-            label=localisation["Income"]
+            label=localisation["Monthlyincome_label"]
             )
         },
-        caption=localisation['Monthly income']
+        caption=localisation["Monthlyincome_caption"]
     )
     monthlybilance=Chart(
         selects={
             ChartSelect(
                 database=Finances.fullpath,
                 select=Finances.selects['MonthlyIncome'],
-                label=localisation['Income']
+                label=localisation["Monthlybilance_Income_label"]
             ),
             ChartSelect(
                 database=Finances.fullpath,
                 select=Finances.selects['MonthlyBills'],
-                label=localisation['Bills']
+                label=localisation["Monthlybilance_Bills_label"]
             ),
             ChartSelect(
                 database=Finances.fullpath,
                 select=Finances.selects['MonthlyExpenditures'],
-                label=localisation['Expenditures']
+                label=localisation["Monthlybilance_Expenditures_label"]
             ),
             ChartSelect(
                 database=Finances.fullpath,
                 select=Finances.selects['MonthlyBilance'],
-                label=localisation['Bilance']
+                label=localisation["Monthlybilance_Bilance_label"]
             )
             },
-        caption=localisation['Bilance']
+        caption=localisation["Monthlybilance_caption"]
     )
 
     prepared_charts = {
@@ -286,7 +287,7 @@ def GivenProduct(product):
             label=product
             )
         },
-        caption=product+localisation[' across time']
+        caption=product+localisation["GivenProduct_caption"]
     )
     product_stats=GetCollectionFromDB(chart)
     return Prepare_plot(product_stats, chart.caption)
@@ -461,9 +462,11 @@ def PrepareWindow(theme=chosentheme):
                  localisation["Menu_Types"],
                  localisation["Menu_Products"]]],
             [localisation["Menu_Options"],              #TODO
-                [#localisation["Menu_Configure"],       #TODO: Stretch - config
-                 localisation["Menu_ChangeTheme"],
-                    [themes],
+                [localisation["Menu_Configure"],       #TODO: Stretch - config
+                    [localisation["Menu_Language"],
+                        [available_languages],
+                     localisation["Menu_ChangeTheme"],
+                        [themes]],
                 localisation["Menu_About"],
                 localisation["Menu_Manual"]]]           #TODO: Wishful thinking - built in manual
             ]
@@ -550,6 +553,7 @@ def main():
     #close loading #TODO: Idea: turn into function and log how long startup took
     #------- Incantations end here -------------------------------------------------
     global chosentheme
+    global language
     sg.theme(chosentheme)
     sg.popup_animated(sg.DEFAULT_BASE64_LOADING_GIF, 
                         message=localisation["Popup_Welcome"]+app_name, 
@@ -654,6 +658,13 @@ def main():
             #change themes on the fly requires some serious work, https://github.com/PySimpleGUI/PySimpleGUI/issues/2437
             #workaround
             chosentheme=event
+            window.close()
+            window=PrepareWindow(chosentheme)
+            continue
+        if event in (available_languages):
+            #change themes on the fly requires some serious work, https://github.com/PySimpleGUI/PySimpleGUI/issues/2437
+            #workaround
+            language=event
             window.close()
             window=PrepareWindow(chosentheme)
             continue
