@@ -463,8 +463,9 @@ def PrepareWindow(theme=chosentheme):
                  localisation["Menu_Products"]]],
             [localisation["Menu_Options"],              #TODO
                 [localisation["Menu_Configure"],       #TODO: Stretch - config
-                    [localisation["Menu_Language"],
-                        [available_languages],
+                    [#TODO: Feature disabled temporarily until fixed 
+                     #localisation["Menu_Language"],
+                     #   [available_languages],
                      localisation["Menu_ChangeTheme"],
                         [themes]],
                 localisation["Menu_About"],
@@ -477,7 +478,8 @@ def PrepareWindow(theme=chosentheme):
                         expand_x=True, 
                         expand_y=True,
                         visible=True)]]
-    IncomeEdition=GenerateTableEditor('Income')
+    
+    =GenerateTableEditor('Income')
     ExpendituresEdition=GenerateTableEditor('Expenditures')
     BillsEdition=GenerateTableEditor('Bills')
     TypesEdition=GenerateTableEditor('ProductTypes')
@@ -530,7 +532,9 @@ capability only if you REALLY know what You are doing.',
         [sg.Column(Splashscreen, key=localisation["Menu_About"], visible=False, expand_x=True, expand_y=True),
          sg.Column(UserManual, key=localisation["Menu_Manual"], visible=False, expand_x=True, expand_y=True),
          sg.Column(Visualization, key=localisation["Menu_visualizations"], visible=False,  expand_x=True, expand_y=True), 
-         sg.Column(IncomeEdition, key='IncomeEdition', visible=False, expand_x=True, expand_y=True), 
+         sg.Column(
+            , key='
+         ', visible=False, expand_x=True, expand_y=True), 
          sg.Column(ExpendituresEdition, key='ExpendituresEdition', visible=False, expand_x=True, expand_y=True),
          sg.Column(BillsEdition, key='BillsEdition', visible=False, expand_x=True, expand_y=True),
          sg.Column(TypesEdition, key='TypesEdition', visible=False, expand_x=True, expand_y=True),
@@ -572,7 +576,8 @@ def main():
         localisation["Editor_Products"]      : 'ProductsEdition',
         localisation["Editor_Expenditures"]  : 'ExpendituresEdition',
         localisation["Editor_Bills"]         : 'BillsEdition',
-        localisation["Editor_Income"]        : 'IncomeEdition'
+        localisation["Editor_Income"]        : '
+        '
     }
     popups={
         'ProductTypesImport' : '',
