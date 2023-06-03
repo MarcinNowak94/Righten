@@ -7,11 +7,9 @@ plot_height = window_height-10
 
 limit=5 #top n products graphed
 placeholder="placeholder"
-startlayout="About..."
 icon=".\Sources\Resources\Graphics\Icon.ico"
 logo=".\Sources\Resources\Graphics\Logo.png"
 theme="DarkAmber"
-language="English (US)"
 
 fullpath="E:\Projects\Budgeter_personal\Finances.sqlite3"
 selects={
@@ -64,3 +62,4 @@ menu_languages=[
     "English (US)",
     "Polish"
 ]
+language=menu_languages[0]

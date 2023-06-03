@@ -38,7 +38,13 @@
     "Menu_ChangeTheme"                   : "Change Theme",
     "Menu_About"                         : "About...",
     "Menu_Manual"                        : "Manual",
-
+    
+    "Editor_Types"                       : "Types",
+    "Editor_Products"                    : "Products",
+    "Editor_Expenditures"                : "Expenditures",
+    "Editor_Bills"                       : "Bills",
+    "Editor_Income"                      : "Income",
+    
     "Visualizations_text"                : "Visualizations",
     "Splashscreen_Info"                  : "Project APP_NAME vAPP_VERSION. Poland, 2023.",
     "Splashscreen_Authors"               : "Author: Nowak Marcin",

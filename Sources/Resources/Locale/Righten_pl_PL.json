@@ -39,6 +39,12 @@
     "Menu_About"                         : "O projekcie...",
     "Menu_Manual"                        : "Instrukcja obsługi",
 
+    "Editor_Types"                       : "Typy",
+    "Editor_Products"                    : "Produkty",
+    "Editor_Expenditures"                : "Wydatki",
+    "Editor_Bills"                       : "Rachunki",
+    "Editor_Income"                      : "Wpływy",
+        
     "Visualizations_text"                : "Wizualizacje",
     "Splashscreen_Info"                  : "Projekt APP_NAME vAPP_VERSION. Polska, 2023.",
     "Splashscreen_Authors"               : "Autor: Nowak Marcin",

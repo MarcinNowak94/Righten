@@ -39,7 +39,7 @@ def localize(language):
     return localisation
 localisation=localize(language)
 
-visibleelement=Config.startlayout
+visibleelement=localisation["Menu_About"]
 #------- Class definitions -----------------------------------------------------
 #TODO: Use Dataclasses as in https://www.youtube.com/watch?v=vBH6GRJ1REM
 class Database():
@@ -527,9 +527,9 @@ capability only if you REALLY know what You are doing.',
     #Inspired by DEMO https://github.com/PySimpleGUI/PySimpleGUI/blob/master/DemoPrograms/Demo_Column_Elem_Swap_Entire_Window.py
     layout=[
         [sg.Menu(key='Menu', menu_definition=menu)],
-        [sg.Column(Splashscreen, key='About...', visible=False, expand_x=True, expand_y=True),
-         sg.Column(UserManual, key='Manual', visible=False, expand_x=True, expand_y=True),
-         sg.Column(Visualization, key='Visualization', visible=False,  expand_x=True, expand_y=True), 
+        [sg.Column(Splashscreen, key=localisation["Menu_About"], visible=False, expand_x=True, expand_y=True),
+         sg.Column(UserManual, key=localisation["Menu_Manual"], visible=False, expand_x=True, expand_y=True),
+         sg.Column(Visualization, key=localisation["Menu_visualizations"], visible=False,  expand_x=True, expand_y=True), 
          sg.Column(IncomeEdition, key='IncomeEdition', visible=False, expand_x=True, expand_y=True), 
          sg.Column(ExpendituresEdition, key='ExpendituresEdition', visible=False, expand_x=True, expand_y=True),
          sg.Column(BillsEdition, key='BillsEdition', visible=False, expand_x=True, expand_y=True),
@@ -566,13 +566,13 @@ def main():
     sg.popup_animated(None)
     #Specify events
     visualizations = PrepareCharts()
+    
     visualization_changes={
-        'Configure'     : 'Configure',
-        'Types'         : 'TypesEdition',
-        'Products'      : 'ProductsEdition',
-        'Expenditures'  : 'ExpendituresEdition',
-        'Bills'         : 'BillsEdition',
-        'Income'        : 'IncomeEdition'
+        localisation["Editor_Types"]         : 'TypesEdition',
+        localisation["Editor_Products"]      : 'ProductsEdition',
+        localisation["Editor_Expenditures"]  : 'ExpendituresEdition',
+        localisation["Editor_Bills"]         : 'BillsEdition',
+        localisation["Editor_Income"]        : 'IncomeEdition'
     }
     popups={
         'ProductTypesImport' : '',
