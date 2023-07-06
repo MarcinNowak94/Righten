@@ -479,7 +479,7 @@ def PrepareWindow(theme=chosentheme):
                         expand_y=True,
                         visible=True)]]
     
-    =GenerateTableEditor('Income')
+    IncomeEdition=GenerateTableEditor('Income')
     ExpendituresEdition=GenerateTableEditor('Expenditures')
     BillsEdition=GenerateTableEditor('Bills')
     TypesEdition=GenerateTableEditor('ProductTypes')
@@ -532,9 +532,7 @@ capability only if you REALLY know what You are doing.',
         [sg.Column(Splashscreen, key=localisation["Menu_About"], visible=False, expand_x=True, expand_y=True),
          sg.Column(UserManual, key=localisation["Menu_Manual"], visible=False, expand_x=True, expand_y=True),
          sg.Column(Visualization, key=localisation["Menu_visualizations"], visible=False,  expand_x=True, expand_y=True), 
-         sg.Column(
-            , key='
-         ', visible=False, expand_x=True, expand_y=True), 
+         sg.Column(IncomeEdition, key='IncomeEdition', visible=False, expand_x=True, expand_y=True),
          sg.Column(ExpendituresEdition, key='ExpendituresEdition', visible=False, expand_x=True, expand_y=True),
          sg.Column(BillsEdition, key='BillsEdition', visible=False, expand_x=True, expand_y=True),
          sg.Column(TypesEdition, key='TypesEdition', visible=False, expand_x=True, expand_y=True),
@@ -576,8 +574,7 @@ def main():
         localisation["Editor_Products"]      : 'ProductsEdition',
         localisation["Editor_Expenditures"]  : 'ExpendituresEdition',
         localisation["Editor_Bills"]         : 'BillsEdition',
-        localisation["Editor_Income"]        : '
-        '
+        localisation["Editor_Income"]        : 'IncomeEdition'
     }
     popups={
         'ProductTypesImport' : '',
