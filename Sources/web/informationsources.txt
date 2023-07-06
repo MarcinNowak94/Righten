@@ -1,10 +1,12 @@
+Preparation:
+pip3 install flask flask_sqlalchemy
+To run application run python <thisfilepath> command in terminal
+
+
 Sources used in creating this app:
 https://www.youtube.com/watch?v=3vfum74ggHE - framework reconeissance
 https://www.youtube.com/watch?v=SLftzEqoLPk - Flask basics
 https://www.youtube.com/watch?v=38TeyubArgk - templates
-
-
-
 
 
 TODO:
