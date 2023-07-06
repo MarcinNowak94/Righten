@@ -7,7 +7,12 @@ Sources used in creating this app:
 https://www.youtube.com/watch?v=3vfum74ggHE - framework reconeissance
 https://www.youtube.com/watch?v=SLftzEqoLPk - Flask basics
 https://www.youtube.com/watch?v=38TeyubArgk - templates
-
+https://www.youtube.com/watch?v=iBgtRGWE3NM - database
 
 TODO:
 https://www.youtube.com/watch?v=5aYpkLfkgRE
+https://realpython.com/getting-started-with-bootstrap-3/
+
+
+#ARWES - react framework for UI 
+https://hackaday.com/2023/06/29/sci-fi-ui-made-easy-with-arwes/
