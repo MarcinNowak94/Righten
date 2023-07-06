@@ -1,0 +1,11 @@
+Sources used in creating this app:
+https://www.youtube.com/watch?v=3vfum74ggHE - framework reconeissance
+https://www.youtube.com/watch?v=SLftzEqoLPk - Flask basics
+https://www.youtube.com/watch?v=38TeyubArgk - templates
+
+
+
+
+
+TODO:
+https://www.youtube.com/watch?v=5aYpkLfkgRE
