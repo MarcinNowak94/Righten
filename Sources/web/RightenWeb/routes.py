@@ -140,8 +140,26 @@ def producttypessummary():
 
 @app.route("/income")
 def income():
+    form = IncomeInputForm()
     entries = db.session.query(Income).order_by(Income.DateTime.desc()).all()
-    return render_template("incometable.html", title="Income", entries=entries)
+    if form.validate_on_submit():
+        #https://youtu.be/JgF6vaDYxzU?t=1015
+        #TODO: Get ProductID, TypeID of product
+        #productID=form.product.data
+        #typeID=form.product.data
+        #entry = #IncomeRecord(datetime=form.datetime.data,
+        #                      amount=form.amount.data,
+            #                      source=form.source.data,
+        #                      type=form.type.data,
+        #                      comment=form.comment.data
+        # )
+        #db.session.add(entry)
+        #TODO: Add confirmation screen
+        #flash("do you really want to add record", "message")
+        #db.session.commit()
+        flash("Data added", "success")
+        return redirect(url_for("income")) #So user can add another record
+    return render_template("incometable.html", title="Income", entries=entries, form=form)
 
 @app.route("/bills")
 def bills():
@@ -168,7 +186,6 @@ def producttypes():
 #TODO: Secure - at least hash it
 @app.route("/delete/<string:table>/<int:entry_id>")
 def delete(table, entry_id):
-    #TODO: Add record deletion confirmation screen
     try:
         db.session.query(tables[table]).filter_by(ID=entry_id).delete()
         db.session.commit()
@@ -184,7 +201,7 @@ def delete(table, entry_id):
 @app.route("/edit/<string:table><int:entry_id>")
 def edit(table, entry_id):
     #TODO: Generalize - use table variable
-    entry = db.get_or_404(entity=Incometable, ident=entry_id)
+    entry = db.get_or_404(entity=Income, ident=entry_id)
     #TODO: Prepare edition panel
     #db.session.delete(entry)
     #db.session.commit()
