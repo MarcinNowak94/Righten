@@ -10,20 +10,29 @@
             </div>
         </div>
     </div>
+    <div class="col-xs-10, col-sm-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="IncomeOverTime"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {% block javascript %}
         <script>
             let IncomeSummarydata = JSON.parse({{ IncomeSummarydata | tojson }})
             let datalabels = JSON.parse({{ labels | tojson }})
+            let mimonths = JSON.parse({{ mimonths | tojson }})
+            let miamounts = JSON.parse({{ miamounts | tojson }})
             
-
-        
             let IncomeSummarychart = new Chart(document.getElementById("IncomeSummary"), {
                     type: 'pie',
                     data: {
                         labels: datalabels,
                         datasets: [{
-                            label: "Income type summary",
+                            label: "Income type",
                             data: IncomeSummarydata,
                             backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
                                 '#B276B2', '#E16851', '#FB8267'],
@@ -52,6 +61,22 @@
                             elements: {
                                 hitRadius: 3,
                             }
+                    }
+                })
+                
+                //NICE-TO-HAVE: add option to divide by type
+                let IncomeOverTime = new Chart(document.getElementById("IncomeOverTime"), {
+                    type: "line",
+                    data: {
+                        labels: mimonths,
+                        datasets: [{
+                            label: "Income",
+                            
+                            data: miamounts,
+                            fill: false,
+                            borderColor: "rgb(75, 192, 192)",
+                            lineTension: 0.1
+                        }]
                     }
                 })
 

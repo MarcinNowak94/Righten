@@ -11,8 +11,10 @@ from sqlalchemy.ext.automap import automap_base
 #with app.app_context():
 #    Incometable=db.Table("Income",metadata=db.metadata,autoload=True, autoload_with=db.engine)
 
-#TODO: Move it out
+#TODO: map all tables
 with app.app_context():
     Base = automap_base()
     Base.prepare(autoload_with=db.engine, reflect=True)
     Incometable=Base.classes.Income
+    
+    MonthlyIncome=Table("MonthlyIncome", db.metadata, autoload_with=db.engine)

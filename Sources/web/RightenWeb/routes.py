@@ -1,7 +1,7 @@
 from RightenWeb import app
 from RightenWeb import db
 from flask import render_template, flash, redirect, url_for, get_flashed_messages
-from RightenWeb.models import Incometable
+from RightenWeb.models import Incometable, MonthlyIncome
 from RightenWeb.forms import IncomeInputForm
 import json
 #NICE-TO-HAVE: Add event logging
@@ -44,17 +44,27 @@ def summary():
         Incometable.Type
         ).group_by(Incometable.Type)\
          .order_by(Incometable.Type).all()
-    
-
+    #TODO: Change summary automate chart labels and values
     incometypesummary=[]
     incometypes=[]
     for sum, type in IncomeSummarydata:
         incometypesummary.append(sum)
         incometypes.append(type)
+
+    IncomeOverTime=db.session.query(MonthlyIncome).all()
+    MonthlyIncomemonths=[]
+    MonthlyIncomeamounts=[]
+    for Month, Amount in IncomeOverTime:
+        MonthlyIncomeamounts.append(Amount)
+        MonthlyIncomemonths.append(Month)
+
+
     return render_template("summary.html",
+                           title="Summary",
                            IncomeSummarydata=json.dumps(incometypesummary),
                            labels=json.dumps(incometypes), 
-                           title="Summary"
+                           mimonths=json.dumps(MonthlyIncomemonths),
+                           miamounts=json.dumps(MonthlyIncomeamounts)
                            )
 
 @app.route("/income")
