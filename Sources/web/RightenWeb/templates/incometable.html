@@ -26,7 +26,7 @@
                             <td>{{entry.Source}}</td>
                             <td>{{entry.Comment}}</td>
                             <td><a href="{{ url_for('edit', table='Income', entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm">Edit</a></td>
-                            <td><a href="{{ url_for('delete', table='Income',entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+                            <td><a href="{{ url_for('delete', table='Income', entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm">Delete</a></td>
                         </tr>
                 {% endfor %}
         </tbody>

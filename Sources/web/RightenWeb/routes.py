@@ -1,11 +1,17 @@
 from RightenWeb import app
 from RightenWeb import db
-from flask import render_template, flash, redirect, url_for, get_flashed_messages
+from flask import render_template, flash, redirect, url_for, request
 from RightenWeb.models import *
 from RightenWeb.forms import IncomeInputForm
+from sqlalchemy import delete
 import json
 #NICE-TO-HAVE: Add event logging
 
+#As per https://stackoverflow.com/questions/14277067/redirect-back-in-flask
+def redirect_url(default="/"):
+    return request.args.get("next") or \
+           request.referrer or \
+           url_for(default)
 
 @app.route("/")
 def index():
@@ -93,7 +99,6 @@ def billssummary():
                            amounts=json.dumps(MonthlyBillsamounts)
                            )
 
-#TODO: expendituressummary
 @app.route("/expendituressummary")
 def expendituressummary():
     ExpendituresSummarydata=db.session.query(TypeSummary.columns.Type, TypeSummary.columns.Amount).all()
@@ -161,21 +166,19 @@ def producttypes():
 #NICE-TO-HAVE: let user bulk delete records
 #TODO: Fix - it does not work
 #TODO: Secure - at least hash it
-@app.route("/delete/<string:table><int:entry_id>")
+@app.route("/delete/<string:table>/<int:entry_id>")
 def delete(table, entry_id):
-    #TODO: Generalize - use table variable
-
-    #entry = db.session.query(Incometable).get_or_404(entity=db.Model, ident=entry_id)
+    #TODO: Add record deletion confirmation screen
     try:
-        db.session.delete().where(Incometable.ID==entry_id)
+        db.session.query(tables[table]).filter_by(ID=entry_id).delete()
         db.session.commit()
         flash("Data removed", "success")
-    except:
-        #TODO: Handle exception
+    except Exception as error:
+        print(error)
         db.session.flush()
         flash("Data not removed", "error")
-    #TODO: Ask once again if user wants to delete record
-    return redirect(url_for("income"))
+    
+    return redirect(redirect_url())
 
 #TODO: Secure - at least hash it
 @app.route("/edit/<string:table><int:entry_id>")

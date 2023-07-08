@@ -15,6 +15,7 @@ from sqlalchemy.ext.automap import automap_base
 with app.app_context():
     Base = automap_base()
     Base.prepare(autoload_with=db.engine, reflect=True)
+    #Tables
     Income=Base.classes.Income
     Bills=Base.classes.Bills
     ProductTypes=Base.classes.ProductTypes
@@ -23,6 +24,7 @@ with app.app_context():
     #TODO: temporary table, can get rid of it if data added to this table is strictly verified
     Expenditures_transitory=Base.classes.Expenditures
 
+    #Views
     Expenditures_Enriched=Table("Expenditures_Enriched", db.metadata, autoload_with=db.engine)
     MonthlyBilance=Table("MonthlyBilance", db.metadata, autoload_with=db.engine)
     MonthlyBills=Table("MonthlyBills", db.metadata, autoload_with=db.engine)
@@ -33,4 +35,24 @@ with app.app_context():
     ProductSummary=Table("ProductSummary", db.metadata, autoload_with=db.engine)
     TypeSummary=Table("TypeSummary", db.metadata, autoload_with=db.engine)
     BillsSummary=Table("BillsSummary", db.metadata, autoload_with=db.engine)
-    
+
+#Map used to generalize functions - to refer to table by objectname alone
+tables={
+    "Income": Income,
+    "Bills" : Bills,
+    "ProductTypes": ProductTypes,
+    "Products" : Products,
+    "Expenditures" : Expenditures,
+    "Expenditures_transitory" : Expenditures_transitory,
+
+    "Expenditures_Enriched" : Expenditures_Enriched,
+    "MonthlyBilance" : MonthlyBilance,
+    "MonthlyBills" : MonthlyBills,
+    "MonthlyExpenditures" : MonthlyExpenditures,
+    "MonthlyIncome" : MonthlyIncome,
+    "Monthly_Expenditures_by_Type" : Monthly_Expenditures_by_Type,
+    "Monthly_common_products" : Monthly_common_products,
+    "ProductSummary" : ProductSummary,
+    "TypeSummary" : TypeSummary,
+    "BillsSummary" : BillsSummary
+}
