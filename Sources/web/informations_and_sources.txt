@@ -10,6 +10,7 @@ https://stackoverflow.com/questions/39955521/sqlalchemy-existing-database-query
 https://www.youtube.com/watch?v=UK57IHzSh8I
 https://stackoverflow.com/questions/31444036/runtimeerror-working-outside-of-application-context
 https://www.chartjs.org/
+https://getbootstrap.com/docs/4.0/
 
 TODO: Check materials
 https://www.youtube.com/watch?v=5aYpkLfkgRE

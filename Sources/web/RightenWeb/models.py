@@ -11,6 +11,7 @@ from sqlalchemy.ext.automap import automap_base
 #with app.app_context():
 #    Incometable=db.Table("Income",metadata=db.metadata,autoload=True, autoload_with=db.engine)
 
+#NICE-TO-HAVE: create factory function to recreate full schema as classes
 with app.app_context():
     Base = automap_base()
     Base.prepare(autoload_with=db.engine, reflect=True)

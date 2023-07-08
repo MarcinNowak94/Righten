@@ -1,7 +1,7 @@
 from RightenWeb import app
 from RightenWeb import db
 from flask import render_template, flash, redirect, url_for, get_flashed_messages
-from RightenWeb.models import Income, MonthlyIncome
+from RightenWeb.models import *
 from RightenWeb.forms import IncomeInputForm
 import json
 #NICE-TO-HAVE: Add event logging
@@ -37,8 +37,8 @@ def incomeadd():
         return redirect(url_for("incomeadd")) #So user can add another record
     return render_template("income_add.html", title="Add income", form=form)
 
-@app.route("/summary")
-def summary():
+@app.route("/incomesummary")
+def incomesummary():
     IncomeSummarydata=db.session.query(
         db.func.round(db.func.sum(Income.Amount),2),
         Income.Type
@@ -59,18 +59,70 @@ def summary():
         MonthlyIncomemonths.append(Month)
 
 
-    return render_template("summary.html",
-                           title="Summary",
+    return render_template("incomesummary.html",
+                           title="Income",
                            IncomeSummarydata=json.dumps(incometypesummary),
                            labels=json.dumps(incometypes), 
                            mimonths=json.dumps(MonthlyIncomemonths),
                            miamounts=json.dumps(MonthlyIncomeamounts)
                            )
 
+#TODO: billssummary
+@app.route("/billssummary")
+def billssummary():
+        return render_template("underconstruction.html",
+                           title="Bills"
+                           )
+
+#TODO: expendituressummary
+@app.route("/expendituressummary")
+def expendituressummary():
+        return render_template("underconstruction.html",
+                           title="Expenditures"
+                           )
+
+#TODO: productssummary
+@app.route("/productssummary")
+def productssummary():
+        return render_template("underconstruction.html",
+                           title="Products"
+                           )
+
+#TODO: producttypessummary
+@app.route("/producttypessummary")
+def producttypessummary():
+        return render_template("underconstruction.html",
+                           title="Product types"
+                           )
+
 @app.route("/income")
 def income():
     entries = db.session.query(Income).order_by(Income.DateTime.desc()).all()
     return render_template("income_table.html", title="Income", entries=entries)
+
+#TODO: bills
+@app.route("/bills")
+def bills():
+    entries = db.session.query(Bills).order_by(Bills.DateTime.desc()).all()
+    return render_template("underconstruction.html", title="Bills")
+
+#TODO: expenditures
+@app.route("/expenditures")
+def expenditures():
+    entries = db.session.query(Expenditures).order_by(Expenditures.DateTime.desc()).all()
+    return render_template("underconstruction.html", title="Expenditures")
+
+#TODO: products
+@app.route("/products")
+def products():
+    entries = db.session.query(Products).order_by(Products.DateTime.desc()).all()
+    return render_template("underconstruction.html", title="Products")
+
+#TODO: producttypes
+@app.route("/producttypes")
+def producttypes():
+    entries = db.session.query(ProductTypes).order_by(ProductTypes.DateTime.desc()).all()
+    return render_template("underconstruction.html", title="Product Types")
 
 #NICE-TO-HAVE: let user bulk delete records
 #TODO: Fix - it does not work
