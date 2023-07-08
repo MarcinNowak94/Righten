@@ -1,34 +1,18 @@
-"""from RightenWeb import db
-from sqlalchemy import Table
-from sqlalchemy.ext.declarative import declarative_base
+from RightenWeb import db
+from RightenWeb import app
+from sqlalchemy import Table, MetaData, create_engine
+from sqlalchemy.ext.automap import automap_base
 
-Base = declarative_base()
-CONN_STR = '///E:/Projects\Budgeter_personal\Finances.sqlite3'
-engine = create_engine(CONN_STR, echo=True)
-class MyClass(Base):
-    __table__ = Table('Income', Base.metadata,
-                    autoload=True, autoload_with=egine)
-    
-"""
-from sqlalchemy.sql import select
-from sqlalchemy import create_engine, MetaData, Table
+#TODO: Table reflection https://docs.sqlalchemy.org/en/20/tutorial/metadata.html#table-reflection
+# OR better
+#TODO: Automap https://www.youtube.com/watch?v=UK57IHzSh8I
 
-CONN_STR = '///E:/Projects\Budgeter_personal\Finances.sqlite3'
-engine = create_engine(CONN_STR, echo=True)
-metadata = MetaData()
-income = Table('Income', metadata, autoload=True,
-                           autoload_with=engine)
-cols = income.c
+#engine = create_engine(db, echo=True)
+#with app.app_context():
+#    Incometable=db.Table("Income",metadata=db.metadata,autoload=True, autoload_with=db.engine)
 
-
-with engine.connect() as conn:
-
-    query = (
-        select([cols.created_at, cols.name])
-                .order_by(cols.created_at)
-                .limit(1)
-    )
-    for row in conn.execute(query):
-        print(row)
-
-
+#TODO: Move it out
+with app.app_context():
+    Base = automap_base()
+    Base.prepare(autoload_with=db.engine, reflect=True)
+    Incometable=Base.classes.Income

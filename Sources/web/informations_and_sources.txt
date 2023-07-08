@@ -7,6 +7,8 @@ Sources used in creating this app:
 https://www.youtube.com/watch?v=3vfum74ggHE - framework reconeissance
 https://www.youtube.com/watch?v=JgF6vaDYxzU&list=PLU7aW4OZeUzwn6L1txXQ9viaAIR2mDqbv
 https://stackoverflow.com/questions/39955521/sqlalchemy-existing-database-query
+https://www.youtube.com/watch?v=UK57IHzSh8I
+https://stackoverflow.com/questions/31444036/runtimeerror-working-outside-of-application-context
 
 
 TODO: Check materials
