@@ -35,7 +35,7 @@ def incomeadd():
         #db.session.commit()
         flash("Data added", "success")
         return redirect(url_for("incomeadd")) #So user can add another record
-    return render_template("income_add.html", title="Add income", form=form)
+    return render_template("incomeadd.html", title="Add income", form=form)
 
 @app.route("/incomesummary")
 def incomesummary():
@@ -98,31 +98,27 @@ def producttypessummary():
 @app.route("/income")
 def income():
     entries = db.session.query(Income).order_by(Income.DateTime.desc()).all()
-    return render_template("income_table.html", title="Income", entries=entries)
+    return render_template("incometable.html", title="Income", entries=entries)
 
-#TODO: bills
 @app.route("/bills")
 def bills():
     entries = db.session.query(Bills).order_by(Bills.DateTime.desc()).all()
-    return render_template("underconstruction.html", title="Bills")
+    return render_template("billstable.html", title="Bills", entries=entries)
 
-#TODO: expenditures
 @app.route("/expenditures")
 def expenditures():
-    entries = db.session.query(Expenditures).order_by(Expenditures.DateTime.desc()).all()
-    return render_template("underconstruction.html", title="Expenditures")
+    entries = db.session.query(Expenditures_Enriched).order_by(Expenditures_Enriched.columns.DateTime.desc()).all()
+    return render_template("expenditurestable.html", title="Expenditures", entries=entries)
 
-#TODO: products
 @app.route("/products")
 def products():
-    entries = db.session.query(Products).order_by(Products.DateTime.desc()).all()
-    return render_template("underconstruction.html", title="Products")
+    entries = db.session.query(ProductSummary).all()
+    return render_template("productstable.html", title="Products", entries=entries)
 
-#TODO: producttypes
 @app.route("/producttypes")
 def producttypes():
-    entries = db.session.query(ProductTypes).order_by(ProductTypes.DateTime.desc()).all()
-    return render_template("underconstruction.html", title="Product Types")
+    entries = db.session.query(TypeSummary).all()
+    return render_template("producttypestable.html", title="Product Types", entries=entries)
 
 #NICE-TO-HAVE: let user bulk delete records
 #TODO: Fix - it does not work
