@@ -32,3 +32,5 @@ with app.app_context():
     Monthly_common_products=Table("Monthly_common_products", db.metadata, autoload_with=db.engine)
     ProductSummary=Table("ProductSummary", db.metadata, autoload_with=db.engine)
     TypeSummary=Table("TypeSummary", db.metadata, autoload_with=db.engine)
+    BillsSummary=Table("BillsSummary", db.metadata, autoload_with=db.engine)
+    

@@ -67,18 +67,56 @@ def incomesummary():
                            miamounts=json.dumps(MonthlyIncomeamounts)
                            )
 
-#TODO: billssummary
 @app.route("/billssummary")
 def billssummary():
-        return render_template("underconstruction.html",
-                           title="Bills"
+    BillsSummarydata=db.session.query(BillsSummary.columns.Medium, BillsSummary.columns.Amount).all()
+    #TODO: Change summary automate chart labels and values
+    billstypesummary=[]
+    billstypes=[]
+    for Medium, Amount in BillsSummarydata:
+        billstypesummary.append(Amount)
+        billstypes.append(Medium)
+
+    BillsOverTime=db.session.query(MonthlyBills).all()
+    MonthlyBillsmonths=[]
+    MonthlyBillsamounts=[]
+    for Month, Amount in BillsOverTime:
+        MonthlyBillsmonths.append(Month)
+        MonthlyBillsamounts.append(Amount)
+
+
+    return render_template("billssummary.html",
+                           title="Bills",
+                           data=json.dumps(billstypesummary),
+                           labels=json.dumps(billstypes), 
+                           months=json.dumps(MonthlyBillsmonths),
+                           amounts=json.dumps(MonthlyBillsamounts)
                            )
 
 #TODO: expendituressummary
 @app.route("/expendituressummary")
 def expendituressummary():
-        return render_template("underconstruction.html",
-                           title="Expenditures"
+    ExpendituresSummarydata=db.session.query(TypeSummary.columns.Type, TypeSummary.columns.Amount).all()
+    #TODO: Change summary automate chart labels and values
+    Expenditurestypesummary=[]
+    Expenditurestypes=[]
+    for Type, Amount in ExpendituresSummarydata:
+        Expenditurestypesummary.append(Amount)
+        Expenditurestypes.append(Type)
+
+    ExpendituresOverTime=db.session.query(MonthlyExpenditures).all()
+    MonthlyExpendituresmonths=[]
+    MonthlyExpendituresamounts=[]
+    for Month, Amount in ExpendituresOverTime:
+        MonthlyExpendituresmonths.append(Month)
+        MonthlyExpendituresamounts.append(Amount)
+
+    return render_template("expendituressummary.html",
+                           title="Expenditures",
+                           data=json.dumps(Expenditurestypesummary),
+                           labels=json.dumps(Expenditurestypes), 
+                           months=json.dumps(MonthlyExpendituresmonths),
+                           amounts=json.dumps(MonthlyExpendituresamounts)
                            )
 
 #TODO: productssummary
