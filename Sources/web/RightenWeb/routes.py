@@ -3,6 +3,7 @@ from RightenWeb import db
 from flask import render_template, flash, redirect, url_for, get_flashed_messages
 from RightenWeb.models import Incometable
 from RightenWeb.forms import IncomeInputForm
+import json
 #NICE-TO-HAVE: Add event logging
 
 
@@ -38,7 +39,23 @@ def incomeadd():
 
 @app.route("/summary")
 def summary():
-    return render_template("summary.html", title="Summary")
+    IncomeSummarydata=db.session.query(
+        db.func.sum(Incometable.Amount),
+        Incometable.Type
+        ).group_by(Incometable.Type)\
+         .order_by(Incometable.Type).all()
+    
+
+    incometypesummary=[]
+    incometypes=[]
+    for sum, type in IncomeSummarydata:
+        incometypesummary.append(sum)
+        incometypes.append(type)
+    return render_template("summary.html",
+                           IncomeSummarydata=json.dumps(incometypesummary),
+                           labels=json.dumps(incometypes), 
+                           title="Summary"
+                           )
 
 @app.route("/income")
 def income():
