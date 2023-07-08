@@ -1,7 +1,7 @@
 from RightenWeb import app
 from RightenWeb import db
 from flask import render_template, flash, redirect, url_for, get_flashed_messages
-from RightenWeb.models import Incometable, MonthlyIncome
+from RightenWeb.models import Income, MonthlyIncome
 from RightenWeb.forms import IncomeInputForm
 import json
 #NICE-TO-HAVE: Add event logging
@@ -40,10 +40,10 @@ def incomeadd():
 @app.route("/summary")
 def summary():
     IncomeSummarydata=db.session.query(
-        db.func.sum(Incometable.Amount),
-        Incometable.Type
-        ).group_by(Incometable.Type)\
-         .order_by(Incometable.Type).all()
+        db.func.round(db.func.sum(Income.Amount),2),
+        Income.Type
+        ).group_by(Income.Type)\
+         .order_by(Income.Type).all()
     #TODO: Change summary automate chart labels and values
     incometypesummary=[]
     incometypes=[]
@@ -69,7 +69,7 @@ def summary():
 
 @app.route("/income")
 def income():
-    entries = db.session.query(Incometable).order_by(Incometable.DateTime.desc()).all()
+    entries = db.session.query(Income).order_by(Income.DateTime.desc()).all()
     return render_template("income_table.html", title="Income", entries=entries)
 
 #NICE-TO-HAVE: let user bulk delete records
