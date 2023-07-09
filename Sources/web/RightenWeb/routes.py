@@ -4,8 +4,19 @@ from flask import render_template, flash, redirect, url_for, request
 from RightenWeb.models import *
 from RightenWeb.forms import IncomeInputForm
 from sqlalchemy import delete
+from datetime import date
 import json
 #NICE-TO-HAVE: Add event logging
+
+def addtodb(entry):
+    try:
+        db.session.add(entry)
+        db.session.commit()
+        flash("Data added", "success")
+    except Exception as error:
+        print(error)
+        db.session.flush()
+        flash("Data not added", "error")
 
 #As per https://stackoverflow.com/questions/14277067/redirect-back-in-flask
 def redirect_url(default="/"):
@@ -20,28 +31,6 @@ def index():
 @app.route("/layout")
 def layout():
     return render_template("layout.html")
-
-@app.route("/incomeadd", methods=["GET", "POST"])
-def incomeadd():
-    form = IncomeInputForm()
-    if form.validate_on_submit():
-        #https://youtu.be/JgF6vaDYxzU?t=1015
-        #TODO: Get ProductID, TypeID of product
-        #productID=form.product.data
-        #typeID=form.product.data
-        #entry = #IncomeRecord(datetime=form.datetime.data,
-        #                      amount=form.amount.data,
-            #                      source=form.source.data,
-        #                      type=form.type.data,
-        #                      comment=form.comment.data
-        # )
-        #db.session.add(entry)
-        #TODO: Add confirmation screen
-        #flash("do you really want to add record", "message")
-        #db.session.commit()
-        flash("Data added", "success")
-        return redirect(url_for("incomeadd")) #So user can add another record
-    return render_template("incomeadd.html", title="Add income", form=form)
 
 @app.route("/incomesummary")
 def incomesummary():
@@ -141,24 +130,16 @@ def producttypessummary():
 @app.route("/income", methods=["GET", "POST"])
 def income():
     form = IncomeInputForm()
-    entries = db.session.query(Income).order_by(Income.DateTime.desc()).all()
+    entries = db.session.query(Income).order_by(Income.DateTime.desc(),Income.ID.desc()).all()
     if form.validate_on_submit():
-        #https://youtu.be/JgF6vaDYxzU?t=1015
-        #TODO: Get ProductID, TypeID of product
-        #productID=form.product.data
-        #typeID=form.product.data
-        #entry = #IncomeRecord(datetime=form.datetime.data,
-        #                      amount=form.amount.data,
-            #                      source=form.source.data,
-        #                      type=form.type.data,
-        #                      comment=form.comment.data
-        # )
-        #db.session.add(entry)
-        #TODO: Add confirmation screen
-        #flash("do you really want to add record", "message")
-        #db.session.commit()
-        flash("Data added", "success")
-        return redirect(url_for("income")) #So user can add another record
+        entry = Income(DateTime=date.fromisoformat(form.datetime.data),
+                Amount=form.amount.data,
+                Type=form.type.data,
+                Source=form.source.data,
+                Comment=form.comment.data
+        )
+        addtodb(entry)
+        return redirect(redirect_url())
     return render_template("incometable.html", title="Income", entries=entries, form=form)
 
 @app.route("/bills")
