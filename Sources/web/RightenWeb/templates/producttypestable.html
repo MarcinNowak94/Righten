@@ -16,6 +16,7 @@ IDs are turned into readable data which they represent-->
                     <th scope="col">BoughtTimes</th>
                     <th scope="col">FirstBought</th>
                     <th scope="col">LastBought</th>
+                    <th scope="col">Priority</th>
                     <th scope="col">Common</th>
                     <th scope="col">Edit</th>
                     <th scope="col">Delete</th>
@@ -31,6 +32,7 @@ IDs are turned into readable data which they represent-->
                             <td>{{entry.BoughtTimes}}</td>
                             <td>{{entry.FirstBought}}</td>
                             <td>{{entry.FirstBought}}</td>
+                            <td>{{entry.Priority}}</td>
                             <td>{{entry.Common}}</td>
                             <td><a href="{{ url_for('edit', table='ProductTypes', entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm">Edit</a></td>
                             <td><a href="{{ url_for('delete', table='ProductTypes',entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm">Delete</a></td>

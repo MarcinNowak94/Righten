@@ -138,7 +138,7 @@ def producttypessummary():
                            title="Product types"
                            )
 
-@app.route("/income")
+@app.route("/income", methods=["GET", "POST"])
 def income():
     form = IncomeInputForm()
     entries = db.session.query(Income).order_by(Income.DateTime.desc()).all()
