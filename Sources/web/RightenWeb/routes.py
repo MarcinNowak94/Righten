@@ -5,6 +5,7 @@ from RightenWeb.models import *
 from RightenWeb.forms import *
 from sqlalchemy import delete
 from datetime import date
+from decimal import Decimal
 import json
 #NICE-TO-HAVE: Add event logging
 
@@ -220,14 +221,39 @@ def delete(table, entry_id):
     
     return redirect(redirect_url())
 
+
 #TODO: Secure - at least hash it
-@app.route("/edit/<string:table><int:entry_id>")
+@app.route("/edit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
 def edit(table, entry_id):
+    #TODO: this does not work, halting work for now
     #TODO: Generalize - use table variable
-    entry = db.get_or_404(entity=Income, ident=entry_id)
-    #TODO: Prepare edition panel
-    #db.session.delete(entry)
-    #db.session.commit()
-    #TODO: Ask once again if user wants to delete record
+    form = IncomeInputForm()
+    #Get edited entry from db
+    entry = db.get_or_404(entity=tables[table], ident=entry_id)
+    #Set default values for edition form 
+    if request.method == "POST" and form.validate_on_submit():
+        #FIXME: for some unknown reason form data is converted into tuples while saving into class fields, thus commits are failing
+        entry.DateTime=date.fromisoformat(form.datetime.data)
+        entry.Amount=form.amount.data.real #FIXME: (builtins.TypeError) float() argument must be a string or a real number, not 'tuple'
+        #FIXME: (sqlite3.InterfaceError) Error binding parameter 1 - probably unsupported type.
+        entry.Type=str(form.type.data),    #FIXME: Arbitrary string works, form data even converted into string does not
+        entry.Source=str(form.source.data),
+        entry.Comment=str(form.comment.data)
+
+        try:
+            db.session.commit()
+            flash("Data updated", "success")
+        except Exception as error:
+            print(error)
+            db.session.flush()
+            flash("Data not updated", "error")
+        return redirect(redirect_url())
+    else:
+        form.datetime.data=entry.DateTime.strftime("%Y-%m-%d")
+        form.amount.data=entry.Amount,
+        form.type.data=entry.Type,
+        form.source.data=entry.Source,
+        form.comment.data=entry.Comment
+    
     flash("Data editted", "success")
-    return redirect(url_for("income"))
+    return render_template("incomeedit.html", title="Incomeedit", form=form)
