@@ -2,7 +2,7 @@ from RightenWeb import app
 from RightenWeb import db
 from flask import render_template, flash, redirect, url_for, request
 from RightenWeb.models import *
-from RightenWeb.forms import IncomeInputForm
+from RightenWeb.forms import *
 from sqlalchemy import delete
 from datetime import date
 import json
@@ -142,25 +142,67 @@ def income():
         return redirect(redirect_url())
     return render_template("incometable.html", title="Income", entries=entries, form=form)
 
-@app.route("/bills")
+@app.route("/bills", methods=["GET", "POST"])
 def bills():
+    form = BillsInputForm()
     entries = db.session.query(Bills).order_by(Bills.DateTime.desc()).all()
-    return render_template("billstable.html", title="Bills", entries=entries)
+    if form.validate_on_submit():
+        entry = Bills(DateTime=date.fromisoformat(form.datetime.data),
+                Amount=form.amount.data,
+                Medium=form.medium.data,
+                Comment=form.comment.data
+        )
+        addtodb(entry)
+        return redirect(redirect_url())
+    
+    return render_template("billstable.html", title="Bills", entries=entries, form=form)
 
-@app.route("/expenditures")
+@app.route("/expenditures", methods=["GET", "POST"])
 def expenditures():
+    form = ExpenditureInputForm()
     entries = db.session.query(Expenditures_Enriched).order_by(Expenditures_Enriched.columns.DateTime.desc()).all()
-    return render_template("expenditurestable.html", title="Expenditures", entries=entries)
+    if form.validate_on_submit():
+        #TODO: GET ProductID, table[] usage is setup for generalization
+        entry = Expenditures(DateTime=date.fromisoformat(form.datetime.data),
+                Amount=form.amount.data,
+                ProductID=form.productID.data,
+                isCash=form.isCash.data,
+                Comment=form.comment.data
+        )
+        addtodb(entry)
+        return redirect(redirect_url())
+    return render_template("expenditurestable.html", title="Expenditures", entries=entries, form=form)
 
-@app.route("/products")
+@app.route("/products", methods=["GET", "POST"])
 def products():
+    form = ProductInputForm()
     entries = db.session.query(ProductSummary).all()
-    return render_template("productstable.html", title="Products", entries=entries)
+    if form.validate_on_submit():
+        #TODO: GET ProductID, table[] usage is setup for generalization
+        entry = Products(Product=form.product.data,
+                TypeID=form.typeID.data,
+                Comment=form.comment.data,
+                Priority=form.priority.data
+        )
+        addtodb(entry)
+        return redirect(redirect_url())
 
-@app.route("/producttypes")
+    return render_template("productstable.html", title="Products", entries=entries, form=form)
+
+@app.route("/producttypes", methods=["GET", "POST"])
 def producttypes():
+    form = ProductTypeInputForm()
     entries = db.session.query(TypeSummary).all()
-    return render_template("producttypestable.html", title="Product Types", entries=entries)
+    if form.validate_on_submit():
+        #TODO: GET ProductID, table[] usage is setup for generalization
+        entry = ProductTypes(Type=form.type.data,
+                Comment=form.comment.data,
+                Priority=form.priority.data
+        )
+        addtodb(entry)
+        return redirect(redirect_url())
+
+    return render_template("producttypestable.html", title="Product Types", entries=entries, form=form)
 
 #NICE-TO-HAVE: let user bulk delete records
 #TODO: Fix - it does not work
