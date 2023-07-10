@@ -11,11 +11,11 @@ https://www.youtube.com/watch?v=UK57IHzSh8I
 https://stackoverflow.com/questions/31444036/runtimeerror-working-outside-of-application-context
 https://www.chartjs.org/
 https://getbootstrap.com/docs/4.0/
+https://flask-wtf.readthedocs.io/en/1.0.x/
 
 TODO: Check materials
 https://www.youtube.com/watch?v=5aYpkLfkgRE
 https://realpython.com/getting-started-with-bootstrap-3/
-https://flask-wtf.readthedocs.io/en/1.0.x/
 https://github.com/Princekrampah/FlaskExpenseTracker/tree/master
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
 

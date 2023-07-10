@@ -26,7 +26,7 @@ class IncomeInputForm(CommonForm):
           sources.append(source[0])
 
     type = SelectField("Type", validators=[DataRequired()],
-                          choices=types
+                          choices=types,
                         )
     #NICE-TO-HAVE: display only sources viable for specified type
     source = SelectField("Source", validators=[DataRequired()],
