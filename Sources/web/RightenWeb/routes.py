@@ -19,7 +19,7 @@ def addtodb(entry):
         db.session.flush()
         flash("Data not added", "error")
 
-def createchartdataset(dbdata):
+def createchartdataset(dbdata, fill="false"):
     months=[]
     sets={}
 
@@ -35,8 +35,8 @@ def createchartdataset(dbdata):
                 sets[set].append({"x": Month, "y": 0})
             else:
                 sets[set].append({"x": Month, "y": Amount})
-    
-    chartline='{label: "LABEL_PLACEHOLDER", data: DATA_PLACEHOLDER}'
+
+    chartline='{label: "LABEL_PLACEHOLDER", data: DATA_PLACEHOLDER, fill:'+fill+'}'
     dataset=[]
     for set in sets:
         dataset.append({"label": set, "data": sets[set]})
@@ -104,28 +104,36 @@ def billssummary():
                            BillsTypesData=json.dumps(BillsTypesData)
                            )
 
+#TODO: Add product picker and corresponding graph
+#TODO: Add type picker and corresponding graph
+#TODO: Add pie chart by 'Necessary'
+#TODO: Organize displays by Amount descending
 @app.route("/expendituressummary")
 def expendituressummary():
     ExpendituresSummarydata=db.session.query(TypeSummary.columns.Type, TypeSummary.columns.Amount).all()
-    Expenditurestypesummary=[]
-    Expenditurestypes=[]
+    ExpendituresSummaryData=[]
+    ExpendituresSummaryTypes=[]
     for Type, Amount in ExpendituresSummarydata:
-        Expenditurestypesummary.append(Amount)
-        Expenditurestypes.append(Type)
+        ExpendituresSummaryData.append(Amount)
+        ExpendituresSummaryTypes.append(Type)
 
     ExpendituresOverTime=db.session.query(MonthlyExpenditures).all()
-    MonthlyExpendituresmonths=[]
-    MonthlyExpendituresamounts=[]
+    MonthlyExpendituresData=[]
     for Month, Amount in ExpendituresOverTime:
-        MonthlyExpendituresmonths.append(Month)
-        MonthlyExpendituresamounts.append(Amount)
+        MonthlyExpendituresData.append({"x":Month,"y":Amount})
+
+    TopTypeExpendituresData=db.session.query(Top10ProductTypesMonthly).all();
+    TopTypeExpenditures=createchartdataset(TopTypeExpendituresData, "true")
+
+    TopProductsChartData=db.session.query(Top10ProductsMonthly).all();
+    TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
 
     return render_template("expendituressummary.html",
-                           title="Expenditures",
-                           data=json.dumps(Expenditurestypesummary),
-                           labels=json.dumps(Expenditurestypes), 
-                           months=json.dumps(MonthlyExpendituresmonths),
-                           amounts=json.dumps(MonthlyExpendituresamounts)
+                           ExpendituresSummaryData=json.dumps(ExpendituresSummaryData),
+                           ExpendituresSummaryTypes=json.dumps(ExpendituresSummaryTypes), 
+                           MonthlyExpenditures=json.dumps(MonthlyExpendituresData),
+                           TopTypeExpenditures=json.dumps(TopTypeExpenditures),
+                           TopProductsExpenditures=json.dumps(TopProductsExpenditures)
                            )
 
 #TODO: productssummary

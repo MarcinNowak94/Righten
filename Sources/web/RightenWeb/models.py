@@ -36,6 +36,8 @@ with app.app_context():
     IncomeSummaryByType=Table("IncomeSummaryByType", db.metadata, autoload_with=db.engine)
     TotalIncomeByType=Table("TotalIncomeByType", db.metadata, autoload_with=db.engine)
     MonthlyBillsByMedium=Table("MonthlyBillsByMedium", db.metadata, autoload_with=db.engine)
+    Top10ProductTypesMonthly = Table("Top10ProductTypesMonthly", db.metadata, autoload_with=db.engine)
+    Top10ProductsMonthly = Table("Top10ProductsMonthly", db.metadata, autoload_with=db.engine)
 
 #Map used to generalize functions - to refer to table by objectname alone
 tables={
@@ -60,5 +62,7 @@ tables={
     "IncomeSummary" : IncomeSummary,
     "IncomeSummaryByType" : IncomeSummaryByType,
     "TotalIncomeByType" : TotalIncomeByType,
-    "MonthlyBillsByMedium" : MonthlyBillsByMedium
+    "MonthlyBillsByMedium" : MonthlyBillsByMedium,
+    "Top10ProductTypesMonthly" : Top10ProductTypesMonthly,
+    "Top10ProductsMonthly" : Top10ProductsMonthly
 }
