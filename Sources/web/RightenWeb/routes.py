@@ -8,6 +8,7 @@ from datetime import date
 import json
 #NICE-TO-HAVE: Add event logging
 
+
 def addtodb(entry):
     try:
         db.session.add(entry)
@@ -17,6 +18,30 @@ def addtodb(entry):
         print(error)
         db.session.flush()
         flash("Data not added", "error")
+
+def createchartdataset(dbdata):
+    months=[]
+    sets={}
+
+    #Build distinct month list for labels and type dictionaries for data 
+    for Month, Amount, Type in dbdata:
+        if Month not in months: months.append(Month)
+        if Type not in sets: sets[Type]=[]
+
+    #Fill type dictionaries with amount or 0 
+    for Month, Amount, Type in dbdata:
+        for set in sets:
+            if not Type==set:
+                sets[set].append({"x": Month, "y": 0})
+            else:
+                sets[set].append({"x": Month, "y": Amount})
+    
+    chartline='{label: "LABEL_PLACEHOLDER", data: DATA_PLACEHOLDER}'
+    dataset=[]
+    for set in sets:
+        dataset.append({"label": set, "data": sets[set]})
+
+    return dataset
 
 #As per https://stackoverflow.com/questions/14277067/redirect-back-in-flask
 def redirect_url(default="/"):
@@ -31,13 +56,6 @@ def index():
 @app.route("/layout")
 def layout():
     return render_template("layout.html")
-
-class ChartData():
-    def __init__(self,
-                    label,
-                    value):
-        self.label=label,
-        self.value=value
 
 @app.route("/incomesummary")
 def incomesummary():
@@ -54,26 +72,7 @@ def incomesummary():
         monthlyincomedata.append({"x": Month, "y": Amount})
 
     IncomeTypesByTime=db.session.query(MonthlyIncomeByType).all()
-    months=[]
-    incomes={}
-
-    #Build distinct month list for labels and type dictionaries for data 
-    for Month, Amount, Type in IncomeTypesByTime:
-        if Month not in months: months.append(Month)
-        if Type not in incomes: incomes[Type]=[]
-
-    #Fill type dictionaries with amount or 0 
-    for Month, Amount, Type in IncomeTypesByTime:
-        for itype in incomes:
-            if not Type==itype:
-                incomes[itype].append({"x": Month, "y": 0})
-            else:
-                incomes[itype].append({"x": Month, "y": Amount})
-    
-    chartline='{label: "LABEL_PLACEHOLDER", data: DATA_PLACEHOLDER}'
-    IncomeTypesByTimeDataset=[]
-    for itype in incomes:
-        IncomeTypesByTimeDataset.append({"label": itype, "data": incomes[itype]})
+    IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
 
     return render_template("incomesummary.html",
                            title="Income",
@@ -85,28 +84,24 @@ def incomesummary():
 
 @app.route("/billssummary")
 def billssummary():
-    BillsSummarydata=db.session.query(BillsSummary.columns.Medium, BillsSummary.columns.Amount).all()
-    #TODO: Change summary automate chart labels and values
-    billstypesummary=[]
-    billstypes=[]
-    for Medium, Amount in BillsSummarydata:
-        billstypesummary.append(Amount)
-        billstypes.append(Medium)
+    BillsTypeAmounts=[]
+    BillsTypes=[]
+    for Medium, Amount in db.session.query(BillsSummary.columns.Medium, BillsSummary.columns.Amount).all():
+        BillsTypeAmounts.append(Amount)
+        BillsTypes.append(Medium)
 
-    BillsOverTime=db.session.query(MonthlyBills).all()
-    MonthlyBillsmonths=[]
-    MonthlyBillsamounts=[]
-    for Month, Amount in BillsOverTime:
-        MonthlyBillsmonths.append(Month)
-        MonthlyBillsamounts.append(Amount)
-
+    MonthlyBillsData=[]
+    for Month, Amount in db.session.query(MonthlyBills).all():
+        MonthlyBillsData.append({"x": Month, "y":Amount})
+    
+    BillsTypespermonth=db.session.query(MonthlyBillsByMedium).all();
+    BillsTypesData=createchartdataset(BillsTypespermonth)
 
     return render_template("billssummary.html",
-                           title="Bills",
-                           data=json.dumps(billstypesummary),
-                           labels=json.dumps(billstypes), 
-                           months=json.dumps(MonthlyBillsmonths),
-                           amounts=json.dumps(MonthlyBillsamounts)
+                           BillsTypeAmounts=json.dumps(BillsTypeAmounts),
+                           BillsTypes=json.dumps(BillsTypes), 
+                           MonthlyBillsData=json.dumps(MonthlyBillsData),
+                           BillsTypesData=json.dumps(BillsTypesData)
                            )
 
 @app.route("/expendituressummary")

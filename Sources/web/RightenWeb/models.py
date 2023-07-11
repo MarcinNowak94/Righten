@@ -7,10 +7,6 @@ from sqlalchemy.ext.automap import automap_base
 # OR better
 #TODO: Automap https://www.youtube.com/watch?v=UK57IHzSh8I
 
-#engine = create_engine(db, echo=True)
-#with app.app_context():
-#    Incometable=db.Table("Income",metadata=db.metadata,autoload=True, autoload_with=db.engine)
-
 #NICE-TO-HAVE: create factory function to recreate full schema as classes
 with app.app_context():
     Base = automap_base()
@@ -35,12 +31,12 @@ with app.app_context():
     ProductSummary=Table("ProductSummary", db.metadata, autoload_with=db.engine)
     TypeSummary=Table("TypeSummary", db.metadata, autoload_with=db.engine)
     BillsSummary=Table("BillsSummary", db.metadata, autoload_with=db.engine)
-
     MonthlyIncomeByType=Table("MonthlyIncomeByType", db.metadata, autoload_with=db.engine)
     IncomeSummary=Table("IncomeSummary", db.metadata, autoload_with=db.engine)
     IncomeSummaryByType=Table("IncomeSummaryByType", db.metadata, autoload_with=db.engine)
     TotalIncomeByType=Table("TotalIncomeByType", db.metadata, autoload_with=db.engine)
-    
+    MonthlyBillsByMedium=Table("MonthlyBillsByMedium", db.metadata, autoload_with=db.engine)
+
 #Map used to generalize functions - to refer to table by objectname alone
 tables={
     "Income": Income,
@@ -60,9 +56,9 @@ tables={
     "ProductSummary" : ProductSummary,
     "TypeSummary" : TypeSummary,
     "BillsSummary" : BillsSummary,
-
     "MonthlyIncomeByType" : MonthlyIncomeByType,
     "IncomeSummary" : IncomeSummary,
     "IncomeSummaryByType" : IncomeSummaryByType,
-    "TotalIncomeByType" : TotalIncomeByType
+    "TotalIncomeByType" : TotalIncomeByType,
+    "MonthlyBillsByMedium" : MonthlyBillsByMedium
 }
