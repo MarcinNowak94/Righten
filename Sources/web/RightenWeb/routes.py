@@ -5,7 +5,6 @@ from RightenWeb.models import *
 from RightenWeb.forms import *
 from sqlalchemy import delete
 from datetime import date
-from decimal import Decimal
 import json
 #NICE-TO-HAVE: Add event logging
 
@@ -33,14 +32,16 @@ def index():
 def layout():
     return render_template("layout.html")
 
+class ChartData():
+    def __init__(self,
+                    label,
+                    value):
+        self.label=label,
+        self.value=value
+
 @app.route("/incomesummary")
 def incomesummary():
-    IncomeSummarydata=db.session.query(
-        db.func.round(db.func.sum(Income.Amount),2),
-        Income.Type
-        ).group_by(Income.Type)\
-         .order_by(Income.Type).all()
-    #TODO: Change summary automate chart labels and values
+    IncomeSummarydata=db.session.query(TotalIncomeByType).all()
     incometypesummary=[]
     incometypes=[]
     for sum, type in IncomeSummarydata:
@@ -48,19 +49,17 @@ def incomesummary():
         incometypes.append(type)
 
     IncomeOverTime=db.session.query(MonthlyIncome).all()
-    MonthlyIncomemonths=[]
-    MonthlyIncomeamounts=[]
+    monthlyincomedata=[]
     for Month, Amount in IncomeOverTime:
-        MonthlyIncomeamounts.append(Amount)
-        MonthlyIncomemonths.append(Month)
+        monthlyincomedata.append({"x": Month, "y": Amount})
 
+    InvomeTypesByTime=db.session.query(MonthlyIncomeByType).all()
 
     return render_template("incomesummary.html",
                            title="Income",
                            IncomeSummarydata=json.dumps(incometypesummary),
-                           labels=json.dumps(incometypes), 
-                           mimonths=json.dumps(MonthlyIncomemonths),
-                           miamounts=json.dumps(MonthlyIncomeamounts)
+                           IncomeSummarylabels=json.dumps(incometypes),
+                           MonthlyIncome=json.dumps(monthlyincomedata)
                            )
 
 @app.route("/billssummary")
@@ -92,7 +91,6 @@ def billssummary():
 @app.route("/expendituressummary")
 def expendituressummary():
     ExpendituresSummarydata=db.session.query(TypeSummary.columns.Type, TypeSummary.columns.Amount).all()
-    #TODO: Change summary automate chart labels and values
     Expenditurestypesummary=[]
     Expenditurestypes=[]
     for Type, Amount in ExpendituresSummarydata:

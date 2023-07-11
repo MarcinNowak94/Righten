@@ -1,6 +1,6 @@
 from RightenWeb import db
 from RightenWeb import app
-from sqlalchemy import Table, MetaData, create_engine
+from sqlalchemy import Table
 from sqlalchemy.ext.automap import automap_base
 
 #TODO: Table reflection https://docs.sqlalchemy.org/en/20/tutorial/metadata.html#table-reflection
@@ -36,6 +36,11 @@ with app.app_context():
     TypeSummary=Table("TypeSummary", db.metadata, autoload_with=db.engine)
     BillsSummary=Table("BillsSummary", db.metadata, autoload_with=db.engine)
 
+    MonthlyIncomeByType=Table("MonthlyIncomeByType", db.metadata, autoload_with=db.engine)
+    IncomeSummary=Table("IncomeSummary", db.metadata, autoload_with=db.engine)
+    IncomeSummaryByType=Table("IncomeSummaryByType", db.metadata, autoload_with=db.engine)
+    TotalIncomeByType=Table("TotalIncomeByType", db.metadata, autoload_with=db.engine)
+    
 #Map used to generalize functions - to refer to table by objectname alone
 tables={
     "Income": Income,
@@ -54,5 +59,10 @@ tables={
     "Monthly_common_products" : Monthly_common_products,
     "ProductSummary" : ProductSummary,
     "TypeSummary" : TypeSummary,
-    "BillsSummary" : BillsSummary
+    "BillsSummary" : BillsSummary,
+
+    "MonthlyIncomeByType" : MonthlyIncomeByType,
+    "IncomeSummary" : IncomeSummary,
+    "IncomeSummaryByType" : IncomeSummaryByType,
+    "TotalIncomeByType" : TotalIncomeByType
 }
