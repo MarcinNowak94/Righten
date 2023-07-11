@@ -53,13 +53,34 @@ def incomesummary():
     for Month, Amount in IncomeOverTime:
         monthlyincomedata.append({"x": Month, "y": Amount})
 
-    InvomeTypesByTime=db.session.query(MonthlyIncomeByType).all()
+    IncomeTypesByTime=db.session.query(MonthlyIncomeByType).all()
+    months=[]
+    incomes={}
+
+    #Build distinct month list for labels and type dictionaries for data 
+    for Month, Amount, Type in IncomeTypesByTime:
+        if Month not in months: months.append(Month)
+        if Type not in incomes: incomes[Type]=[]
+
+    #Fill type dictionaries with amount or 0 
+    for Month, Amount, Type in IncomeTypesByTime:
+        for itype in incomes:
+            if not Type==itype:
+                incomes[itype].append({"x": Month, "y": 0})
+            else:
+                incomes[itype].append({"x": Month, "y": Amount})
+    
+    chartline='{label: "LABEL_PLACEHOLDER", data: DATA_PLACEHOLDER}'
+    IncomeTypesByTimeDataset=[]
+    for itype in incomes:
+        IncomeTypesByTimeDataset.append({"label": itype, "data": incomes[itype]})
 
     return render_template("incomesummary.html",
                            title="Income",
                            IncomeSummarydata=json.dumps(incometypesummary),
                            IncomeSummarylabels=json.dumps(incometypes),
-                           MonthlyIncome=json.dumps(monthlyincomedata)
+                           MonthlyIncome=json.dumps(monthlyincomedata),
+                           IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset)
                            )
 
 @app.route("/billssummary")
