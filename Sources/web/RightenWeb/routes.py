@@ -3,7 +3,7 @@ from RightenWeb import db
 from flask import render_template, flash, redirect, url_for, request
 from RightenWeb.models import *
 from RightenWeb.forms import *
-from sqlalchemy import delete
+from sqlalchemy import delete, union_all, func
 from datetime import date
 import json
 #NICE-TO-HAVE: Add event logging
@@ -36,10 +36,9 @@ def createchartdataset(dbdata, fill="false"):
             else:
                 sets[set].append({"x": Month, "y": Amount})
 
-    chartline='{label: "LABEL_PLACEHOLDER", data: DATA_PLACEHOLDER, fill:'+fill+'}'
     dataset=[]
     for set in sets:
-        dataset.append({"label": set, "data": sets[set]})
+        dataset.append({"label": set, "data": sets[set], "fill": fill})
 
     return dataset
 
@@ -86,7 +85,10 @@ def incomesummary():
 def billssummary():
     BillsTypeAmounts=[]
     BillsTypes=[]
-    for Medium, Amount in db.session.query(BillsSummary.columns.Medium, BillsSummary.columns.Amount).all():
+    for Medium, Amount in db.session.query(BillsSummary.columns.Medium,
+                                           BillsSummary.columns.Amount)\
+                                            .order_by(BillsSummary.columns.Amount.desc())\
+                                                .all():
         BillsTypeAmounts.append(Amount)
         BillsTypes.append(Medium)
 
@@ -98,6 +100,7 @@ def billssummary():
     BillsTypesData=createchartdataset(BillsTypespermonth)
 
     return render_template("billssummary.html",
+                           title="Bills",
                            BillsTypeAmounts=json.dumps(BillsTypeAmounts),
                            BillsTypes=json.dumps(BillsTypes), 
                            MonthlyBillsData=json.dumps(MonthlyBillsData),
@@ -110,7 +113,9 @@ def billssummary():
 #TODO: Organize displays by Amount descending
 @app.route("/expendituressummary")
 def expendituressummary():
-    ExpendituresSummarydata=db.session.query(TypeSummary.columns.Type, TypeSummary.columns.Amount).all()
+    ExpendituresSummarydata=db.session.query(TypeSummary.columns.Type,
+                                             TypeSummary.columns.Amount)\
+                                                .order_by(TypeSummary.columns.Amount.desc()).all()
     ExpendituresSummaryData=[]
     ExpendituresSummaryTypes=[]
     for Type, Amount in ExpendituresSummarydata:
@@ -129,11 +134,56 @@ def expendituressummary():
     TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
 
     return render_template("expendituressummary.html",
+                           title="Expenditures",
                            ExpendituresSummaryData=json.dumps(ExpendituresSummaryData),
                            ExpendituresSummaryTypes=json.dumps(ExpendituresSummaryTypes), 
                            MonthlyExpenditures=json.dumps(MonthlyExpendituresData),
                            TopTypeExpenditures=json.dumps(TopTypeExpenditures),
                            TopProductsExpenditures=json.dumps(TopProductsExpenditures)
+                           )
+
+#TODO: Financial posture
+@app.route("/finances")
+def finances():
+    BilanceData=db.session.query(MonthlyBilanceSingle).all();
+    Bilance=[]
+    Breakeven=[]
+    BilanceSet=[]
+    #Adding breakeven line 
+    for Month, Amount in BilanceData:
+        Bilance.append({"x":Month,"y":Amount})
+        Breakeven.append({"x":Month,"y":0})
+
+    sets={"Bilance":Bilance, "Breakeven":Breakeven}
+    for set in sets:
+        BilanceSet.append({"label": set, "data": sets[set]})
+    
+    BilanceSources=db.session.query(MonthlyBilance).all()
+    BilanceSourcesData=createchartdataset(BilanceSources, "true")
+
+    BilanceTotal=db.session.query(MonthlyBilance.columns.Source,
+                                  db.func.round(db.func.sum(MonthlyBilance.columns.Amount)))\
+                                    .group_by(MonthlyBilance.columns.Source).all()
+    
+    #Calculate net income
+    NetIncome=0
+    Total=0
+    for Source, Amount in BilanceTotal:
+        NetIncome=NetIncome+Amount
+        Total=Total+abs(Amount)
+    BilanceTotalLabels=[]
+    BilanceTotalValues=[]
+    for Source, Amount in BilanceTotal:
+        BilanceTotalLabels.append(Source+' '+str(round((abs(Amount)/Total)*100,2))+'%')
+        BilanceTotalValues.append(Amount)
+
+    return render_template("financialposture.html",
+                           title="Finances",
+                           BilanceTotalLabels=json.dumps(BilanceTotalLabels),
+                           BilanceTotalValues=json.dumps(BilanceTotalValues),
+                           NetIncome=NetIncome,
+                           BilanceSourcesData=json.dumps(BilanceSourcesData),
+                           BilanceData=json.dumps(BilanceSet)
                            )
 
 #TODO: productssummary

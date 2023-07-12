@@ -47,7 +47,7 @@ class ExpenditureInputForm(CommonForm):
       productsquery=db.session.query(
           ProductSummary.columns.ID, 
           ProductSummary.columns.Product).\
-            order_by(ProductSummary.columns.BoughtTimes.desc()).all()
+            order_by(ProductSummary.columns.Times.desc()).all()
       products=[]
       for ID, product in productsquery:
           products.append((int(ID), str(product)))
@@ -69,7 +69,7 @@ class ProductInputForm(FlaskForm):
       typesquery=db.session.query(
           TypeSummary.columns.ID, 
           TypeSummary.columns.Type).\
-            order_by(TypeSummary.columns.BoughtTimes.desc()).all()
+            order_by(TypeSummary.columns.Times.desc()).all()
       types=[]
       for ID, type in typesquery:
           types.append((int(ID), str(type)))
