@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.umd.js" integrity="sha512-CMF3tQtjOoOJoOKlsS7/2loJlkyctwzSoDK/S40iAB+MqWSaf50uObGQSk5Ny/gfRhRCjNLvoxuCvdnERU4WGg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!--jinja2 syntax-->
     {% if title %}
-        <title>Righten - {{ title}}</title>
+        <title>Righten - {{ title }}</title>
     {% else %}
         <title>Righten WEB</title>
     {% endif %}
@@ -47,6 +47,7 @@
                                   Summaries
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="summaries">
+                                    <a class="dropdown-item" href="{{ url_for('finances')}}">Finances</a>
                                     <a class="dropdown-item" href="{{ url_for('incomesummary')}}">Income</a>
                                     <a class="dropdown-item" href="{{ url_for('billssummary')}}">Bills</a>
                                     <a class="dropdown-item" href="{{ url_for('expendituressummary')}}">Expenditures</a>
