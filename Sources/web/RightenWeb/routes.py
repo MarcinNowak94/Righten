@@ -293,6 +293,26 @@ def delete(table, entry_id):
     
     return redirect(redirect_url())
 
+@app.route("/manbasic", methods=["GET"])
+def manbasic():
+    return render_template("manbasic.html", title="Basics")
+
+@app.route("/mandata", methods=["GET"])
+def mandata():
+    return render_template("underconstruction.html", title="Basics")
+
+@app.route("/manvisual", methods=["GET"])
+def manvisual():
+    return render_template("underconstruction.html", title="Basics")
+
+@app.route("/manaction", methods=["GET"])
+def manaction():
+    return render_template("underconstruction.html", title="Basics")
+
+@app.route("/manQnA", methods=["GET"])
+def manQnA():
+    return render_template("underconstruction.html", title="Basics")
+
 
 #TODO: Secure - at least hash it
 @app.route("/edit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
