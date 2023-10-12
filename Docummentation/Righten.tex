@@ -5,7 +5,7 @@
 % - https://www.overleaf.com/learn/latex/Code_listing#Code_styles_and_colours
 
 %--------------------------------------------------------------------------------
-%-----------------------------------   TODO   ----------------------------------
+%-----------------------------------   #TODO   ----------------------------------
 %--------------------------------------------------------------------------------
 % add section about icon source https://www.iconpacks.net/free-icon/money-bag-6384.html
 
@@ -196,8 +196,7 @@
 	\end{center}
 \end{titlepage}
 
-%TODO: fix, this moves formatting 
-\null\newpage %TODO: fix, this moves formatting \addtocounter{page}{-1}
+\null\newpage % #TODO: fix, this moves formatting \addtocounter{page}{-1}
 
 % [REQUIREMENT] 2. Spis treści
 \renewcommand*\contentsname{Spis treści}
@@ -209,7 +208,6 @@
 % 3.1. Wstęp <-[Wprowadzenie do tematyki projektu, Zamierzony cel projektu]
 %http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/wstep/
 
-% [REQUIREMENT] 3. Wprowadzenie do tematyki projektu
 \chapter{\customstylechapter{Wstęp}}
 {Finanse są dziedziną nauki ekonomicznej któa zajmuje się rozporządzaniem 
 pieniędzmi \cite{wiki_ekonomia}. Nauka ta w podobnym zakresie a różnej skali 
@@ -219,27 +217,33 @@ każdym zakresie w którym można ją zagłębić. Wiedza z zakresu finansów st
 szczególnie przydatna gdy na rynku panuje trudna sytuacja ekonomiczna, w takich 
 warunkach nierzadko decyduje ona o jakości oraz stanie życia poszczególnych 
 osób fizycznych, rentowności przedsiębiorstw czy stabilności państw. W przypadku
- państw i firma przeważnie budżetem zarządzają dedykowane osoby lub też całe 
+ państw i firm przeważnie budżetem zarządzają dedykowane osoby lub też całe 
 zespoły, posiadające ekspercką wiedzę w tej dziedzinie. Jednak osoby 
 zarządzające budżetem domowym najczęściej dysponują wyłacznie nabytym 
-doświadczeniem, rzadko jeśi wogóle wspomagając się jakimikolwiek narzędziami 
-które ułatwiałyby to zadanie.}
-%
-% [REQUIREMENT] 4. Zamierzony cel projektu
-{Celem projektu jest zaprojektowanie i realizacja modułu analitycznego aplikacji 
-która ułatwi zarządzanie budżetem domowym dostarczając użytkownikowi narzędzia 
-do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
-kategoryzujące wpływy i wydatki. Będzie to aplikacja przeglądarkowa napisana w 
-języku Python z wykorzystaniem biblioteki PySimpleGUI\cite{PySimpleGUI}.}
+doświadczeniem i na ogół stosują podejście intuicyjne, rzadko jeśli wogóle 
+wspomagając się jakimikolwiek narzędziami które ułatwiałyby to zadanie. Wiele 
+osób sposzukuje pożytecznych treści o tematyce finansowej w Internecie, jednakże 
+rozpoczynając zaznajamianie się z tematyką mogą mieć spore trudność z 
+odnalezieniem treści dobrej jakości w natłoku materiałów błędnych, słabych 
+merytorycznie, niekatualnych czy też nastawionych na marketing ponad poprawność 
+oraz przystępnością treści źródeł dobrej jakości.}
 
+{Celem pracy jest zaprojektowanie i realizacja modułu analitycznego aplikacji 
+która ułatwi jej użytkownikom zarządzanie budżetem domowym dostarczając 
+narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
+kategoryzujące wpływy i wydatki. Będzie to aplikacja przeglądarkowa napisana w 
+języku Python, wykorzystująca frameworki: frontend Bootstrap\cite{Bootstrap}, 
+Flask\cite{Flask}, WTForms\cite{WTForms}, silnik szablonów jinja\cite{jinja}, 
+oraz bibliotekę chart.js\cite{chart.js} do generowania wizualizacji.}
+
+
+% #TODO: Uzupełniać w trakcie "Streszczenie zawartości kolejnych rozdziałów (...) Ten fragment to zakres pracy."
 {Rozdział drugi zawiera rozwinięcie charakterystyki i motywacji problemu krótko 
-zaznaczonej we wstępie pracy. Rozdział trzeci Analiza istniejących rozwiązań. }
+zaznaczonej we wstępie pracy. Rozdział trzeci Analiza istniejących rozwiązań.}
 
 % 3.2. Charakterystyka/analiza problemu
 %http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/charakterystykaanaliza-problemu/
 \chapter{\customstylechapter{Charakterystyka i analiza problemu}}
-
-
 
 {Docelowymi odbiorcami aplikacji są użytkownicy domowi, możliwe że w miarę 
 rozwoju w późniejszych fazach projektu także średnie lub małe przedsiębiorstwa. 
@@ -295,7 +299,7 @@ programistycznego (API). Założono że na tym etapie interfejs aplikacji będzi
 
 % [REQUIREMENT] 6. Założone ograniczenia (ramy czasowe, umiejętności) 
 % i możliwość ewaluacji projektu
-%[TODO] Shorten title to FIX overspill in table of contents 
+%[#TODO] Shorten title to FIX overspill in table of contents 
 \chapter{\customstylechapter{Założone ograniczenia i możliwości ewaluacji projektu}}
 {W miarę możliwości standard danych w aplikacji dopasowany zostanie do wiodącego
  globalnego standardu danych w obrębie tej samej tematyki. Typy obiektów będzie
@@ -336,7 +340,7 @@ priorytetu posłuży metoda MoSCoW \cite{MOSCOW} lub Matryca Eisenhowera
         \item Założenia wstępne
         \item Spis wymagań każdego typu
         \item Przegląd rynku pod kątem dostępnych rozwiązań
-        \item Określenie metodologii pracy
+        \item Określenie me#TODOlogii pracy
         \item Dokumentacja modelowania
         \item Dokumentacja uruchomieniowa projektu
         \item Przeprowadzone testy
@@ -402,7 +406,7 @@ z nich zostały spełnione. Nagłówki z powodu objętości zostały skrócone, 
 
 {IMPL - Oznaczenie czy funkcję wdrożono}
 
-%[TODO]: try tabularray as suggested
+%[#TODO]: try tabularray as suggested
 % Wrapping as per: https://stackoverflow.com/questions/790932/how-to-wrap-text-in-latex-tables
 \begin{table}[h]
     \footnotesize
@@ -606,7 +610,7 @@ W fazie prototypu zostaną wdrożone wszystkie funkcje wymagane (M),
 natomiast wdrożenie wszelkich pozostałych kategorii zostanie rozpatrzone w fazie
  rozwoju aplikacji. Plan uwzględnia także cykliczne przeglądy priorytetów aby 
  lepiej dopasować aplikację do potrzeb użytkowników i kierunku rozwoju projektu.
- Zadania rozpisane zostaną w metodologii kanban \cite{Kanban}. Zgodnie z 
+ Zadania rozpisane zostaną w me#TODOlogii kanban \cite{Kanban}. Zgodnie z 
 zasadami LEAN \cite{LEAN} w każdej iteracji kod będzie dodatkowo refaktoryzowany
  i upraszczany, jeśli zajdzie taka potrzeba i uprości to interfejsy funkcji i 
 zwiększy czytelność dane zostaną także zebrane w dedykowane klasy.}
@@ -683,7 +687,7 @@ powinno ograniczyć nakład pracy wymagany do wdrożenia dodatkowych funkcji.}
 %-----------------------------TABLES--------------------------------------------
 %ADD: Account_data
 
-%[TODO]: Fix - some table span the end of page 
+%[#TODO]: Fix - some table span the end of page 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[ caption={Tabela ProductTypes},
                     language=SQL,
@@ -704,7 +708,7 @@ CREATE TABLE [ProductTypes] (
 {Tabela ProductTypes zawiera typy produktów zdefiniowane przez użytkownika.}
 \end{minipage}
 
-%[TODO] Make function accept 2nd parameter and display caption
+%[#TODO] Make function accept 2nd parameter and display caption
 %{Tabela ProductTypes zawiera typy produktów zdefiniowane przez użytkownika.}
 %\begin{SQLlisting}[{Tabela ProductTypes (v2)}]
 %    CREATE TABLE [ProductTypes] (
@@ -835,7 +839,7 @@ Expenditures\_transitory.}
 
 
 %------------------------------VIEWS--------------------------------------------
-%[TODO]: Add Ledger_comparison, MonthlyCharge
+%[#TODO]: Add Ledger_comparison, MonthlyCharge
 
 \begin{figure}[H]           %requires float package
     \caption{Klasy warstwy bazy danych - widoki}
@@ -1079,11 +1083,11 @@ SELECT *
 FROM [Expenditures_Enriched]
 WHERE [Product] IN (NULL,
                     'UNKNOWN')
-    OR [Comment] LIKE '%[TODO]%';
+    OR [Comment] LIKE '%[#TODO]%';
 \end{lstlisting}
 {Widok Products\_to\_fix zawiera dane wprowadzone przez użytkownika poprawnie i 
 oznaczone jako dane do uzupełnienia specjalnymi etykietami - wartością w polu 
-PRODUCT=UNKNOWN lub [TODO] w komentarzu.}
+PRODUCT=UNKNOWN lub [#TODO] w komentarzu.}
 \end{minipage}
 
 \begin{minipage}{\textwidth}
@@ -1339,7 +1343,7 @@ rejestrowania zdarzenia w logu aplikacji.}
 utworzono z wykorzystaniem biblioteki PySimpleGUI \cite{PySimpleGUI}. Dzięki 
 temu interfejs definiowany jest w postaci kolekcji jak listy, lub listy list, 
 obiektów klas zawartych w bibliotece - jako przykład przedstawiono opcje listy 
-rozwijanej na poniższym listingu. %TODO: Figure out how to reference listings \ref{Dropdown}. 
+rozwijanej na poniższym listingu. %#TODO: Figure out how to reference listings \ref{Dropdown}. 
 Aby zapewnić responsywność interfejs budowany jest w kilku etapach, a cała 
 budowa wydzielona do specjalnych funkcji generujących wywoływanych później 
 zależnie od potrzeb. Funkcje opisane są w dalszej części w sekcji 
@@ -1384,10 +1388,10 @@ zależnie od potrzeb. Funkcje opisane są w dalszej części w sekcji
 \end{minipage}
 
 {Interfejs przedstawiono poglądowo na poniższyczh grafikach.}
-%{Jego iteracyjny rozwój zaprezentowano na przykładzie zakładki Visualizations.} %TODO: optional
+%{Jego iteracyjny rozwój zaprezentowano na przykładzie zakładki Visualizations.} %#TODO: optional
 \begin{figure}[H]           %requires float package
     \caption{Wizualizacja danych}
-    \label{fig:Wizualizacja_danych}    %TODO: fix duplicate name
+    \label{fig:Wizualizacja_danych}    %#TODO: fix duplicate name
     \centering  
     \includegraphics[width=12cm]{figures/Interface_Visualizations_v0.3.png}
 \end{figure}
@@ -1408,7 +1412,7 @@ zależnie od potrzeb. Funkcje opisane są w dalszej części w sekcji
 
 \begin{figure}[H]           %requires float package
     \caption{Dodawanie rekordu}
-    \label{fig:Dodawanie_rekordu}   %TODO: fix duplicate name
+    \label{fig:Dodawanie_rekordu}   %#TODO: fix duplicate name
     \centering  
     \includegraphics[width=12cm]{figures/Interface_Browse_AddRecord_v0.3.png}
 \end{figure}
@@ -1543,7 +1547,7 @@ ekranie.}
 obsługi tabel bazy projektu, dlatego zwracany obiekt jest krotką - pierwsza 
 linia pliku traktowana jest jako nagłówek, pozostała zawartość jako dane.}
 
-%TODO: Edit in case if implemented before deadline
+%#TODO: Edit in case if implemented before deadline
 \medskip
 {Funkcja \inlinecode{EditCell(window, key, row, col, edition)} jest funkcją 
 dodatkową wyykraczającą poza ramy podstawowego prototypu aplikacji. Pozwala 
@@ -1623,7 +1627,7 @@ opisanych w sekcji \nameref{Metody projektu}, w opisie funkcji
 \inlinecode{EditCell}, w projekcie wykorzystano kod rozwiązania dostępny 
 publicznie \cite{EdittableTable}.}
 
-%TODO: Describe installation - finish application > PyInstaller > package and try to use it
+%#TODO: Describe installation - finish application > PyInstaller > package and try to use it
 % [REQUIREMENT] 15. Przebieg uruchamiania projektu (być może na różnych 
 % platformach, konfiguracjach...)
 \chapter{\customstylechapter{Przebieg uruchamiania projektu}}
@@ -1646,7 +1650,7 @@ Otwórz w terminalu. W terminalu wydanie polecenia
 uruchamiające aplikację podając w pełni kwalifikowaną nazwę pliku Righten.py z 
 dowolnego miejsca w systemie.}
 
-%TODO: after PyInstaller prepare section
+%#TODO: after PyInstaller prepare section
 \section{\customstylesection{Aplikacja w formie pliku wykonywalnego}}
 {Uruchomienie aplikacji w wersji skompilowanej do pliku wykonywalnego z 
 wykorzystaniem narzędzia PyInstaller \cite[text]{PyInstaller} jest o wiele 
@@ -1690,7 +1694,7 @@ błędem. W połaczeniu z faktem że interfejs przyjmuje dane użytkownika w for
 ciągów znaków klasy string, a funkcja walidacji danych nie została wdrożona na 
 obecnym etapie prototypu możliwe są błędy danych w aplikacji. Podnosi to 
 priorytet funkcji walidacji danych, nalezy więc rozpatrzyć szybkie wdrożenie 
-funkcje w następnym etapie projektu. Problem jest nieco mitygowany %TODO: Fix, i don't like this word
+funkcje w następnym etapie projektu. Problem jest nieco mitygowany %#TODO: Fix, i don't like this word
 przez fakt, że użytkownicy mają także dostęp bezpośrednio do bazy danych dzięki 
 czemu mogą osobiście poprawić swoje błędnie wprowadzone dane z pominięciem 
 aplikacji.}
@@ -2061,7 +2065,16 @@ znane jednak przed kilkoma z nich możesz się ustrzec. Tego typu błędami są:
     https://github.com/MarcinNowak94/budgeter}
 \bibitem{GITRighten} github.com MarcinNowak94, Righten \raggedright\url{
     https://github.com/MarcinNowak94/Righten}
-
+\bibitem{Bootstrap} getbootstrap.com, Bootstrap \raggedright\url{
+    https://getbootstrap.com/}
+\bibitem{Flask} flask.palletsprojects.com, Flask \raggedright\url{
+    https://flask.palletsprojects.com/en/3.0.x/}
+\bibitem{WTForms} wtforms.readthedocs.io, WTForms \raggedright\url{
+    https://wtforms.readthedocs.io/en/3.1.x/}
+\bibitem{jinja} jinja.palletsprojects.com, Jinja \raggedright\url{
+    https://jinja.palletsprojects.com/en/3.1.x/}
+\bibitem{chart.js} www.chartjs.org, Chart.js \raggedright\url{
+    https://www.chartjs.org/}
 \end{thebibliography}
 
 % [REQUIREMENT] 21. Spisy ilustracji (spis obiektów graficznych, diagramów, tabel...)
@@ -2132,7 +2145,7 @@ znane jednak przed kilkoma z nich możesz się ustrzec. Tego typu błędami są:
 % 2. [SELF] Add Licence
 % 3.1. Wstęp <-[sections moved here: Motywacja, cel i plan działania]
 
-% [TODO]:
+% [#TODO]:
 % 3. [Initial review] Change structure to adhere to rules described here:
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/
 % 3.2. Charakterystyka/analiza problemu
