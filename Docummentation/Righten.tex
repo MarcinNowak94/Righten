@@ -1,11 +1,11 @@
-% Docummentation: 
+% Docummentation:
 % - https://www.latex-project.org/help/documentation/
 % - https://docs.w3cub.com/latex/
 % - https://tex.stackexchange.com/questions/455993/formatting-sql-code
 % - https://www.overleaf.com/learn/latex/Code_listing#Code_styles_and_colours
 
 %--------------------------------------------------------------------------------
-%-----------------------------------   #TODO   ----------------------------------
+%-----------------------------------   TODO   ----------------------------------
 %--------------------------------------------------------------------------------
 % add section about icon source https://www.iconpacks.net/free-icon/money-bag-6384.html
 
@@ -245,16 +245,31 @@ zaznaczonej we wstępie pracy. Rozdział trzeci Analiza istniejących rozwiąza�
 %http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/charakterystykaanaliza-problemu/
 \chapter{\customstylechapter{Charakterystyka i analiza problemu}}
 
-{Docelowymi odbiorcami aplikacji są użytkownicy domowi, możliwe że w miarę 
-rozwoju w późniejszych fazach projektu także średnie lub małe przedsiębiorstwa. 
-Użytkownik po wprowadzeniu danych uzyska dostęp do możliwie czytelnego obrazu 
-sytuacji finansowej co uwidoczni trendy wydatków i przychodów, pozwoli bardziej 
-świadomie podejmować dalsze decyzje finansowe, planować budżet a także łatwo 
-identyfikować obszary które wymagają usprawnień. W efekcie uwidocznione przez 
-aplikację informacje i wyciągnięte z nich wnioski ułatwią użytkownikowi poprawę 
-sytuacji finansowej swojego domostwa poprzez bardziej efektywne zarządzanie 
-budżetem.}
-%
+{Na dzień dzisiejszy wiedza z zakresu finansów oferowana w ramach systemu 
+edukacji\cite{edukacjafinansowawszkołach} publicznej jest znikoma. Sytuacja ta 
+ma miejsce od dawna, dlatego spora część obywateli Polski słabo orientuje się w 
+kwestii finansów osobistych, ekonomii i przedsiębiorczości. Istnieje wiele 
+aktywnie działających programów które wprowadzają uczestników w świat finansów 
+poprzez przedstawienie podstawowych zagadnień z dziedziny ekonomii i podstaw 
+inwestowania\cite{edukacjafinansowawszkołach}. Działania te mają na celu 
+zbudować w nich świadomość ogólnej sytuacji ekonomicznej jednakże jak wynika z 
+badań Banku Pekao\cite{edukacjafinansowamlodziezy}, większość rodziców stwierdza
+ że nie posiada wystarczającej wiedzy o finansach żeby przekazać ją dzieciom, 
+co pozwala wysnuć wniosek iż sami zarządzają finansami rodzinnymi korzystając 
+raczej z intuicji i własnego doświadczenia aniżeli solidnych podstaw 
+teretycznych.}
+% #TODO: Continue from here
+% - zarobki, zadłużenie, budżet  
+
+{Zaradzić temu można w dwóch krokach - po pierwsze dostarczając metody lub 
+narzędzia które ułatwią zarządzanie budżetem domowym bez potrzeby znajomości 
+podstaw zarządzania finansami, oraz przedstawienie w możliwie prostej, 
+zwięzłej i przystępnej formie już gotowych opracowanych rozwiązań które można 
+zastosować aby usprawnić budżet. W efekcie taki zestaw narzędzi obniży próg 
+wejścia do poprawy sytuacji finansowej oraz pozwoli na dalsze świadome 
+zarządzanie własną sytuacją i nakieruje na dodatkowe zasoby do dalszej edukacji 
+co powinno poprawić zarówno stan życia jak i stan wiedzy użytkownika.}
+
 % [REQUIREMENT] 5. Wstępne założenia i uwarunkowania, w których 
 % projekt będzie powstawał  -----------------------
 \chapter{\customstylechapter{Wstępne założenia i uwarunkowania}}
@@ -340,7 +355,7 @@ priorytetu posłuży metoda MoSCoW \cite{MOSCOW} lub Matryca Eisenhowera
         \item Założenia wstępne
         \item Spis wymagań każdego typu
         \item Przegląd rynku pod kątem dostępnych rozwiązań
-        \item Określenie me#TODOlogii pracy
+        \item Określenie metodologii pracy
         \item Dokumentacja modelowania
         \item Dokumentacja uruchomieniowa projektu
         \item Przeprowadzone testy
@@ -406,7 +421,7 @@ z nich zostały spełnione. Nagłówki z powodu objętości zostały skrócone, 
 
 {IMPL - Oznaczenie czy funkcję wdrożono}
 
-%[#TODO]: try tabularray as suggested
+% #TODO: try tabularray as suggested
 % Wrapping as per: https://stackoverflow.com/questions/790932/how-to-wrap-text-in-latex-tables
 \begin{table}[h]
     \footnotesize
@@ -610,7 +625,7 @@ W fazie prototypu zostaną wdrożone wszystkie funkcje wymagane (M),
 natomiast wdrożenie wszelkich pozostałych kategorii zostanie rozpatrzone w fazie
  rozwoju aplikacji. Plan uwzględnia także cykliczne przeglądy priorytetów aby 
  lepiej dopasować aplikację do potrzeb użytkowników i kierunku rozwoju projektu.
- Zadania rozpisane zostaną w me#TODOlogii kanban \cite{Kanban}. Zgodnie z 
+ Zadania rozpisane zostaną w metodologii kanban \cite{Kanban}. Zgodnie z 
 zasadami LEAN \cite{LEAN} w każdej iteracji kod będzie dodatkowo refaktoryzowany
  i upraszczany, jeśli zajdzie taka potrzeba i uprości to interfejsy funkcji i 
 zwiększy czytelność dane zostaną także zebrane w dedykowane klasy.}
@@ -1083,11 +1098,11 @@ SELECT *
 FROM [Expenditures_Enriched]
 WHERE [Product] IN (NULL,
                     'UNKNOWN')
-    OR [Comment] LIKE '%[#TODO]%';
+    OR [Comment] LIKE '%[TODO]%';
 \end{lstlisting}
 {Widok Products\_to\_fix zawiera dane wprowadzone przez użytkownika poprawnie i 
 oznaczone jako dane do uzupełnienia specjalnymi etykietami - wartością w polu 
-PRODUCT=UNKNOWN lub [#TODO] w komentarzu.}
+PRODUCT=UNKNOWN lub [TODO] w komentarzu.}
 \end{minipage}
 
 \begin{minipage}{\textwidth}
@@ -2002,7 +2017,7 @@ znane jednak przed kilkoma z nich możesz się ustrzec. Tego typu błędami są:
      się po aktualizacji. 
 \end{itemize}
 
-
+% #TODO: Remove unused sources
 % [REQUIREMENT] 22. Bibliografia - wykaz wszystkich źródeł
 \begin{thebibliography} {books}
 \bibitem{wiki_ekonomia} Wikipedia, Nauki Ekonomiczne \raggedright\url{
@@ -2075,6 +2090,10 @@ znane jednak przed kilkoma z nich możesz się ustrzec. Tego typu błędami są:
     https://jinja.palletsprojects.com/en/3.1.x/}
 \bibitem{chart.js} www.chartjs.org, Chart.js \raggedright\url{
     https://www.chartjs.org/}
+\bibitem{edukacjafinansowawszkołach} Łukasz Grygiel, Jak wygląda edukacja finansowa dzieci i młodzieży w Polsce? \raggedright\url{
+        https://web.archive.org/web/20230529115945/https://lukaszgrygiel.com/edukacja-finansowa-dzieci-i-mlodziezy/}
+\bibitem{edukacjafinansowamlodziezy} Bank Pekao, Raport Banku Pekao: „Dziecięcy świat finansów - jak rynek finansowy odpowiada na potrzeby najmłodszych klientów”. \raggedright\url{
+        https://www.pekao.com.pl/o-banku/aktualnosci/d4e423aa-0ba4-4bde-8a0a-7ff3a17a9793/raport-banku-pekao-dzieciecy-swiat-finansow-jak-rynek-finansowy-odpowiada-na-potrzeby-najmodszych-klientow.html}
 \end{thebibliography}
 
 % [REQUIREMENT] 21. Spisy ilustracji (spis obiektów graficznych, diagramów, tabel...)
