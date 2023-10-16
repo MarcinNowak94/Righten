@@ -236,10 +236,10 @@ języku Python, wykorzystująca frameworki: frontend Bootstrap\cite{Bootstrap},
 Flask\cite{Flask}, WTForms\cite{WTForms}, silnik szablonów jinja\cite{jinja}, 
 oraz bibliotekę chart.js\cite{chart.js} do generowania wizualizacji.}
 
-
+% #TODO: Dodaj łamanie
 % #TODO: Uzupełniać w trakcie "Streszczenie zawartości kolejnych rozdziałów (...) Ten fragment to zakres pracy."
 {Rozdział drugi zawiera rozwinięcie charakterystyki i motywacji problemu krótko 
-zaznaczonej we wstępie pracy. Rozdział trzeci Analiza istniejących rozwiązań.}
+zaznaczonej we wstępie pracy. Rozdział trzeci to analiza istniejących rozwiązań.}
 
 % 3.2. Charakterystyka/analiza problemu
 %http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/charakterystykaanaliza-problemu/
@@ -257,18 +257,54 @@ badań Banku Pekao\cite{edukacjafinansowamlodziezy}, większość rodziców stwi
  że nie posiada wystarczającej wiedzy o finansach żeby przekazać ją dzieciom, 
 co pozwala wysnuć wniosek iż sami zarządzają finansami rodzinnymi korzystając 
 raczej z intuicji i własnego doświadczenia aniżeli solidnych podstaw 
-teretycznych.}
+teretycznych. Tego rodzaju podejście na wyczucie, przez większość czasu działa. 
+Wydaje się że nie ma większego na życie gdy sytuacja ekonomiczna jest spokojna -
+ zmiana podejścia pozwala wtedy co prawda więcej zaoszczędzić, jednak wydaje się
+ to opcjonalne. Kiedy jednak na rynku lokalnym lub globalnym pojawiają się 
+zawirowania, przeważnie koszta życia rosną, a tym samym dopięcie finansów 
+osobistych i domowych tak, by bilans wyszedłdodatni wymaga więcej uwagi. W 
+ostatnich latach miało miejsce kilka tego typu zdarzeń któe dotknęły światową 
+ekonomię. Jednym z tych zdarzeń jest pandemia Covid 19, która, jak wynika z 
+badań Krajowego Rejestru Długów \cite{portfelpolakawpandemii} u prawie połowy 
+polaków wywołała poczucie zagrożenia biedą, podczas gdy jedynie 22\% twierdzi 
+że jest spokojna o swoją sytuację finansową.}
 % #TODO: Continue from here
 % - zarobki, zadłużenie, budżet  
 
-{Zaradzić temu można w dwóch krokach - po pierwsze dostarczając metody lub 
+{Podstawowym narzędziem które może pomóc w tego typu sytuacji jest planowanie 
+domowego budżetu. Wymaga to dwóch etapów - po pierwsze dostarczzenia metody lub 
 narzędzia które ułatwią zarządzanie budżetem domowym bez potrzeby znajomości 
-podstaw zarządzania finansami, oraz przedstawienie w możliwie prostej, 
-zwięzłej i przystępnej formie już gotowych opracowanych rozwiązań które można 
-zastosować aby usprawnić budżet. W efekcie taki zestaw narzędzi obniży próg 
-wejścia do poprawy sytuacji finansowej oraz pozwoli na dalsze świadome 
-zarządzanie własną sytuacją i nakieruje na dodatkowe zasoby do dalszej edukacji 
-co powinno poprawić zarówno stan życia jak i stan wiedzy użytkownika.}
+podstaw zarządzania finansami, oraz przedstawienie w możliwie prostej, zwięzłej 
+i przystępnej formie już gotowych opracowanych rozwiązań które można zastosować 
+aby usprawnić budżet. W efekcie taki zestaw narzędzi obniży próg wejścia w 
+świat finansó osobistych, oraz pozwoli na dalsze świadome zarządzanie własną 
+sytuacją. Opcjonalnym choć mile widzianym krokiem jest nakierowanie na dodatkowe
+ zasoby do dalszej edukacji. Taki kompletny zestaw narzędzi pozwala poprawić 
+zarówno stan życia jak i stan wiedzy użytkownika. W najprostszym wariancie na 
+budżet \cite{o24_budzetowanie}\cite{budget}\cite{mintbudget} składają się: 
+wpływy czyli dochody ze wszystkich źródeł, zobowiązania czyli płatności stałe 
+jak rachunki czy raty kredytów oraz wydatki które są zróżnicowane. Skrupulatne 
+zbieranie danych z pewnego okresu pozwala dostrzec ogólną sytuację finansową, a 
+w miarę jak zakres czasu dostępnych danych się wydłuża a ich precyzja zwiększa 
+pojawia się także możliwość wysłuskania trendu przez co i prognozowania 
+przyszłej sytuacji. Istnieje wiele różnych podejść do tworzenia budżetu - od 
+najbardziej ogólnych które skupiają się wyłącznie na określeniu bilansu wydatków
+ oraz wpływów, po najbardziej szczegółowe analizy wydatków na poszczególne 
+kategorie czy nawet produkty. Każde z podejść ma swoje dobre strony, i w 
+gruncie rzeczy każdy powinien wybrać podejście odpowiednie dla siebie.}
+
+
+{Z uwagi na tematykę z zasady są to dane bardzo wrażliwe, zatem muszą być 
+odpowiednio zabezpieczone. Idealną opcją dla potencjalnych użytkowników byłoby 
+gdyby jako jedyni mieli dostęp do prywatnych danych, lub mogli je współdzielić 
+z wybranymi przez siebie osobami. Przy znaczącej statystycznie ilości 
+użytkowników dane zebrane w aplikacji po odpowiedniej anonimizacji i 
+uśrednieniu mogą posłużyć do modelowania wydatków obywateli danych regionów, 
+sektorów, segmentów gospodarki lub nawet ogólnie całego państwa, co z kolei 
+można wykorzystać zwrotnie w samej aplikacji aby porównać model wydatków 
+użytkownika do adekwatnej średniej , i zwrócić uwagę na obszary w których 
+pozytywnie od niej odstaje co moze zaowocować pozytywnym wzmocnieniem dobrego 
+nawyku a nawet chęcią dalszej poprawy w innej kategorii wydatków.}
 
 % [REQUIREMENT] 5. Wstępne założenia i uwarunkowania, w których 
 % projekt będzie powstawał  -----------------------
@@ -2091,9 +2127,15 @@ znane jednak przed kilkoma z nich możesz się ustrzec. Tego typu błędami są:
 \bibitem{chart.js} www.chartjs.org, Chart.js \raggedright\url{
     https://www.chartjs.org/}
 \bibitem{edukacjafinansowawszkołach} Łukasz Grygiel, Jak wygląda edukacja finansowa dzieci i młodzieży w Polsce? \raggedright\url{
-        https://web.archive.org/web/20230529115945/https://lukaszgrygiel.com/edukacja-finansowa-dzieci-i-mlodziezy/}
+    https://web.archive.org/web/20230529115945/https://lukaszgrygiel.com/edukacja-finansowa-dzieci-i-mlodziezy/}
 \bibitem{edukacjafinansowamlodziezy} Bank Pekao, Raport Banku Pekao: „Dziecięcy świat finansów - jak rynek finansowy odpowiada na potrzeby najmłodszych klientów”. \raggedright\url{
-        https://www.pekao.com.pl/o-banku/aktualnosci/d4e423aa-0ba4-4bde-8a0a-7ff3a17a9793/raport-banku-pekao-dzieciecy-swiat-finansow-jak-rynek-finansowy-odpowiada-na-potrzeby-najmodszych-klientow.html}
+    https://www.pekao.com.pl/o-banku/aktualnosci/d4e423aa-0ba4-4bde-8a0a-7ff3a17a9793/raport-banku-pekao-dzieciecy-swiat-finansow-jak-rynek-finansowy-odpowiada-na-potrzeby-najmodszych-klientow.html}
+\bibitem{portfelpolakawpandemii} Krajowy Rejestr Długów, Portfel statystycznego Polaka w pandemii \raggedright\url{
+    https://krd.pl/centrum-prasowe/raporty/2022/portfel-statystycznego-polaka-w-pandemii}
+\bibitem{budget} The Balance, Understanding Budgeting \& Personal Finance\raggedright\url{
+    https://www.thebalancemoney.com/personal-finance-budget-4802696}
+\bibitem{mintbudget} www.mint.intuit.com, Budgeting 101 \raggedright\url{
+    https://mint.intuit.com/blog/category/budgeting/}
 \end{thebibliography}
 
 % [REQUIREMENT] 21. Spisy ilustracji (spis obiektów graficznych, diagramów, tabel...)
