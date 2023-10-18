@@ -12,3 +12,9 @@ Docummentation/Righten.lol
 Docummentation/Righten.lot
 Docummentation/Righten.synctex.gz
 Sources/__pycache__/Config.cpython-310.pyc
+Sources/web/RightenWeb/__pycache__/__init__.cpython-310.pyc
+Sources/web/RightenWeb/__pycache__/forms.cpython-310.pyc
+Sources/web/RightenWeb/__pycache__/routes.cpython-310.pyc
+Sources/web/RightenWeb/db/Righten_mock.sqlite3
+Sources/web/RightenWeb/__pycache__/models.cpython-310.pyc
+Righten_bibliography.lnk

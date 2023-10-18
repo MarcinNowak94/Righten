@@ -1,0 +1,74 @@
+<!--TODO: This one will be tricky: display ProductSummary, edit Products-->
+<!--Products is an underlying table, ProductSummary is view in which
+IDs are turned into readable data which they represent-->
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="col-sm-10 ml-auto mr-auto">
+    <form action="" method="POST">
+        {{ form.csrf_token() }}
+        <fieldset class="form-group">
+            <legend class="mb-4">Add Product Type</legend>
+            <div class="row form-group">
+            <div class="col form-group">
+                {{ form.type.label(class = "form-control-label") }}
+                {{ form.type(class = "form-control form-control-sm") }}
+            </div>
+
+            <div class="col form-group">
+                {{ form.priority.label(class = "form-control-label") }}
+                {{ form.priority(class = "form-control form-control-sm") }}
+            </div>
+
+            <div class="col form-group">
+                {{ form.comment.label(class = "form-control-label") }}
+                {{ form.comment(class = "form-control form-control-sm") }}
+            </div>
+
+            <div class="col">
+                {{ form.submit(class="btn btn-success", value="Add record")}}
+            </div>
+        </div>
+        </fieldset>
+    </form>
+</div>
+<br></br>
+
+<div class="col-sm-20 ">
+    <H2>Product Types</H2>
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Type</th>
+                <th scope="col">Comment</th>
+                <th scope="col">Amount</th>
+                <th scope="col">BoughtTimes</th>
+                <th scope="col">FirstBought</th>
+                <th scope="col">LastBought</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Common</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+                    <tr>
+                        <td>{{entry.ID}}</td>
+                        <td>{{entry.Type}}</td>
+                        <td>{{entry.Comment}}</td>
+                        <td>{{entry.Amount}}</td>
+                        <td>{{entry.BoughtTimes}}</td>
+                        <td>{{entry.FirstBought}}</td>
+                        <td>{{entry.FirstBought}}</td>
+                        <td>{{entry.Priority}}</td>
+                        <td>{{entry.Common}}</td>
+                        <td><a href="{{ url_for('edit', table='ProductTypes', entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm">Edit</a></td>
+                        <td><a href="{{ url_for('delete', table='ProductTypes',entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+                    </tr>
+            {% endfor %}
+    </tbody>
+    </table>
+</div>
+{% endblock %}

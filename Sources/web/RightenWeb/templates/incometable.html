@@ -1,0 +1,122 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+
+<!--#TODO: Change so user can add multiple records in one transaction-->
+<div class="col-sm-10 ml-auto mr-auto">
+    <form action="" method="POST">
+        {{ form.csrf_token() }}
+        <fieldset class="form-group">
+            <legend class="mb-4">Add Income</legend>
+            <div class="row form-group">
+            <div class="col form-group">
+                {{ form.datetime.label(class="form-control-label") }}
+                {% if form.datetime.errors %}
+                {{ form.datetime(class="form-control form-control-sm is-invalid") }}
+                {% for error in form.datetime.errors %}
+                <div class="invalid-feedback">
+                    <span>{{error}}</span>
+                </div>
+                {% endfor %}
+                {% else %}
+                {{ form.datetime(class="form-control form-control-sm") }}
+                {% endif %}
+            </div>
+
+            <div class="col form-group">
+                {{ form.amount.label(class="form-control-label") }}
+                {% if form.amount.errors %}
+                {{ form.amount(class="form-control form-control-sm is-invalid") }}
+                {% for error in form.amount.errors %}
+                <div class="invalid-feedback">
+                    <span>{{error}}</span>
+                </div>
+                {% endfor %}
+                {% else %}
+                {{ form.amount(class="form-control form-control-sm") }}
+                {% endif %}
+            </div>
+
+            <div class="col form-group">
+                {{ form.type.label(class = "form-control-label") }}
+                {{ form.type(class = "form-control form-control-sm") }}
+            </div>
+
+            <div class="col form-group">
+                {{ form.source.label(class = "form-control-label") }}
+                {{ form.source(class = "form-control form-control-sm") }}
+            </div>
+
+            <div class="col form-group">
+                {{ form.comment.label(class = "form-control-label") }}
+                {{ form.comment(class = "form-control form-control-sm") }}
+            </div>
+
+            <div class="col">
+                {{ form.submit(class="btn btn-success", value="Add record")}}
+            </div>
+        </div>
+        </fieldset>
+    </form>
+</div>
+<br></br>
+
+
+<!--
+    TODO: Add record deletion confirmation screen, or hide delete button until user confirms
+    
+    Add this to layout.html 
+    Adding disabled to <a> tag as per https://stackoverflow.com/questions/29379979/disable-a-link-in-bootstrap
+    solution to: https://getbootstrap.com/docs/5.0/components/buttons/#disabled-state
+    <style>
+        a.disabled{
+            pointer-events: none;
+            color: gray;
+            cursor: default;
+        }
+    </style>
+    
+
+    Leave this here
+    <div class="form-check form-switch d-grid gap-2 d-md-flex justify-content-md-end">
+        <input class="form-check-input" 
+               type="checkbox" 
+               onchange="document.getElementById('DeleteButton').disabled = !this.checked;"
+               id="EnableDelete" 
+               >
+        <label class="form-check-label" for="EnableDelete">Enable delete</label>
+    </div>
+-->
+<div class="col-sm-10 ml-auto mr-auto">
+    <H2>Incomes</H2>
+    #TODO: To edit records try contenteditable='true'
+    <table class="table" >
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">DateTime</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Type</th>
+                <th scope="col">Source</th>
+                <th scope="col">Comment</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+                <tr>
+                    <td>{{entry.ID}}</td>
+                    <td>{{entry.DateTime.strftime("%Y-%m-%d")}}</td>
+                    <td>{{entry.Amount}}</td>
+                    <td>{{entry.Type}}</td>
+                    <td>{{entry.Source}}</td>
+                    <td>{{entry.Comment}}</td>
+                    <td><a href="{{ url_for('edit', table='Income', entry_id = entry.ID) }}" class="btn btn-outline-warning btn-sm" id="EditButton">Edit</a></td>
+                    <td><a href="{{ url_for('delete', table='Income', entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm" id="DeleteButton">Delete</a></td>
+                </tr>
+            {% endfor %}
+    </tbody>
+    </table>
+</div>
+{% endblock %}

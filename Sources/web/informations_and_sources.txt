@@ -1,0 +1,23 @@
+Preparation:
+pip3 install flask flask_sqlalchemy Flask-WTF
+To run application run python <thisfilepath> command in terminal
+
+
+Sources used in creating this app:
+https://www.youtube.com/watch?v=3vfum74ggHE - framework reconeissance
+https://www.youtube.com/watch?v=JgF6vaDYxzU&list=PLU7aW4OZeUzwn6L1txXQ9viaAIR2mDqbv
+https://stackoverflow.com/questions/39955521/sqlalchemy-existing-database-query
+https://www.youtube.com/watch?v=UK57IHzSh8I
+https://stackoverflow.com/questions/31444036/runtimeerror-working-outside-of-application-context
+https://www.chartjs.org/
+https://getbootstrap.com/docs/4.0/
+https://flask-wtf.readthedocs.io/en/1.0.x/
+
+TODO: Check materials
+https://www.youtube.com/watch?v=5aYpkLfkgRE
+https://realpython.com/getting-started-with-bootstrap-3/
+https://github.com/Princekrampah/FlaskExpenseTracker/tree/master
+https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
+
+#ARWES - react framework for UI 
+https://hackaday.com/2023/06/29/sci-fi-ui-made-easy-with-arwes/

@@ -1,0 +1,100 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="IncomeOverTime"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="IncomeTypesOverTime"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-10, col-sm-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="IncomeSummary"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    {% block javascript %}
+        <script>
+            let IncomeSummarydata = JSON.parse({{ IncomeSummarydata | tojson }})
+            let IncomeSummarylabels = JSON.parse({{ IncomeSummarylabels | tojson }})
+            let MonthlyIncome = JSON.parse({{ MonthlyIncome | tojson }})
+            let IncomeTypesByTimeDataset = JSON.parse({{ IncomeTypesByTimeDataset | tojson }})
+
+            let IncomeSummarychart = new Chart(document.getElementById("IncomeSummary"), {
+                    type: 'pie',
+                    data: {
+                        labels: IncomeSummarylabels,
+                        datasets: [{
+                            label: "Income type",
+                            data: IncomeSummarydata,
+                            backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
+                                '#B276B2', '#E16851', '#FB8267'],
+
+                            borderWidth: 1,
+                            hoverBorderColor: "black",
+                            hoverBorderWidth: 2,
+                            hoverBackgroundColor: 'rgba(154, 245, 140)',
+                            pointHoverRadius: 5
+                        }]
+                    },
+                    options: {
+                            title: {
+                                display: true,
+                                    text: "Income type summary",
+                                        fontSize: 20,
+                            },
+                            legend: {
+                                position: "right",
+                                    labels: {
+                                    fontColor: "gray"
+                                },
+                                display: true
+                            },
+
+                            elements: {
+                                hitRadius: 3,
+                            }
+                    }
+                })
+
+            let IncomeOverTime = new Chart(document.getElementById("IncomeOverTime"), {
+                type: "line",
+                data: {
+                    datasets: [{
+                        label: "Income",
+                        data: MonthlyIncome,
+                    }]
+                }
+            })
+
+            let IncomeTypesOverTime = new Chart(document.getElementById("IncomeTypesOverTime"), {
+                type: "line",
+                data: {
+                    datasets: IncomeTypesByTimeDataset
+                }
+            })
+
+        </script>
+    {% endblock %}
+{% endblock %}
