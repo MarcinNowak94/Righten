@@ -228,6 +228,7 @@ odnalezieniem treści dobrej jakości w natłoku materiałów błędnych, słaby
 merytorycznie, niekatualnych czy też nastawionych na marketing ponad poprawność 
 oraz przystępnością treści źródeł dobrej jakości.}
 
+\medskip
 {Celem pracy jest zaprojektowanie i realizacja modułu analitycznego aplikacji 
 która ułatwi jej użytkownikom zarządzanie budżetem domowym dostarczając 
 narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
@@ -236,7 +237,7 @@ języku Python, wykorzystująca frameworki: frontend Bootstrap\cite{Bootstrap},
 Flask\cite{Flask}, WTForms\cite{WTForms}, silnik szablonów jinja\cite{jinja}, 
 oraz bibliotekę chart.js\cite{chart.js} do generowania wizualizacji.}
 
-% #TODO: Dodaj łamanie
+\medskip
 % #TODO: Uzupełniać w trakcie "Streszczenie zawartości kolejnych rozdziałów (...) Ten fragment to zakres pracy."
 {Rozdział drugi zawiera rozwinięcie charakterystyki i motywacji problemu krótko 
 zaznaczonej we wstępie pracy. Rozdział trzeci to analiza istniejących rozwiązań.}
@@ -289,7 +290,6 @@ wykazuje natomiast spadek realnych płac (uwzględniających zarobki oraz wydatk
     \includegraphics[width=12cm]{figures/300gospodarka-pl_inflacjawpolsce.png}
 \end{figure}
 
-
 {Podstawowym narzędziem które może pomóc utrzymać wydatki na odpowiednim 
 poziomie jest planowanie domowego budżetu. Wymaga to dwóch etapów - po pierwsze 
 metody lub narzędzia które ułatwią zarządzanie budżetem domowym oraz znajomości 
@@ -309,7 +309,6 @@ najbardziej ogólnych które skupiają się wyłącznie na określeniu bilansu w
 kategorie czy nawet produkty. Każde z podejść ma swoje dobre strony, i w gruncie
  rzeczy każdy powinien wybrać podejście odpowiednie dla siebie.}
 
-
 \begin{figure}[H]           %requires float package
     \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - przychody}
     \label{fig:}
@@ -317,14 +316,12 @@ kategorie czy nawet produkty. Każde z podejść ma swoje dobre strony, i w grun
     \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_przychody.jpg}
 \end{figure}
 
-
 \begin{figure}[H]           %requires float package
     \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - wydatki}
     \label{fig:}
     \centering  
     \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_wydatki.jpg}
 \end{figure}
-
 
 {Poza ukazaniem ogólnego obrazu sytuacji budżetowej w budżecie uwzględnić można 
 cele jak spłata zadłużenia, czy planowany znaczny wydatek, oraz limity 
@@ -360,16 +357,64 @@ najlepszych danych, które mogłoby zostać wykorzystane do porównań.}
 
 % #TODO: Continue from here
 % 3.3. Analiza istniejących rozwiązań
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/analiza-istniejacych-rozwiazan/
+% Pull from documment: https://docs.google.com/document/d/1cYnRqie6xpVnRh8HOuYQZlcuSP_wxj1rPUvHp9FGgDg/edit
+\chapter{\customstylechapter{Analiza istniejących rozwiązań}}
+{W tym rozdziale przedstawiona zostanie analiza obecnie dostępnych rozwiązań 
+opisanego problemu aby określić ich wady i zalety. Jako że budżetowanie jest 
+problemem tak starym jak sam wynalazek pieniądza, historycznie powstało wiele 
+różnych rozwiązań których celem jest je ułatwić.}
 
+{Podstawową i najprostszą formą budżetu jest zapis na papierze czy chociażby w 
+formie księgi zawierającej przychody i wydatki. Sposób ten zostanie 
+przeanalizowany ponieważ do niedawna była to główna metoda prowadzenia budżetu 
+i mimo postępu cyfryzacji i informatyzacji nadal jest szeroko stosowany. Po 
+części zastąpiły go rozwiązania komputerowe w formie różnych aplikacji które 
+wymagają mniejszych lub większych nakładów pracy od użytkownika. Okazjonalnie 
+tego typu zestawienia prowadzone są dziś także w arkuszach kalkulacyjnych.}
+
+{Podstawową opcją cyfrową są same witryny kont bankowych na których klient 
+często może kategoryzować poszczególne transakcje i wyświetlać podsumowania oraz
+ określić zakładany budżet. Warto się im przyjrzeć ponieważ rozwiązania te są 
+dostępne dla każdego klienta danego banku.}
+
+{Kolejną kategorią rozwiązań są aplikacje dedykowane do zarządzania budżetem. 
+Tego typu aplikacje po wprowadzeniu danych udostępniają użytkownikowi cały 
+wachlarz dodatkowych specjalistycznych opcji i narzędzi. Omówione zostaną dwa 
+przykłady tego rodzaju aplikacji - Intuit mint\cite{mint} oraz 
+Goodbudget\cite{goodbudget}. Na rynku dostępnych jest wiele więcej rozwiązań 
+przez co użytkownik ma dowolny wybór, jednak świadomy wybór odpowiedniej opcji 
+wymaga od użytkownika dokładnego przeglądu i porównania kilku aplikacji.}
+
+\section{\customstylesection{Rozwiązanie analogowe - budżet papierowy}}
+\section{\customstylesection{Systemy bankowe - przykład funkcja Budżet w ING Banku Śląskim}}
+\section{\customstylesection{Aplikacje dedykowane - Intuit Mint}}
+%Worknotes
+{darmowa z reklamami lub płatna - ios, android, desktop, ciągłe reklamy, pozwala
+ sprawdzić ocenę zdolności kredytowej (TransUnion), popularna 
+(25m użytkowników), śledzenie inwestycji, słaba kategoryzacja, powiadomienia i 
+przypomnienia (ręcznie), dobre wizualizacje, brak zintegrowanego 
+samouczka/instrukcji., Możliwość utworzenia wielu równoczesnych budżetów 
+jednocześnie, monitoring subskrybcji, alerty opłat bankowych. Rzekomo dobre 
+zabezpieczenia danych.}
+
+\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
+%Worknotes
+{mobilna i desktopowa, darmowa (historia rok wstecz) i płatna 
+(rozszerzona, historia 7 lat wstecz), system kopertowy (dzielenie przychodów na 
+koszyki) z priorytetyzacją i monitoringiem, dobra do współdzielonego budżetu 
+(synchronizacja między kontami wielu użytkowników), wskazuje źródła edukacyjne, 
+dobre wsparcie i często rozszerzana, ręczne dodawanie wydatków, automatyczna i 
+ręczna kategoryzacja, [ręczny?] import danych,}
 
 % [#TODO]:
-% 3.3. Analiza istniejących rozwiązań
-% 3.4. Koncepcja własnego rozwiązania
-% 3.5. Projekt ogólny
-% 3.6. Dokumentacja techniczna
-% 3.7. Testy i weryfikacja systemu
-% 3.8. Przykładowy scenariusz wykorzystania systemu
-% 3.9. Zakończenie
+% 3.3. Analiza istniejących rozwiązań               #TODO: dodaj streszczenie do do 3.1.
+% 3.4. Koncepcja własnego rozwiązania               #TODO: dodaj streszczenie do do 3.1.
+% 3.5. Projekt ogólny                               #TODO: dodaj streszczenie do do 3.1.
+% 3.6. Dokumentacja techniczna                      #TODO: dodaj streszczenie do do 3.1.
+% 3.7. Testy i weryfikacja systemu                  #TODO: dodaj streszczenie do do 3.1.
+% 3.8. Przykładowy scenariusz wykorzystania systemu #TODO: dodaj streszczenie do do 3.1.
+% 3.9. Zakończenie                                  #TODO: dodaj streszczenie do do 3.1.
 % 3.13.Ewentualne załączniki
 
 
@@ -400,8 +445,6 @@ najlepszych danych, które mogłoby zostać wykorzystane do porównań.}
         https://en.wikipedia.org/wiki/SQL}
     \bibitem{Python} python.org, Python \raggedright\url{
         https://www.python.org/}
-    \bibitem{PySimpleGUI} pysimplegui.org, PySimpleGUI Python GUIs for Humans \raggedright\url{
-        https://www.pysimplegui.org/en/latest/}
     \bibitem{JSON} json.org, Introducing JSON \raggedright\url{
         https://www.json.org/json-en.html}
     \bibitem{Python_read-file} pythonspot.com, Python tutorials, How to Read a File in Python \raggedright\url{
@@ -416,7 +459,7 @@ najlepszych danych, które mogłoby zostać wykorzystane do porównań.}
         https://code.visualstudio.com/}
     \bibitem{DataGrid} JetBrains, DataGrid \raggedright\url{
         https://www.jetbrains.com/datagrip/}
-    \bibitem{Kanban} Lean Action PLan, Kanban – układ nerwowy sterowania produkcją w koncepcji Lean Manufacturing \raggedright\url{
+    \bibitem{Kanban} Lean Action Plan, Kanban – układ nerwowy sterowania produkcją w koncepcji Lean Manufacturing \raggedright\url{
         https://leanactionplan.pl/kanban/}
     \bibitem{LEAN} Wikipedia, Lean software development \raggedright\url{
         https://pl.wikipedia.org/wiki/Lean_software_development}
@@ -428,10 +471,6 @@ najlepszych danych, które mogłoby zostać wykorzystane do porównań.}
         https://pl.wikipedia.org/wiki/Model_przyrostowy}
     \bibitem{EdittableTable} YouTube The CS Classroom, PySimpleGUI - Excel-style Editable Table \raggedright\url{
         https://www.youtube.com/watch?v=ETHtvd-_FJg}
-    \bibitem{Tkinter} python.org, tkinter — Python interface to Tcl/Tk \raggedright\url{
-        https://docs.python.org/3/library/tkinter.html}
-    \bibitem{PyInstaller} pyinstaller.org, PyInstaller Manual \raggedright\url{
-        https://pyinstaller.org/en/stable/}
     \bibitem{GITBudgeterApp} github.com MarcinNowak94, DatabaseShenanigans \raggedright\url{
         https://github.com/MarcinNowak94/DatabaseShenanigans}
     \bibitem{GITBudgeterDoc} github.com MarcinNowak94, budgeter \raggedright\url{
@@ -458,10 +497,17 @@ najlepszych danych, które mogłoby zostać wykorzystane do porównań.}
         https://www.thebalancemoney.com/personal-finance-budget-4802696}
     \bibitem{mintbudget} www.mint.intuit.com, Budgeting 101 \raggedright\url{
         https://mint.intuit.com/blog/category/budgeting/}
+    \bibitem{mint} Inuit inc., Mint \raggedright\url{
+        https://mint.intuit.com/}
+    \bibitem{goodbudget} Dayspring Partners, Goodbudget \raggedright\url{
+        https://goodbudget.com/}
     \bibitem{koszty2010-22} Warsaw Enterprise Institute, [RAPORT] Żegnajcie niskie ceny? Koszty życia i poziom cen w Polsce na tle krajów UE w latach 2010–2022 \raggedright\url{
         https://wei.org.pl/2022/aktualnosci/wiktorwojciechowski/raport-zegnajcie-niskie-ceny-koszty-zycia-i-poziom-cen-w-polsce-na-tle-krajow-ue-w-latach-2010-2022/}
     \bibitem{weiinflacja} Warsaw Enterprise Institute, [RAPORT] Jak inflacja zubaża Polaków? \raggedright\url{
         https://wei.org.pl/2023/publikacje/raporty/mateusz-benedyk/raport-jak-inflacja-zubaza-polakow/}
+    \bibitem{ingbudżet} ING Bank Śląski, Jak zapanować nad budżetem domowym? \raggedright\url{
+        https://spolecznosc.ing.pl/-/Blog/Jak-zapanowa\%C4\%87-nad-bud\%C5\%BCetem-domowym/ba-p/3968}
+        
 \end{thebibliography}
 
 % 3.11.Spis rysunków
