@@ -1,7 +1,8 @@
 Preparation:
-pip3 install flask flask_sqlalchemy Flask-WTF
+pip3 install flask flask_sqlalchemy Flask-WTF python-dotenv cryptography pyopenssl
 To run application run python <thisfilepath> command in terminal
 
+#need to create keys as per https://stackoverflow.com/questions/29458548/can-you-add-https-functionality-to-a-python-flask-web-server
 
 Sources used in creating this app:
 https://www.youtube.com/watch?v=3vfum74ggHE - framework reconeissance
@@ -12,8 +13,11 @@ https://stackoverflow.com/questions/31444036/runtimeerror-working-outside-of-app
 https://www.chartjs.org/
 https://getbootstrap.com/docs/4.0/
 https://flask-wtf.readthedocs.io/en/1.0.x/
+https://www.youtube.com/watch?v=L1h5gRxh8w8
+https://www.youtube.com/watch?v=tqZxama6tiE
 
 TODO: Check materials
+https://pythonhosted.org/Flask-Security/
 https://www.youtube.com/watch?v=5aYpkLfkgRE
 https://realpython.com/getting-started-with-bootstrap-3/
 https://github.com/Princekrampah/FlaskExpenseTracker/tree/master

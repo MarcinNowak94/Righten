@@ -1,13 +1,25 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-debugmode=True
+#from logging.handlers import SysLogHandler
+#Secure config as per https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
+#https://www.youtube.com/watch?v=L1h5gRxh8w8
+import os
+from dotenv import load_dotenv
+
+basepath = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basepath, '.env'))
 
 app=Flask(__name__)
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///E:\\Projects\\Git\\Righten\\Sources\\web\\RightenWeb\\db\\Righten.sqlite'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///E:\\Projects\\Git\\Righten\\Sources\\web\\RightenWeb\\db\\Righten_mock.sqlite3'
-#TODO: Secure later as per https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
-app.config['SECRET_KEY']="dkmhUYT#U^T#8u286754jd7jGHVSAHGfsa__2" 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
 db=SQLAlchemy(app)
+
+if not app.config['SECRET_KEY']:
+    raise ValueError("No SECRET_KEY set for Flask application")
+
+if (app.config['DEBUG']):
+    for key, variable in app.config.items():
+        value=str(variable)
+        print("{:<35} {:<10}".format(key, value))
+
 
 from RightenWeb import routes
