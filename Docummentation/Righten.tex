@@ -284,14 +284,14 @@ budżetowania.}
 \begin{figure}[H]           %requires float package
     \caption{Główny Urząd Statystyczny, Dynamika realnych dochodów i wydatków na 1 osobę w gospodarstwach domowych
     w latach 2010–2022\cite{gussytuacjabudzetowa}}
-    \label{fig:}
+    \label{gusbudzet10-22}
     \centering  
     \includegraphics[width=12cm]{figures/GUS_dynamikarealnychdochodowiwydatkow2010-2020.png}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
     \caption{300gospodarka.p, Inflacja w Polsce w latach 1996-2023 dane GUS}
-    \label{fig:}
+    \label{inflacja}
     \centering  
     \includegraphics[width=12cm]{figures/300gospodarka-pl_inflacjawpolsce.png}
 \end{figure}
@@ -317,14 +317,14 @@ kategorie czy nawet produkty. Każde z podejść ma swoje dobre strony, i w grun
 
 \begin{figure}[H]           %requires float package
     \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - przychody}
-    \label{fig:}
+    \label{prostybudżetprzychody}
     \centering  
     \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_przychody.jpg}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
     \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - wydatki}
-    \label{fig:}
+    \label{prostybudżetwydatki}
     \centering  
     \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_wydatki.jpg}
 \end{figure}
@@ -362,7 +362,6 @@ co roku, jest to więc potencjalne źródło najbardziej precyzyjnych danych, kt
 mogłoby zostać wykorzystane do porównań.}
 
 
-% #TODO: Continue from here
 % 3.3. Analiza istniejących rozwiązań
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/analiza-istniejacych-rozwiazan/
 % Pull from documment: https://docs.google.com/document/d/1cYnRqie6xpVnRh8HOuYQZlcuSP_wxj1rPUvHp9FGgDg/edit
@@ -395,6 +394,8 @@ oraz Goodbudget\cite{goodbudget}. Na rynku dostępnych jest wiele więcej
 rozwiązań przez co użytkownik ma dowolny wybór, jednak świadomy wybór 
 odpowiedniej opcji wymaga od użytkownika dokładnego przeglądu i porównania kilku
  aplikacji.}
+
+%#TODO: Describe what criteria will be evaluated
 
 \section{\customstylesection{Budżet papierowy lub arkusz kalkulacyjny}}
 {Grupa ta obejmuje wiele różnorodnych narzędzi, nierzadko darmowych, lub takich, 
@@ -437,25 +438,83 @@ dostępne rozwiązania.}
     \includegraphics[width=12cm]{figures/jakoszczedzacpieniadze.pl_budzet-domowy-1.jpg}
 \end{figure}
 
+%#TODO
 \section{\customstylesection{Systemy bankowe - przykład funkcja Budżet w ING Banku Śląskim}}
+
+
 \section{\customstylesection{Aplikacje dedykowane - Intuit Mint}}
 %Worknotes
-{darmowa z reklamami lub płatna - ios, android, desktop, ciągłe reklamy, pozwala
- sprawdzić ocenę zdolności kredytowej (TransUnion), popularna 
-(25m użytkowników), śledzenie inwestycji, słaba kategoryzacja, powiadomienia i 
-przypomnienia (ręcznie), dobre wizualizacje, brak zintegrowanego 
-samouczka/instrukcji., Możliwość utworzenia wielu równoczesnych budżetów 
-jednocześnie, monitoring subskrybcji, alerty opłat bankowych. Rzekomo dobre 
-zabezpieczenia danych.}
+{Aplikacja Intuit Mint\cite{mint}\cite{mintrecenzja} dostępna jest w wersji 
+darmowej z reklamami lub płatnej, na systemy mobilne Android i iOS oraz 
+przeglądarki. Po uruchomieniu Mint prezentuje użytkownikowi ekran z 
+podsumowaniem finansów w obecnym miesiącu w postaci zakładek które grupują 
+informacje z kilku kategorii, m.in.: Wartość netto, Wydatki, Inwestycje. Aby 
+zasilić dane użytkownik musi dać aplikacji dostęp do swoich kont bankowych i 
+inwestycyjnych, co wiele recenzentów uznaje za niesamowicie wygodne jednak 
+jednocześnie przez to nie jest to aplikacja dla ludzi dbających o prywatność - 
+jest to także główny powód dlaczego przegląd tej aplikacji oparty jest na 
+recenzjach i poradnikach opublikowanych w internecie. W zakładce Transakcje 
+zgromadzone są także wszystkie płatności zarejestrowane na udostępnionych 
+aplikacji kontach, z opinii długotrwałych użytkowników wynika że jakość 
+automatycznej kategoryzacji jest 
+słaba\cite{porownanieaplikacji1}\cite{porownanieaplikacji2}\cite{porownanieaplikacji3}\cite{porownanieaplikacji4}. 
+Użytkownik może je oznaczać etykietami (tag), dodawać do nich notatki czy wykluczać z zestawień. W zakładce 
+Miesiąc aplikacja generuje podsumowanie przychodów i wydatków, pozwala utworzyć 
+tygodniowe cele wydatków oraz budżet (a nawet kilka jednocześnie) przy użyciu 
+prostego kreatora. Kreator budżetu wydaje się bardzo prosty w obsłudze, 
+samodzielnie szacuje przychód na podstawie dostępnych danych który następnie 
+użytkownik zatwierdza lub nadpisuje dowolną wartością, w drugim kroku użytkownik
+ definiuje samodzielnie listę kategorii oraz podkategorii wydatków co niestety 
+wymaga od wcześniejszego przzygotowania.Użytkownik może dodać cel finansowy 
+podając nazwę, wartość, oraz datę kiedy powinien być spełniony, następnie 
+wybiera konto bankowe które chce z nim powiązać - jego spełnienie śledzi 
+porównując ilość środkó na koncie z wyznaczonym celem. Dodatkową opcją są 
+przypomnienia o opłacie nadchodzących rachunków w postaci powiadomień push, 
+wiadomości email lub wydarzeń w kalendarzu.}
 
-\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
+\begin{figure}[H]           %requires float package
+    \caption{https://www.pcmag.com/reviews/mintcom Mint w wersji mobilnej}
+    \label{mintmobile}
+    \centering  
+    \includegraphics[width=12cm]{figures/pcmag_mintmobile_05OMSsUmroXJ6F6sETKpH9R-50.fit_lim.size_1152x.jpg}
+\end{figure}
+
+{Wersja w przeglądarce pozwala dodać nieruchomości i pojazdy wliczane do 
+całkowitej wartości netto, porady poprawy zdolności kredytowej i wartość 
+inwestycji na dodanych rachunkach inwestycyjnych. Zakłądka Trends zawiera 
+kilka predefiniownych wykresów wizualizujących dane, zawierających dość ogólne 
+dane.}
+
+\begin{figure}[H]           %requires float package
+    \caption{https://www.pcmag.com/reviews/mintcom Mint w wersji na przeglądarki}
+    \label{mintweb}
+    \centering  
+    \includegraphics[width=12cm]{figures/pcmag_mintweb_05OMSsUmroXJ6F6sETKpH9R-51.fit_lim.size_1152x.jpg}
+\end{figure}
+
+{Mint integruje także dodatkowe usługi jak wyliczanie zdolności kredytowej przez 
+usługę firmy TransUnion, czy negocjację umów przez usługę firmy BillShark. 
+Aplikacja sama w sobie nie zawiera zintegrowanego samouczka bądź instrukcji, 
+informacje wymagane zdaniem twórców skrótowo prezentowane są kontekstowo w miejscu w 
+którym są wymagane.}
+
+{Podsumowując aplikacja Mint jest prostota w obsłudze, wymaga minimum dodatkowej
+ uwagi od użytkownika, jest bardzo przejrzysta, estetyczna i nowoczesna. Jednak 
+wstępna konfiguracja wymaga od użytkownika nadania jej dostępu do kont które 
+zawierają wiele wrażliwych danych co jest problemem z uwagi na prywatność, 
+ponadto użytkownik musi samodzielnie z góry określić wydatki na poszczególne 
+kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
+
+
+%Trimmed content, leaving it here in case 3 examples are not enough 
+%\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
 %Worknotes
-{mobilna i desktopowa, darmowa (historia rok wstecz) i płatna 
-(rozszerzona, historia 7 lat wstecz), system kopertowy (dzielenie przychodów na 
-koszyki) z priorytetyzacją i monitoringiem, dobra do współdzielonego budżetu 
-(synchronizacja między kontami wielu użytkowników), wskazuje źródła edukacyjne, 
-dobre wsparcie i często rozszerzana, ręczne dodawanie wydatków, automatyczna i 
-ręczna kategoryzacja, [ręczny?] import danych,}
+%{mobilna i desktopowa, darmowa (historia rok wstecz) i płatna 
+%(rozszerzona, historia 7 lat wstecz), system kopertowy (dzielenie przychodów na 
+%koszyki) z priorytetyzacją i monitoringiem, dobra do współdzielonego budżetu 
+%(synchronizacja między kontami wielu użytkowników), wskazuje źródła edukacyjne, 
+%dobre wsparcie i często rozszerzana, ręczne dodawanie wydatków, automatyczna i 
+%ręczna kategoryzacja, [ręczny?] import danych,}
 
 % [#TODO]:
 % 3.3. Analiza istniejących rozwiązań               #TODO: dodaj streszczenie do do 3.1.
@@ -510,8 +569,20 @@ ręczna kategoryzacja, [ręczny?] import danych,}
         https://www.centrum24.pl/}
     \bibitem{mint} Inuit inc., Mint \raggedright\url{
         https://mint.intuit.com/}
+    \bibitem{mintrecenzja} Ryan McGregor, Mint Budgeting App: How to Setup and Use a Budget (BEST WAY) \raggedright\url{
+        https://www.youtube.com/watch?v=rQ_5v3BUBqQ}
     \bibitem{goodbudget} Dayspring Partners, Goodbudget \raggedright\url{
         https://goodbudget.com/}
+    \bibitem{porownanieaplikacji1} https://www.cnbc.com/select/best-free-budgeting-tools/ \raggedright\url{
+        https://www.cnbc.com/select/best-free-budgeting-tools}
+    \bibitem{porownanieaplikacji2} https://www.forbes.com/advisor/banking/best-budgeting-apps/ \raggedright\url{
+        https://www.forbes.com/advisor/banking/best-budgeting-apps/}
+    \bibitem{porownanieaplikacji3} https://www.tomsguide.com/best-picks/best-budgeting-apps \raggedright\url{
+        https://www.tomsguide.com/best-picks/best-budgeting-apps}
+    \bibitem{porownanieaplikacji4} https://www.investopedia.com/best-budgeting-apps-5085405 \raggedright\url{
+        https://www.investopedia.com/best-budgeting-apps-5085405}
+    \bibitem{porownanieaplikacji5} https://www.nerdwallet.com/article/finance/best-budget-apps \raggedright\url{
+        https://www.nerdwallet.com/article/finance/best-budget-apps}
 
     %Tools and technologies
     \bibitem{MOSCOW} Product Plan, MOSCOW Prioritetization \raggedright\url{
