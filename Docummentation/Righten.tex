@@ -285,14 +285,14 @@ budżetowania.}
     \caption{Główny Urząd Statystyczny, Dynamika realnych dochodów i wydatków na 1 osobę w gospodarstwach domowych
     w latach 2010–2022\cite{gussytuacjabudzetowa}}
     \label{gusbudzet10-22}
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/GUS_dynamikarealnychdochodowiwydatkow2010-2020.png}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
     \caption{300gospodarka.p, Inflacja w Polsce w latach 1996-2023 dane GUS}
     \label{inflacja}
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/300gospodarka-pl_inflacjawpolsce.png}
 \end{figure}
 
@@ -318,14 +318,14 @@ kategorie czy nawet produkty. Każde z podejść ma swoje dobre strony, i w grun
 \begin{figure}[H]           %requires float package
     \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - przychody}
     \label{prostybudżetprzychody}
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_przychody.jpg}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
     \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - wydatki}
     \label{prostybudżetwydatki}
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_wydatki.jpg}
 \end{figure}
 
@@ -400,8 +400,9 @@ odpowiedniej opcji wymaga od użytkownika dokładnego przeglądu i porównania k
 \section{\customstylesection{Budżet papierowy lub arkusz kalkulacyjny}}
 {Grupa ta obejmuje wiele różnorodnych narzędzi, nierzadko darmowych, lub takich, 
 które użytkownik posiada do innych celów. Przykładowe opcje obejmują proste 
-rozpiski i podsumowania na katrkach, arkuusze kalkulacyjne jak Microsoft 
-Excel\ref{budzetprzykladowyexcel}, Google Sheets, LibreOffice Calc. Największą 
+rozpiski i podsumowania na katrkach, arkusze kalkulacyjne jak Microsoft 
+Excel, Google Sheets, LibreOffice Calc - przykłady na rysunkach 
+\ref{budzetprzykladowyexcel} oraz \ref{budzetprzykladowypapier}. Największą 
 zaletą tych rozwiązań jest prostota dzięki której z tego typu rozwiązania jest 
 w stanie skorzystać w zasadzie każdy jednakże odpowiedzialność za manualne 
 utrzymanie i dbanie o jakość czy spójność danych spoczywa wyłącznie na 
@@ -427,23 +428,85 @@ dostępne rozwiązania.}
 \begin{figure}[H]           %requires float package
     \caption{https://marciniwuc.com/budzet-domowy-05-wydatki-nieregularne/ Przykładowy budżet w aplikacji Excel}
     \label{budzetprzykladowyexcel}
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/marciniwuc.com_Wydatki-nieregularne-plan-roczny.png}
 \end{figure}
+
+{Co ciekawe na tym podejściu zbudowana jest także aplikacja Tiller\cite{tiller},
+ służy jako interfejs który pozwala użytkownikowi na migrację danych bankowych 
+do prywatnego arkusza kalkulacyjnego w Excel lub Google Sheets, w którym tworzy 
+predefiniowany szablon z wizualizacjami i podsumowaniami.}
 
 \begin{figure}[H]           %requires float package
     \caption{https://jakoszczedzacpieniadze.pl/prosty-budzet-domowy Przykładowy budżet na papierze}
     \label{budzetprzykladowypapier}
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/jakoszczedzacpieniadze.pl_budzet-domowy-1.jpg}
 \end{figure}
 
-%#TODO
-\section{\customstylesection{Systemy bankowe - przykład funkcja Budżet w ING Banku Śląskim}}
+\section{\customstylesection{Systemy bankowe - Przegląd wydatków w Santander}}
+{Wraz z rozwojem technologii i cyfryzacji posiadanie konta bankowego stało się 
+praktyczne wymogiem. Na rynku istnieje szeroki wybór, dlatego jak każda 
+nowoczesna firma, także i banki starają się wyjść naprzeciw oczekiwaniom 
+klienta i zachęcić go dodatkowymi funkcjami. W efekcie, choć jest to jedynie 
+opcja dodatkowa, część z nich wdrożyło u siebie usługę pomagającą użytkownikowi 
+w analizie finansów i planowaniu budżetu.}
+
+\begin{figure}[H]           %requires float package
+    \caption{Centrum24.pl, Santander historia transakcji}
+    \label{santanderhistoria}
+    \centering
+    \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_historia.png}
+\end{figure}
+
+{Jako przykład posłuży system Przegląd wydatków na portalu centrum24.pl banku 
+Santander zaprezentowany na grysunku \ref{santanderprzeglad}. Usługa stara się 
+na bieżąco przypisywać transakcje dokonane na koncie klienta do dość ogólnych 
+kategorii, jednocześnie użytkownik może je dowolnie zmienić. Kategorie mają dwa 
+poziomy szczegółowości, dzięki czemu są grupowane jednak w pewnym stopniu 
+pozwalają ukazać szczegóły. Jak widać na rysunku \ref{santanderkategoryzacja} 
+użytkownikowi prezentowany jest wykres słupkowy pokazujący ilość wydanych 
+pieniędzy na poszczególne kategorie lub grupy kategorii, oraz wykres pokazujący 
+sumę wydatków w danym okresie i wszystkie transakcje któe wchodzą w ich skład.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \caption{Centrum24.pl, Santander przegląd kategorii wydatków}
+    \label{santanderprzegladkategoria}
+    \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_przeglad_kategoria.png}
+
+    \caption{Centrum24.pl, Santander kategoryzacja wydatków}
+    \label{santanderkategoryzacja}
+    \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_kategoryzacja.png}
+\end{figure}
+
+
+{System ma także swoje ograniczenia. Niestety prezentuje wyłącznie wydatki, tym 
+samym jedyne miejsce w którym użytkownik może podejrzeć swoje przychody jest 
+historia konta, jednak jak widać na rysunku \ref{santanderhistoria} jest to 
+jedynie suma w wybranym okresie, ewentualnie zestawienie transakcji wpływów 
+pozostawiając analizę w gestii użytkownika.}
+
+\begin{figure}[H]           %requires float package
+    \caption{Centrum24.pl, Santander przegląd wydatków}
+    \label{santanderprzeglad}
+    \centering
+    \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_przeglad.png}
+\end{figure}
+
 
 
 \section{\customstylesection{Aplikacje dedykowane - Intuit Mint}}
 %Worknotes
+{W trakcie pisania pracy dostawca aplikacji zdecydował się wycofać aplikacje z 
+początkiem roku 2024 i zachęcić użytkowników do migracji na swoją platformę 
+Credit Karma\cite{mintwycofanie} która pozbawiona jest funkcji budżetowania. 
+Mimo to przykład pozostaje aktualny ponieważ aplikacja jest uznawana przez wielu
+ użytkowników i recenzentów za jedną z najlepszych w klategorii finansów, 
+dlatego warto zwrócić uwagę na jej zalety i wady, zwłaszcza że jej wycofanie 
+tworzy na rynku pewną niszę.}
+
+
 {Aplikacja Intuit Mint\cite{mint}\cite{mintrecenzja} dostępna jest w wersji 
 darmowej z reklamami lub płatnej, na systemy mobilne Android i iOS oraz 
 przeglądarki. Po uruchomieniu Mint prezentuje użytkownikowi ekran z 
@@ -571,6 +634,8 @@ kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
         https://mint.intuit.com/}
     \bibitem{mintrecenzja} Ryan McGregor, Mint Budgeting App: How to Setup and Use a Budget (BEST WAY) \raggedright\url{
         https://www.youtube.com/watch?v=rQ_5v3BUBqQ}
+    \bibitem{mintwycofanie} theverge.com, Mint is shutting down, and it’s pushing users toward Credit Karma \raggedright\url{
+        https://mint.intuit.com/blog/mint-app-news/intuit-credit-karma-welcomes-minters/}
     \bibitem{goodbudget} Dayspring Partners, Goodbudget \raggedright\url{
         https://goodbudget.com/}
     \bibitem{porownanieaplikacji1} https://www.cnbc.com/select/best-free-budgeting-tools/ \raggedright\url{
@@ -583,6 +648,9 @@ kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
         https://www.investopedia.com/best-budgeting-apps-5085405}
     \bibitem{porownanieaplikacji5} https://www.nerdwallet.com/article/finance/best-budget-apps \raggedright\url{
         https://www.nerdwallet.com/article/finance/best-budget-apps}
+    \bibitem{tiller} Tiller Inc., Tiller \raggedright\url{
+        https://www.tillerhq.com/}
+       
 
     %Tools and technologies
     \bibitem{MOSCOW} Product Plan, MOSCOW Prioritetization \raggedright\url{
