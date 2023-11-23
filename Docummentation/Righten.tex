@@ -68,11 +68,11 @@
 \lstset{style=mystyle}
 
 % Code listings
-\newcommand\numberstyle[1]{%
+\newcommand\numberstyle[1]{
     \footnotesize
-    \color{codegray}%
+    \color{codegray}
     \ttfamily
-    \ifnum#1<10 0\fi#1 |%
+    \ifnum#1<10 0\fi#1 |
 }
 
 \renewcommand{\lstlistlistingname}{Listingi}
@@ -112,12 +112,24 @@
   % spacer
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % horizontal lines
 
-\newtcbox{\inlinecode}{on line, boxrule=0pt, boxsep=0pt, top=2pt, left=2pt, bottom=2pt, right=2pt, colback=gray!15, colframe=white, fontupper={\ttfamily \footnotesize}}
+\newtcbox{\inlinecode}{
+    on line, 
+    boxrule=0pt, 
+    boxsep=0pt, 
+    top=2pt, 
+    left=2pt, 
+    bottom=2pt, 
+    right=2pt, 
+    colback=gray!15, 
+    colframe=white, 
+    fontupper={\ttfamily \footnotesize}
+}
 
 % --------------------------- documment starts here ---------------------------
 
 % environment
 \begin{document}
+\begin{large}       %Remark 1: make size bigger by ~1,5p
 
 % Define pagestyle
 % [REQUIREMENT] 23. Przypisy dolne, stopki (nr stron), nagłówki...
@@ -207,17 +219,16 @@
 
 % 3.1. Wstęp <-[Wprowadzenie do tematyki projektu, Zamierzony cel projektu]
 %http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/wstep/
-
 \chapter{\customstylechapter{Wstęp}}
-{Finanse są dziedziną nauki ekonomicznej któa zajmuje się rozporządzaniem 
-pieniędzmi \cite{wiki_ekonomia}. Nauka ta w podobnym zakresie a różnej skali 
+{Finanse są dziedziną nauki ekonomicznej która zajmuje się rozporządzaniem 
+pieniędzmi  \cite{wiki_ekonomia}. Nauka ta w podobnym zakresie a różnej skali 
 dotyczy państw, dużych przedsiębiorstw, małych działalności gospodarczych jak i 
 zwykłych obywateli - w efekcie jest to dziedzina o stosunkowo prostych 
 podstawach jednak niesamowicie skomplikowana w każdym aspekcie w którym można ją
  zagłębić. Wiedza z tego zakresu staje się szczególnie przydatna w momencie 
 dynamicznych zmian sytuacji ekonomicznej, wtedy nierzadko decyduje ona o jakości
  oraz stanie życia poszczególnych osób fizycznych, rentowności przedsiębiorstw 
-czy stabilności państw\cite{zapaśćekonomiczna}. W przypadku państw i firm 
+czy stabilności państw \cite{zapaśćekonomiczna}. W przypadku państw i firm 
 przeważnie do zarządznia budżetem oddelegowane są dedykowane całe zespoły lub 
 dedykowani eksperci z tej dziedziny. Jednak osoby zarządzające budżetem domowym 
 najczęściej dysponują wyłacznie nabytym doświadczeniem i na ogół stosują 
@@ -236,28 +247,33 @@ narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automaty
 kategoryzujące wprowadzone dane. W zamierzeniu aby ułatwić obsługę wymagać 
 będzie minimalnej wiedzy i konfiguracji ze strony użytkownika, dostarczając mu 
 jedonocześnie możliwie najlepsze narzędzia. Będzie to aplikacja przeglądarkowa napisana w 
-języku Python, wykorzystująca frameworki: Bootstrap\cite{Bootstrap}, 
-Flask\cite{Flask}, WTForms\cite{WTForms}, jinja2\cite{jinja}, oraz bibliotekę 
-chart.js\cite{chart.js}.}
+języku Python, wykorzystująca frameworki: Bootstrap \cite{Bootstrap}, 
+Flask \cite{Flask}, WTForms \cite{WTForms}, jinja2 \cite{jinja}, oraz bibliotekę 
+chart.js \cite{chart.js}.}
 
 \medskip
 % #TODO: Uzupełniać w trakcie "Streszczenie zawartości kolejnych rozdziałów (...) Ten fragment to zakres pracy."
 {Rozdział drugi zawiera rozwinięcie charakterystyki i motywacji problemu krótko 
-zaznaczonej we wstępie pracy. Rozdział trzeci to analiza istniejących rozwiązań.}
+zaznaczonej we wstępie pracy. Rozdział trzeci to analiza istniejących rozwiązań.
+ Rozdział czwarty opisuje koncepcję własnego rozwiązania. Rozdział piąty to 
+ogólny zarys projektu. W rozdziale szóstym znajduje się dokumentacja techniczna.
+Rozdział siódmy to opis testów i weryfikacji systemu. Rozdział ósmy opisuje 
+przykładowy scenariusz wykorzystania systemu. Ostatecznie rozdział dziewiąty 
+jest zakończeniem pracy.}
 
 % 3.2. Charakterystyka/analiza problemu
 %http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/charakterystykaanaliza-problemu/
 \chapter{\customstylechapter{Charakterystyka i analiza problemu}}
 
 {Na dzień dzisiejszy wiedza z zakresu finansów oferowana w ramach systemu 
-edukacji publicznej jest znikoma\cite{edukacjafinansowawszkołach}. Sytuacja ta 
+edukacji publicznej jest znikoma \cite{edukacjafinansowawszkołach}. Sytuacja ta 
 utrzymuje się od dawna, dlatego spora część obywateli Polski słabo orientuje się
  w kwestii finansów osobistych, ekonomii i przedsiębiorczości. Istnieje wiele 
 aktywnie działających programów które wprowadzają uczestników w świat finansów 
 poprzez przedstawienie podstawowych zagadnień z dziedziny ekonomii i podstaw 
-inwestowania\cite{edukacjafinansowawszkołach}. Część działań ma na celu zbudować 
+inwestowania \cite{edukacjafinansowawszkołach}. Część działań ma na celu zbudować 
 w uczestnikach świadomość ogólnej sytuacji ekonomicznej jednakże jak wynika z 
-badań Banku Pekao\cite{edukacjafinansowamlodziezy}, większość rodziców stwierdza
+badań Banku Pekao \cite{edukacjafinansowamlodziezy}, większość rodziców stwierdza
  że nie posiada wystarczającej wiedzy o finansach żeby przekazać ją dzieciom, 
 co pozwala wysnuć wniosek iż sami zarządzają finansami rodzinnymi korzystając 
 raczej z intuicji i własnego doświadczenia aniżeli solidnych podstaw 
@@ -267,33 +283,33 @@ spokojna - zmiana podejścia pozwala wtedy co prawda więcej zaoszczędzić, jed
 w zasadzie jest to opcjonalne. Kiedy jednak na rynku czy to lokalnym czy 
 globalnym sytuacja staje się trudniejsza, co może powodować nagły wzrost 
 inflacji przeważnie koszta życia rosną niewspółmiernie do 
-zarobków\cite{gussytuacjabudzetowa}, a tym samym dopięcie finansów osobistych i 
+zarobków \cite{gussytuacjabudzetowa}, a tym samym dopięcie finansów osobistych i 
 domowych tak, by bilans wyszedł dodatni wymaga więcej uwagi i wiedzy. W 
 ostatnich latach (2019-2023) miało miejsce kilka zdarzeń któe dotknęły światową 
 gospodarkę. W momencie pisania tej pracy takimi wydarzeniami są pandemia Covid 
 19, działania zbrojne nw terenie Ukrainy oraz wojna na bliskim wschodzie. 
 Zdarzenia te jak wynika z badań Krajowego Rejestru Długów 
-\cite{portfelpolakawpandemii} u prawie połowy polaków wywołała poczucie 
+ \cite{portfelpolakawpandemii} u prawie połowy polaków wywołała poczucie 
 zagrożenia biedą, podczas gdy jedynie 22\% twierdzi że jest spokojna o swoją 
-sytuację finansową. Raport Warsaw Enterprise Institute \cite{weiinflacja} 
+sytuację finansową. Raport Warsaw Enterprise Institute  \cite{weiinflacja} 
 wykazuje natomiast spadek realnych płac (uwzględniających zarobki oraz wydatki) 
 średnio o 2\%, a w niektórych grupach możliwe 5-11\% w latach 2020-2022 co 
 wskazuje na wysokie zapotrzebowanie na narzędzia i edukację w zakresie 
 budżetowania.}
 
 \begin{figure}[H]           %requires float package
-    \caption{Główny Urząd Statystyczny, Dynamika realnych dochodów i wydatków na 1 osobę w gospodarstwach domowych
-    w latach 2010–2022\cite{gussytuacjabudzetowa}}
     \label{gusbudzet10-22}
     \centering
     \includegraphics[width=12cm]{figures/GUS_dynamikarealnychdochodowiwydatkow2010-2020.png}
+    \caption{Główny Urząd Statystyczny, Dynamika realnych dochodów i wydatków na 1 osobę w gospodarstwach domowych
+    w latach 2010–2022 \cite{gussytuacjabudzetowa}}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
-    \caption{300gospodarka.p, Inflacja w Polsce w latach 1996-2023 dane GUS}
     \label{inflacja}
     \centering
     \includegraphics[width=12cm]{figures/300gospodarka-pl_inflacjawpolsce.png}
+    \caption{300gospodarka.pl, Inflacja w Polsce w latach 1996-2023 dane GUS}
 \end{figure}
 
 {Planowanie domowego budżetu jest podstawowym narzędziem które pomaga utrzymać 
@@ -303,7 +319,7 @@ finansami. Dlatego dla osób rozpoczynających budżetowanie ważne jest
 przedstawienie w możliwie prostej, zwięzłej i przystępnej formie już gotowych 
 opracowanych rozwiązań które można zastosować aby świadomie zarządzać sytuacją 
 finansową własnego domostwa. W najprostszym wariancie na 
-budżet\cite{o24_budzetowanie}\cite{budget}\cite{iwućbudżet}\cite{mintbudget} 
+budżet \cite{o24_budzetowanie}\cite{budget}\cite{iwućbudżet}\cite{mintbudget}\cite{ingbudżet} 
 składają się: wpływy czyli dochody ze wszystkich źródeł, zobowiązania czyli 
 płatności stałe jak rachunki czy raty kredytów oraz wydatki które są 
 zróżnicowane. Skrupulatne zbieranie danych z pewnego okresu pozwala określić 
@@ -316,17 +332,17 @@ kategorie czy nawet produkty. Każde z podejść ma swoje dobre strony, i w grun
  rzeczy wybór odpowiedniego podejścia jest wyłacznie kwestią preferencji.}
 
 \begin{figure}[H]           %requires float package
-    \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - przychody}
-    \label{prostybudżetprzychody}
-    \centering
-    \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_przychody.jpg}
-\end{figure}
-
-\begin{figure}[H]           %requires float package
-    \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - wydatki}
     \label{prostybudżetwydatki}
     \centering
     \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_wydatki.jpg}
+    \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - wydatki}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \label{prostybudżetprzychody}
+    \centering
+    \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_przychody.jpg}
+    \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - przychody}
 \end{figure}
 
 {Poza ukazaniem ogólnego obrazu sytuacji finansowej w budżecie uwzględnić można 
@@ -334,9 +350,9 @@ cele jak spłata zadłużenia, czy planowany znaczny wydatek, oraz limity
 pomagające ograniczyć wydatki i cele przychodów zwiększające ilość dostępnych 
 środków finansowych. W literaturze przedmiotowej opisano także wiele przydatnych
  podejść oraz zasad jak wstępny podział wydatków na podstawie 
-priorytetów\cite{najbogatszyczlowiekwbabilonie} czy uwzględnienie oszczędzania 
-w formie podejścia najpierw zapłać sobie\cite{najbogatszyczlowiekwbabilonie}
-\cite{finansowaforteca} które można zastosować jako strategie zarządzania 
+priorytetów \cite{najbogatszyczlowiekwbabilonie} czy uwzględnienie oszczędzania 
+w formie podejścia najpierw zapłać sobie \cite{najbogatszyczlowiekwbabilonie}
+ \cite{finansowaforteca} które można zastosować jako strategie zarządzania 
 finansami domowymi aby usprawnić budżet lub osiągnąć zamierzony cel. Jednak aby 
 zastosować daną strategię trzeba ją najpierw znać, a jak wynika z informacji 
 opisanych wcześniej poziom wiedzy z zakresu finansów w Polsce oceniany jest jako
@@ -356,7 +372,7 @@ danych regionów, sektorów, segmentów gospodarki lub nawet ogólnie całego
 państwa, co z kolei można wykorzystać zwrotnie w samej aplikacji aby porównać 
 model wydatków użytkownika do adekwatnej średniej i zwrócić uwagę na obszary w 
 których pozytywnie od niej odstaje działając jako pozytywne wzmocnienie 
-dobrego nawyku\cite{pozytywnewzmocnienie}. Tego typu modelowanie jest już 
+dobrego nawyku \cite{pozytywnewzmocnienie}. Tego typu modelowanie jest już 
 przeprowadzane przez Główny Urząd Statystyczny, którego raporty publikowane są 
 co roku, jest to więc potencjalne źródło najbardziej precyzyjnych danych, które 
 mogłoby zostać wykorzystane do porównań.}
@@ -372,25 +388,24 @@ problemem tak starym jak sam wynalazek pieniądza, historycznie powstało wiele
 różnych rozwiązań których celem jest je ułatwić.}
 
 {Podstawową i najprostszą formą budżetu jest zapis na papierze czy chociażby w 
-formie księgi zawierającej przychody i wydatki\cite{o24_budzetowanie}. Sposób ten zostanie 
+formie księgi zawierającej przychody i wydatki \cite{o24_budzetowanie}. Sposób ten zostanie 
 przeanalizowany ponieważ do niedawna była to główna metoda prowadzenia budżetu 
 i mimo postępu cyfryzacji i informatyzacji nadal jest szeroko stosowany. Po 
 części zastąpiły go rozwiązania komputerowe w formie różnych aplikacji które 
 wymagają mniejszych lub większych nakładów pracy od użytkownika. Okazjonalnie 
 tego typu zestawienia prowadzone są dziś także w arkuszach kalkulacyjnych.}
 
-{Pierwszą w pełni cyfrową opcją są same witryny kont bankowych\cite{ingbudżet} 
+{Pierwszą w pełni cyfrową opcją są same witryny kont bankowych \cite{ingbudżet} 
 na których klient często może kategoryzować poszczególne transakcje i wyświetlać
  podsumowania oraz określić zakładany budżet. Rozwiązania te są dostępne dla 
 każdego klienta danego banku dlatego warto się im przyjrzeć, jako przykład 
-posłuży portal banku Santander - centrum24.pl\cite{santandercentrum24} oraz 
-narzędzie Budżet w banku ING\cite{ingbudżet}.}
+posłuży portal banku Santander - centrum24.pl \cite{santandercentrum24}.}
 
 {Na kolejną kategorię rozwiązań składają się aplikacje dedykowane do zarządzania
- budżetem\cite{budget}. Systemy tego typu po wprowadzeniu danych udostępniają 
+ budżetem \cite{budget}. Systemy tego typu po wprowadzeniu danych udostępniają 
 użytkownikowi cały wachlarz dodatkowych specjalistycznych opcji i narzędzi. 
-Omówione zostaną dwa przykłady tego rodzaju aplikacji - Intuit mint\cite{mint} 
-oraz Goodbudget\cite{goodbudget}. Na rynku dostępnych jest wiele więcej 
+Omówione zostaną dwa przykłady tego rodzaju aplikacji - Intuit mint \cite{mint} 
+oraz Goodbudget \cite{goodbudget}. Na rynku dostępnych jest wiele więcej 
 rozwiązań przez co użytkownik ma dowolny wybór, jednak świadomy wybór 
 odpowiedniej opcji wymaga od użytkownika dokładnego przeglądu i porównania kilku
  aplikacji.}
@@ -426,22 +441,22 @@ swoje potrzeby i dopasowanych do preferowanych metod pracy lepiej niż pozostał
 dostępne rozwiązania.}
 
 \begin{figure}[H]           %requires float package
-    \caption{https://marciniwuc.com/budzet-domowy-05-wydatki-nieregularne/ Przykładowy budżet w aplikacji Excel}
     \label{budzetprzykladowyexcel}
     \centering
     \includegraphics[width=12cm]{figures/marciniwuc.com_Wydatki-nieregularne-plan-roczny.png}
+    \caption{https://marciniwuc.com/budzet-domowy-05-wydatki-nieregularne/ Przykładowy budżet w aplikacji Excel}
 \end{figure}
 
-{Co ciekawe na tym podejściu zbudowana jest także aplikacja Tiller\cite{tiller},
+{Co ciekawe na tym podejściu zbudowana jest także aplikacja Tiller \cite{tiller},
  służy jako interfejs który pozwala użytkownikowi na migrację danych bankowych 
 do prywatnego arkusza kalkulacyjnego w Excel lub Google Sheets, w którym tworzy 
 predefiniowany szablon z wizualizacjami i podsumowaniami.}
 
 \begin{figure}[H]           %requires float package
-    \caption{https://jakoszczedzacpieniadze.pl/prosty-budzet-domowy Przykładowy budżet na papierze}
     \label{budzetprzykladowypapier}
     \centering
     \includegraphics[width=12cm]{figures/jakoszczedzacpieniadze.pl_budzet-domowy-1.jpg}
+    \caption{https://jakoszczedzacpieniadze.pl/prosty-budzet-domowy Przykładowy budżet na papierze}
 \end{figure}
 
 \section{\customstylesection{Systemy bankowe - Przegląd wydatków w Santander}}
@@ -453,10 +468,10 @@ opcja dodatkowa, część z nich wdrożyło u siebie usługę pomagającą użyt
 w analizie finansów i planowaniu budżetu.}
 
 \begin{figure}[H]           %requires float package
-    \caption{Centrum24.pl, Santander historia transakcji}
     \label{santanderhistoria}
     \centering
     \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_historia.png}
+    \caption{Centrum24.pl, Santander historia transakcji}
 \end{figure}
 
 {Jako przykład posłuży system Przegląd wydatków na portalu centrum24.pl banku 
@@ -471,15 +486,14 @@ sumę wydatków w danym okresie i wszystkie transakcje któe wchodzą w ich skł
 
 \begin{figure}[H]           %requires float package
     \centering
-    \caption{Centrum24.pl, Santander przegląd kategorii wydatków}
     \label{santanderprzegladkategoria}
     \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_przeglad_kategoria.png}
+    \caption{Centrum24.pl, Santander przegląd kategorii wydatków}
 
-    \caption{Centrum24.pl, Santander kategoryzacja wydatków}
     \label{santanderkategoryzacja}
     \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_kategoryzacja.png}
+    \caption{Centrum24.pl, Santander kategoryzacja wydatków}
 \end{figure}
-
 
 {System ma także swoje ograniczenia. Niestety prezentuje wyłącznie wydatki, tym 
 samym jedyne miejsce w którym użytkownik może podejrzeć swoje przychody jest 
@@ -488,26 +502,23 @@ jedynie suma w wybranym okresie, ewentualnie zestawienie transakcji wpływów
 pozostawiając analizę w gestii użytkownika.}
 
 \begin{figure}[H]           %requires float package
-    \caption{Centrum24.pl, Santander przegląd wydatków}
     \label{santanderprzeglad}
     \centering
     \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_przeglad.png}
+    \caption{Centrum24.pl, Santander przegląd wydatków}
 \end{figure}
 
-
-
 \section{\customstylesection{Aplikacje dedykowane - Intuit Mint}}
-%Worknotes
 {W trakcie pisania pracy dostawca aplikacji zdecydował się wycofać aplikacje z 
 początkiem roku 2024 i zachęcić użytkowników do migracji na swoją platformę 
-Credit Karma\cite{mintwycofanie} która pozbawiona jest funkcji budżetowania. 
+Credit Karma \cite{mintwycofanie} która pozbawiona jest funkcji budżetowania. 
 Mimo to przykład pozostaje aktualny ponieważ aplikacja jest uznawana przez wielu
  użytkowników i recenzentów za jedną z najlepszych w klategorii finansów, 
 dlatego warto zwrócić uwagę na jej zalety i wady, zwłaszcza że jej wycofanie 
 tworzy na rynku pewną niszę.}
 
 
-{Aplikacja Intuit Mint\cite{mint}\cite{mintrecenzja} dostępna jest w wersji 
+{Aplikacja Intuit Mint \cite{mint}\cite{mintrecenzja} dostępna jest w wersji 
 darmowej z reklamami lub płatnej, na systemy mobilne Android i iOS oraz 
 przeglądarki. Po uruchomieniu Mint prezentuje użytkownikowi ekran z 
 podsumowaniem finansów w obecnym miesiącu w postaci zakładek które grupują 
@@ -520,7 +531,7 @@ recenzjach i poradnikach opublikowanych w internecie. W zakładce Transakcje
 zgromadzone są także wszystkie płatności zarejestrowane na udostępnionych 
 aplikacji kontach, z opinii długotrwałych użytkowników wynika że jakość 
 automatycznej kategoryzacji jest 
-słaba\cite{porownanieaplikacji1}\cite{porownanieaplikacji2}\cite{porownanieaplikacji3}\cite{porownanieaplikacji4}. 
+słaba \cite{porownanieaplikacji1}\cite{porownanieaplikacji2}\cite{porownanieaplikacji3}\cite{porownanieaplikacji4}. 
 Użytkownik może je oznaczać etykietami (tag), dodawać do nich notatki czy wykluczać z zestawień. W zakładce 
 Miesiąc aplikacja generuje podsumowanie przychodów i wydatków, pozwala utworzyć 
 tygodniowe cele wydatków oraz budżet (a nawet kilka jednocześnie) przy użyciu 
@@ -536,10 +547,10 @@ przypomnienia o opłacie nadchodzących rachunków w postaci powiadomień push,
 wiadomości email lub wydarzeń w kalendarzu.}
 
 \begin{figure}[H]           %requires float package
-    \caption{https://www.pcmag.com/reviews/mintcom Mint w wersji mobilnej}
     \label{mintmobile}
     \centering  
     \includegraphics[width=12cm]{figures/pcmag_mintmobile_05OMSsUmroXJ6F6sETKpH9R-50.fit_lim.size_1152x.jpg}
+    \caption{https://www.pcmag.com/reviews/mintcom Mint w wersji mobilnej}
 \end{figure}
 
 {Wersja w przeglądarce pozwala dodać nieruchomości i pojazdy wliczane do 
@@ -549,10 +560,10 @@ kilka predefiniownych wykresów wizualizujących dane, zawierających dość og�
 dane.}
 
 \begin{figure}[H]           %requires float package
-    \caption{https://www.pcmag.com/reviews/mintcom Mint w wersji na przeglądarki}
     \label{mintweb}
     \centering  
     \includegraphics[width=12cm]{figures/pcmag_mintweb_05OMSsUmroXJ6F6sETKpH9R-51.fit_lim.size_1152x.jpg}
+    \caption{https://www.pcmag.com/reviews/mintcom Mint w wersji na przeglądarki}
 \end{figure}
 
 {Mint integruje także dodatkowe usługi jak wyliczanie zdolności kredytowej przez 
@@ -568,6 +579,63 @@ zawierają wiele wrażliwych danych co jest problemem z uwagi na prywatność,
 ponadto użytkownik musi samodzielnie z góry określić wydatki na poszczególne 
 kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
 
+% #TODO
+% 3.4. Koncepcja własnego rozwiązania (2-5 stron)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/koncepcja-wlasnego-rozwiazania/
+% Migrate and modernise previous description https://github.com/MarcinNowak94/Righten/commit/d8c84ff1961b77599568fe220021e3e78387e193 
+\chapter{\customstylechapter{Koncepcja własnego rozwiązania}}
+{Rozdział ten opisuje koncepcję rozwiązania problemów opisanych we wstępie na 
+podstawie wniosków wyciągniętych z analizy istniejących rozwiązań tak, by 
+skorzystywało możliwie jak najwięcej zalet, adresowało jak najwięcej uwag i 
+uzupełniało braki funckji w obecnie dostępnych na ruynku aplikacjach.}
+
+%m.in: 
+% mile widziane schematy ideowe, graficzne ilustracje przedtswionych koncepcji
+% można wskazać zagadnienia możliwe do wykonania, choć wykraczające poza ramy prac
+% wskazać i uzasadnić wybór metod i narzędzi pracy
+% koncepcja licencjonowania, dystrybucji, jacy odbiorcy
+
+\section{\customstylesection{Koncepcja rozwiązania użytkowego}}
+{Proponowane rozwiążanie powinno przyjąć formę aplikacji przeglądarkowej. 
+Pozwoli to trafić do szerszej grupy użytkowników minimalizując próg wejścia. 
+Projekt aplikacji obejmuje interakcje z pojedynczym użytkownikiem w danym 
+momencie, z uwagi na prywatność danych każdy z użytkowników będzie korzystał z 
+własnej instancji bazy danych aplikacji która przechowywana będzie lokalnie w 
+katalogu który użytkownik zdefinuje w ustawieniach użytkownika - za jej 
+zabezpieczenie przed nieuprawnionym dostępem będzie odpowiedzialny użytkownik. 
+Dostęp do danych będzie wymagany w krótkich okresach zapisu danych z pamięci 
+podręcznej aplikacji do bazy oraz odpytania bazy o dane. Aplikacja udostępniać 
+będzie użytkownikom interfejs do wprowadzania, edycji i usuwania danych jak 
+przychody, rachunki (płatności stałe), wydatki oraz kategorie po których będą 
+grupowane - typy produktów i produkty. Użytkownikom udostępnione zostaną 
+predefiniowane raporty złożone z wizualizacji, statystyk i danych analitycznych,
+ opcjonalnie jako funkcja dodatkowa trendy przewidywane na podstawie danych 
+historycznyh. Dodatkowo użytkownik będzie mógł określić własne progi wydatków i 
+które będą uwzględniane na wizualizacjach, oraz cele finansowe których postęp 
+realizacji będzie mógł śledzić.}
+
+\medskip
+
+{Istnieje też garstka mile widzianych funkcji które są obecnie poza zakresem 
+projektu, kilka przykładów opisano poniżej. Możliwość oceny funkcji przez 
+użytkownika oraz panel zgłoszeń propozycji i problemów, co pozwoli na 
+ukierunkowanie rozwoju aplikacji w stronę najbardziej przydatnych i potrzebnych 
+w danynm momencie rozwiązań. W dalszym etapie rozwoju aplikacji można także 
+wdrożyć moduł predykcji przyszłych wydatków w oparciu o dane historyczne. 
+Kolejnym obszarem z potencjałem rozwoju jest wprowadzanie danych - aby ułatwić 
+użytkowanie aplikacji można utworzyć moduł importu danych z plików w popularnym 
+standardowym formacie jak CSV, a w dalszej perspektywie nawet funkcje ekstrakcji
+ danych z obrazów cp pozwoli na wprowadzanie danych bezpośrednio ze zdjęć 
+paragonów, faktur, rachunków czy pasków wypłat.}
+
+% postać aplikacji - www/mobilna/desktop/hybrydowa?
+% ogólny szkic architektury
+% krótko narzędzia realizacji 
+% opcjonalne: dyskusja możliwych metod, technik i narzędzi realizacji pracy 
+% Nie wchodzić głęboko w zagadnienia technologiczne
+
+\section{\customstylesection{Koncepcja rozwiązania technologicznego}}
+{}
 
 %Trimmed content, leaving it here in case 3 examples are not enough 
 %\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
@@ -580,13 +648,12 @@ kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
 %ręczna kategoryzacja, [ręczny?] import danych,}
 
 % [#TODO]:
-% 3.3. Analiza istniejących rozwiązań               #TODO: dodaj streszczenie do do 3.1.
-% 3.4. Koncepcja własnego rozwiązania               #TODO: dodaj streszczenie do do 3.1.
-% 3.5. Projekt ogólny                               #TODO: dodaj streszczenie do do 3.1.
-% 3.6. Dokumentacja techniczna                      #TODO: dodaj streszczenie do do 3.1.
-% 3.7. Testy i weryfikacja systemu                  #TODO: dodaj streszczenie do do 3.1.
-% 3.8. Przykładowy scenariusz wykorzystania systemu #TODO: dodaj streszczenie do do 3.1.
-% 3.9. Zakończenie                                  #TODO: dodaj streszczenie do do 3.1.
+% 3.4. Koncepcja własnego rozwiązania
+% 3.5. Projekt ogólny
+% 3.6. Dokumentacja techniczna
+% 3.7. Testy i weryfikacja systemu
+% 3.8. Przykładowy scenariusz wykorzystania systemu
+% 3.9. Zakończenie
 % 3.13.Ewentualne załączniki
 
 
@@ -719,6 +786,7 @@ kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
 \listoftables
 \lstlistoflistings
 
+\end{large}
 \end{document}
 
 % Phase 2: Bachelors thesis ----------------------------------------------------
@@ -730,6 +798,7 @@ kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/
 % 3.1. Wstęp <-[sections moved here: Motywacja, cel i plan działania]
 % 3.2. Charakterystyka/analiza problemu
+% 3.3. Analiza istniejących rozwiązań
 % 3.10.Bibliografia
 % 3.11.Spis rysunków
 % 3.12.Spis tabel
