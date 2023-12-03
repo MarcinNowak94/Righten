@@ -18,16 +18,16 @@ with app.app_context():
     Products=Base.classes.Products
     Expenditures=Base.classes.Expenditures
     #TODO: temporary table, can get rid of it if data added to this table is strictly verified
-    Expenditures_transitory=Base.classes.Expenditures
+    ExpendituresTransitory=Base.classes.Expenditures
 
     #Views
-    Expenditures_Enriched=Table("Expenditures_Enriched", db.metadata, autoload_with=db.engine)
+    ExpendituresEnriched=Table("ExpendituresEnriched", db.metadata, autoload_with=db.engine)
     MonthlyBilance=Table("MonthlyBilance", db.metadata, autoload_with=db.engine)
     MonthlyBills=Table("MonthlyBills", db.metadata, autoload_with=db.engine)
     MonthlyExpenditures=Table("MonthlyExpenditures", db.metadata, autoload_with=db.engine)
     MonthlyIncome=Table("MonthlyIncome", db.metadata, autoload_with=db.engine)
-    Monthly_Expenditures_by_Type=Table("Monthly_Expenditures_by_Type", db.metadata, autoload_with=db.engine)
-    Monthly_common_products=Table("Monthly_common_products", db.metadata, autoload_with=db.engine)
+    MonthlyExpendituresbyType=Table("MonthlyExpendituresbyType", db.metadata, autoload_with=db.engine)
+    MonthlyCommonProducts=Table("MonthlyCommonProducts", db.metadata, autoload_with=db.engine)
     ProductSummary=Table("ProductSummary", db.metadata, autoload_with=db.engine)
     TypeSummary=Table("TypeSummary", db.metadata, autoload_with=db.engine)
     BillsSummary=Table("BillsSummary", db.metadata, autoload_with=db.engine)
@@ -47,15 +47,15 @@ tables={
     "ProductTypes": ProductTypes,
     "Products" : Products,
     "Expenditures" : Expenditures,
-    "Expenditures_transitory" : Expenditures_transitory,
+    "ExpendituresTransitory" : ExpendituresTransitory,
 
-    "Expenditures_Enriched" : Expenditures_Enriched,
+    "ExpendituresEnriched" : ExpendituresEnriched,
     "MonthlyBilance" : MonthlyBilance,
     "MonthlyBills" : MonthlyBills,
     "MonthlyExpenditures" : MonthlyExpenditures,
     "MonthlyIncome" : MonthlyIncome,
-    "Monthly_Expenditures_by_Type" : Monthly_Expenditures_by_Type,
-    "Monthly_common_products" : Monthly_common_products,
+    "MonthlyExpendituresbyType" : MonthlyExpendituresbyType,
+    "MonthlyCommonProducts" : MonthlyCommonProducts,
     "ProductSummary" : ProductSummary,
     "TypeSummary" : TypeSummary,
     "BillsSummary" : BillsSummary,

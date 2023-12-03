@@ -61,6 +61,7 @@ def incomesummary():
     IncomeSummarydata=db.session.query(TotalIncomeByType).all()
     incometypesummary=[]
     incometypes=[]
+    Summary = db.session.query(IncomeSummary).all()
     for sum, type in IncomeSummarydata:
         incometypesummary.append(sum)
         incometypes.append(type)
@@ -78,13 +79,15 @@ def incomesummary():
                            IncomeSummarydata=json.dumps(incometypesummary),
                            IncomeSummarylabels=json.dumps(incometypes),
                            MonthlyIncome=json.dumps(monthlyincomedata),
-                           IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset)
+                           IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset),
+                           Summary=Summary
                            )
 
 @app.route("/billssummary")
 def billssummary():
     BillsTypeAmounts=[]
     BillsTypes=[]
+    Summary = db.session.query(BillsSummary).all()
     for Medium, Amount in db.session.query(BillsSummary.columns.Medium,
                                            BillsSummary.columns.Amount)\
                                             .order_by(BillsSummary.columns.Amount.desc())\
@@ -104,7 +107,8 @@ def billssummary():
                            BillsTypeAmounts=json.dumps(BillsTypeAmounts),
                            BillsTypes=json.dumps(BillsTypes), 
                            MonthlyBillsData=json.dumps(MonthlyBillsData),
-                           BillsTypesData=json.dumps(BillsTypesData)
+                           BillsTypesData=json.dumps(BillsTypesData),
+                           Summary=Summary
                            )
 
 #TODO: Add product picker and corresponding graph
@@ -143,6 +147,7 @@ def expendituressummary():
                            )
 
 #TODO: Financial posture
+#TODO: add average income year to date
 @app.route("/finances")
 def finances():
     BilanceData=db.session.query(MonthlyBilanceSingle).all();
@@ -186,9 +191,13 @@ def finances():
                            BilanceData=json.dumps(BilanceSet)
                            )
 
-#TODO: productssummary
+#TODO: productssummary. Add panels:
+# - Product priority over time
+# - spending by Product (move from expenditures?)
+# - Top 10 low priority product spending Calculate (Amount*(100-priority))
 @app.route("/productssummary")
 def productssummary():
+        #Needs: 
         return render_template("underconstruction.html",
                            title="Products"
                            )
@@ -200,6 +209,7 @@ def producttypessummary():
                            title="Product types"
                            )
 
+#TODO: add average income year to date
 @app.route("/income", methods=["GET", "POST"])
 def income():
     form = IncomeInputForm()
@@ -215,6 +225,7 @@ def income():
         return redirect(redirect_url())
     return render_template("incometable.html", title="Income", entries=entries, form=form)
 
+#TODO: add average bills year to date
 @app.route("/bills", methods=["GET", "POST"])
 def bills():
     form = BillsInputForm()
@@ -230,6 +241,7 @@ def bills():
     
     return render_template("billstable.html", title="Bills", entries=entries, form=form)
 
+#TODO: add average expenditures year to date
 @app.route("/expenditures", methods=["GET", "POST"])
 def expenditures():
     form = ExpenditureInputForm()
@@ -315,10 +327,14 @@ def manQnA():
 
 
 #TODO: Secure - at least hash it
+#TODO: FIX - producttypestable > edit - "ProductTypes has no DateTime column"*/
 @app.route("/edit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
 def edit(table, entry_id):
     #TODO: this does not work, halting work for now
     #TODO: Generalize - use table variable
+    # - need to base available fields on table itself
+    # - IDs are not editable
+    # - some fields need to be from droplist
     form = IncomeInputForm()
     #Get edited entry from db
     entry = db.get_or_404(entity=tables[table], ident=entry_id)

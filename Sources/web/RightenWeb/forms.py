@@ -59,7 +59,7 @@ class ExpenditureInputForm(CommonForm):
 class ProductTypeInputForm(FlaskForm):
     #FIXME: check for duplicates  - idea, build blacklist regex from existing data
     type= StringField("Type", validators=[DataRequired()])
-    priority=IntegerField("Priority", validators=[DataRequired(), NumberRange(min=1,max=10)], default=5)
+    priority=IntegerField("Priority (%)", validators=[DataRequired(), NumberRange(min=1,max=100)], default=50)
     comment = StringField("Comment", validators=[])
     submit = SubmitField("SubmitField")
 
@@ -77,6 +77,6 @@ class ProductInputForm(FlaskForm):
     typeID = SelectField("Type", validators=[DataRequired()],
                         choices=types
                       )
-    priority=IntegerField("Priority", validators=[DataRequired(), NumberRange(min=1,max=10)], default=5)
+    priority=IntegerField("Priority (%)", validators=[DataRequired(), NumberRange(min=1,max=100)], default=50)
     comment = StringField("Comment", validators=[])
     submit = SubmitField("SubmitField")

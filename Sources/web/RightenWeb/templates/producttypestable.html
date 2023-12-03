@@ -41,13 +41,16 @@ IDs are turned into readable data which they represent-->
             <tr>
                 <th scope="col">ID</th>
                 <th scope="col">Type</th>
-                <th scope="col">Comment</th>
-                <th scope="col">Amount</th>
+                <th scope="col">TotalSpentOn</th>
                 <th scope="col">BoughtTimes</th>
+                <th scope="col">Priority</th>
                 <th scope="col">FirstBought</th>
                 <th scope="col">LastBought</th>
-                <th scope="col">Priority</th>
+                <th scope="col">Minimum</th>
+                <th scope="col">Average</th>
+                <th scope="col">Maximum</th>
                 <th scope="col">Common</th>
+                <th scope="col">Comment</th>
                 <th scope="col">Edit</th>
                 <th scope="col">Delete</th>
             </tr>
@@ -57,13 +60,16 @@ IDs are turned into readable data which they represent-->
                     <tr>
                         <td>{{entry.ID}}</td>
                         <td>{{entry.Type}}</td>
-                        <td>{{entry.Comment}}</td>
                         <td>{{entry.Amount}}</td>
-                        <td>{{entry.BoughtTimes}}</td>
-                        <td>{{entry.FirstBought}}</td>
-                        <td>{{entry.FirstBought}}</td>
+                        <td>{{entry.Times}}</td>
                         <td>{{entry.Priority}}</td>
+                        <td>{{entry.First}}</td>
+                        <td>{{entry.Last}}</td>
+                        <td>{{entry.Minimum}}</td>
+                        <td>{{entry.Average}}</td>
+                        <td>{{entry.Maximum}}</td>
                         <td>{{entry.Common}}</td>
+                        <td>{{entry.Comment}}</td>
                         <td><a href="{{ url_for('edit', table='ProductTypes', entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm">Edit</a></td>
                         <td><a href="{{ url_for('delete', table='ProductTypes',entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm">Delete</a></td>
                     </tr>
