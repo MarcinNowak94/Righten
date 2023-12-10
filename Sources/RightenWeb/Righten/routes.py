@@ -1,8 +1,8 @@
-from RightenWeb import app
-from RightenWeb import db
+from Righten import app
+from Righten import db
 from flask import render_template, flash, redirect, url_for, request
-from RightenWeb.models import *
-from RightenWeb.forms import *
+from Righten.models import *
+from Righten.forms import *
 from sqlalchemy import delete, union_all, func
 from datetime import date
 import json
@@ -245,7 +245,7 @@ def bills():
 @app.route("/expenditures", methods=["GET", "POST"])
 def expenditures():
     form = ExpenditureInputForm()
-    entries = db.session.query(Expenditures_Enriched).order_by(Expenditures_Enriched.columns.DateTime.desc()).all()
+    entries = db.session.query(ExpendituresEnriched).order_by(ExpendituresEnriched.columns.DateTime.desc()).all()
     if form.validate_on_submit():
         #TODO: GET ProductID, table[] usage is setup for generalization
         entry = Expenditures(DateTime=date.fromisoformat(form.datetime.data),

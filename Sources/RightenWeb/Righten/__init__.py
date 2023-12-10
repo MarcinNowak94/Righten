@@ -22,4 +22,4 @@ if (app.config['DEBUG']):
         print("{:<35} {:<10}".format(key, value))
 
 
-from RightenWeb import routes
+from Righten import routes

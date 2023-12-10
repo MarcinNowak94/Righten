@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, IntegerField, DecimalField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Regexp, NumberRange
 from datetime import date
-from RightenWeb.models import *
+from Righten.models import *
 
 #Base class with common elements
 class CommonForm(FlaskForm):

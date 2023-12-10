@@ -7,11 +7,11 @@ plot_height = window_height-10
 
 limit=5 #top n products graphed
 placeholder="placeholder"
-icon=".\Sources\Resources\Graphics\Icon.ico"
-logo=".\Sources\Resources\Graphics\Logo.png"
+icon=".\Resources\Graphics\Icon.ico"
+logo=".\Resources\Graphics\Logo.png"
 theme="DarkAmber"
 
-fullpath="E:\Projects\Budgeter_personal\Finances.sqlite3"
+fullpath="..\\Database\Righten_mock.sqlite3"
 selects={
     "AnyTable"              : "SELECT * FROM ["+placeholder+"]",
     "Expenditures"          : "SELECT * FROM [Expenditures_Enriched];",
@@ -53,8 +53,8 @@ inserts={
 }
 
 lanuguages={
-    "English (US)"          : ".\Sources\Resources\Locale\Righten_en_US.json",
-    "Polish"                : ".\Sources\Resources\Locale\Righten_pl_PL.json"
+    "English (US)"          : ".\Resources\Locale\Righten_en_US.json",
+    "Polish"                : ".\Resources\Locale\Righten_pl_PL.json"
 }
 
 #TODO: Fix workaround - need only to exstract keys from above
