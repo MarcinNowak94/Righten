@@ -1,7 +1,7 @@
 Flask
 flask_sqlalchemy
-Flask-WTF 
-python-dotenv 
-cryptography 
+Flask-WTF
+python-dotenv
+cryptography
 pyopenssl
-pysqlite3
+psycopg2_binary
