@@ -1,8 +1,8 @@
-from Righten import app
-from Righten import db
+from Resources import app
+from Resources import db
 from flask import render_template, flash, redirect, url_for, request
-from Righten.models import *
-from Righten.forms import *
+from Resources.models import *
+from Resources.forms import *
 from sqlalchemy import delete, union_all, func
 from datetime import date
 import json

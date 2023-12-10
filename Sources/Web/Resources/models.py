@@ -1,5 +1,5 @@
-from Righten import db
-from Righten import app
+from Resources import db
+from Resources import app
 from sqlalchemy import Table
 from sqlalchemy.ext.automap import automap_base
 
