@@ -1,8 +1,5 @@
-Preparation:
-pip3 install flask flask_sqlalchemy Flask-WTF python-dotenv cryptography pyopenssl
-To run application run python <thisfilepath> command in terminal
-
-#need to create keys as per https://stackoverflow.com/questions/29458548/can-you-add-https-functionality-to-a-python-flask-web-server
+Keys created according to:
+https://stackoverflow.com/questions/29458548/can-you-add-https-functionality-to-a-python-flask-web-server
 
 Sources used in creating this app:
 https://www.youtube.com/watch?v=3vfum74ggHE - framework reconeissance

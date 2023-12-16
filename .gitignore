@@ -22,3 +22,4 @@ Sources/web/RightenWeb/.env
 Sources/web/key.pem
 Sources/web/rightenlog.log
 Sources/Database/RightenDB/*
+Sources/.env

@@ -8,6 +8,14 @@ from datetime import date
 import json
 #NICE-TO-HAVE: Add event logging
 
+#https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
+#Dumping decimal data
+from decimal import Decimal
+class DecimalEncoder(json.JSONEncoder):
+  def default(self, obj):
+    if isinstance(obj, Decimal):
+      return str(obj)
+    return json.JSONEncoder.default(self, obj)
 
 def addtodb(entry):
     try:
@@ -76,10 +84,10 @@ def incomesummary():
 
     return render_template("incomesummary.html",
                            title="Income",
-                           IncomeSummarydata=json.dumps(incometypesummary),
-                           IncomeSummarylabels=json.dumps(incometypes),
-                           MonthlyIncome=json.dumps(monthlyincomedata),
-                           IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset),
+                           IncomeSummarydata=json.dumps(incometypesummary, cls=DecimalEncoder),
+                           IncomeSummarylabels=json.dumps(incometypes, cls=DecimalEncoder),
+                           MonthlyIncome=json.dumps(monthlyincomedata, cls=DecimalEncoder),
+                           IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset, cls=DecimalEncoder),
                            Summary=Summary
                            )
 
@@ -104,10 +112,10 @@ def billssummary():
 
     return render_template("billssummary.html",
                            title="Bills",
-                           BillsTypeAmounts=json.dumps(BillsTypeAmounts),
-                           BillsTypes=json.dumps(BillsTypes), 
-                           MonthlyBillsData=json.dumps(MonthlyBillsData),
-                           BillsTypesData=json.dumps(BillsTypesData),
+                           BillsTypeAmounts=json.dumps(BillsTypeAmounts, cls=DecimalEncoder),
+                           BillsTypes=json.dumps(BillsTypes, cls=DecimalEncoder),
+                           MonthlyBillsData=json.dumps(MonthlyBillsData, cls=DecimalEncoder),
+                           BillsTypesData=json.dumps(BillsTypesData, cls=DecimalEncoder),
                            Summary=Summary
                            )
 
@@ -139,11 +147,11 @@ def expendituressummary():
 
     return render_template("expendituressummary.html",
                            title="Expenditures",
-                           ExpendituresSummaryData=json.dumps(ExpendituresSummaryData),
-                           ExpendituresSummaryTypes=json.dumps(ExpendituresSummaryTypes), 
-                           MonthlyExpenditures=json.dumps(MonthlyExpendituresData),
-                           TopTypeExpenditures=json.dumps(TopTypeExpenditures),
-                           TopProductsExpenditures=json.dumps(TopProductsExpenditures)
+                           ExpendituresSummaryData=json.dumps(ExpendituresSummaryData, cls=DecimalEncoder),
+                           ExpendituresSummaryTypes=json.dumps(ExpendituresSummaryTypes, cls=DecimalEncoder), 
+                           MonthlyExpenditures=json.dumps(MonthlyExpendituresData, cls=DecimalEncoder),
+                           TopTypeExpenditures=json.dumps(TopTypeExpenditures, cls=DecimalEncoder),
+                           TopProductsExpenditures=json.dumps(TopProductsExpenditures, cls=DecimalEncoder)
                            )
 
 #TODO: Financial posture
@@ -184,11 +192,11 @@ def finances():
 
     return render_template("financialposture.html",
                            title="Finances",
-                           BilanceTotalLabels=json.dumps(BilanceTotalLabels),
-                           BilanceTotalValues=json.dumps(BilanceTotalValues),
+                           BilanceTotalLabels=json.dumps(BilanceTotalLabels, cls=DecimalEncoder),
+                           BilanceTotalValues=json.dumps(BilanceTotalValues, cls=DecimalEncoder),
                            NetIncome=NetIncome,
-                           BilanceSourcesData=json.dumps(BilanceSourcesData),
-                           BilanceData=json.dumps(BilanceSet)
+                           BilanceSourcesData=json.dumps(BilanceSourcesData, cls=DecimalEncoder),
+                           BilanceData=json.dumps(BilanceSet, cls=DecimalEncoder)
                            )
 
 #TODO: productssummary. Add panels:
@@ -210,6 +218,7 @@ def producttypessummary():
                            )
 
 #TODO: add average income year to date
+#TODO: Paginate
 @app.route("/income", methods=["GET", "POST"])
 def income():
     form = IncomeInputForm()
@@ -226,6 +235,7 @@ def income():
     return render_template("incometable.html", title="Income", entries=entries, form=form)
 
 #TODO: add average bills year to date
+#TODO: Paginate
 @app.route("/bills", methods=["GET", "POST"])
 def bills():
     form = BillsInputForm()
@@ -242,6 +252,7 @@ def bills():
     return render_template("billstable.html", title="Bills", entries=entries, form=form)
 
 #TODO: add average expenditures year to date
+#TODO: Paginate
 @app.route("/expenditures", methods=["GET", "POST"])
 def expenditures():
     form = ExpenditureInputForm()
