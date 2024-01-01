@@ -1,6 +1,7 @@
 #https://github.com/felipewom/docker-compose-postgres
 services:
   righten:
+    image:                'righten:app'
     build:                ./Web/
     restart:              always #might be bad choice
     command:              sh -c "sleep 10s ; python3 ./run.py" #Waiter script
@@ -13,9 +14,10 @@ services:
       - ./Logs:/logs
     depends_on:
       - rightendb
+    
   
-  #FIXME: Currently refuses connection from pgadmin, need to connect app
   rightendb:
+    image:                'rightendb:db'
     build:                ./Database/
     restart:              always
     ports:
@@ -24,16 +26,16 @@ services:
       POSTGRES_USER:      postgres # The PostgreSQL user (useful to connect to the database)
       POSTGRES_PASSWORD:  postgres # The PostgreSQL password (useful to connect to the database)
       POSTGRES_DB:        RightenDB # The PostgreSQL default database (automatically created at first launch
-    #Share folder with container to persist data
+    #Share catalog with container to persist data
     volumes:
       - ./Database/RightenDB/:/var/lib/postgresql/data/
       #Initialize data first time container is run
       - ./Database/Righten_mock-sqlite_dump_PostgreSQL-dialect.sql:/docker-entrypoint-initdb.d/init.sql
     
   pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4
-    restart: always
+    image:                dpage/pgadmin4
+    container_name:       pgadmin4_container
+    restart:              always
     environment:
       #Cardinal sin #1: Thou shall not devulge your password
       PGADMIN_DEFAULT_EMAIL: admin@righten.com

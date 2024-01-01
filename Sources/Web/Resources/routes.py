@@ -51,10 +51,14 @@ def createchartdataset(dbdata, fill="false"):
     return dataset
 
 #As per https://stackoverflow.com/questions/14277067/redirect-back-in-flask
-def redirect_url(default="/"):
-    return request.args.get("next") or \
+#FIXME: Does not work:
+# - original version - need to figure out how to use 'next' attribute
+# - modified version - delete does not know its referral, figure out callback 
+defaulturl="/"
+def redirect_url(destination=""):
+    return url_for(destination) or \
            request.referrer or \
-           url_for(default)
+           url_for(defaulturl)
 
 @app.route("/")
 def index():
@@ -63,6 +67,10 @@ def index():
 @app.route("/layout")
 def layout():
     return render_template("layout.html")
+
+
+
+#Summaries and visualizations --------------------------------------------------
 
 @app.route("/incomesummary")
 def incomesummary():
@@ -205,10 +213,9 @@ def finances():
 # - Top 10 low priority product spending Calculate (Amount*(100-priority))
 @app.route("/productssummary")
 def productssummary():
-        #Needs: 
-        return render_template("underconstruction.html",
-                           title="Products"
-                           )
+    return render_template("underconstruction.html",
+                        title="Products"
+                        )
 
 #TODO: producttypessummary
 @app.route("/producttypessummary")
@@ -217,8 +224,13 @@ def producttypessummary():
                            title="Product types"
                            )
 
+
+
+#Basic data display ------------------------------------------------------------
+
 #TODO: add average income year to date
 #TODO: Paginate
+#NICE-TO-HAVE: Add data import option
 @app.route("/income", methods=["GET", "POST"])
 def income():
     form = IncomeInputForm()
@@ -236,6 +248,7 @@ def income():
 
 #TODO: add average bills year to date
 #TODO: Paginate
+#NICE-TO-HAVE: Add data import option
 @app.route("/bills", methods=["GET", "POST"])
 def bills():
     form = BillsInputForm()
@@ -253,6 +266,7 @@ def bills():
 
 #TODO: add average expenditures year to date
 #TODO: Paginate
+#NICE-TO-HAVE: Add data import option
 @app.route("/expenditures", methods=["GET", "POST"])
 def expenditures():
     form = ExpenditureInputForm()
@@ -300,6 +314,10 @@ def producttypes():
 
     return render_template("producttypestable.html", title="Product Types", entries=entries, form=form)
 
+
+
+#Deletion and edition pages ----------------------------------------------------
+
 #NICE-TO-HAVE: let user bulk delete records
 #TODO: Fix - it does not work
 #TODO: Secure - at least hash it
@@ -315,6 +333,154 @@ def delete(table, entry_id):
         flash("Data not removed", "error")
     
     return redirect(redirect_url())
+
+#TODO: Secure - at least hash it
+#TODO: set propper initial type & source based on record
+@app.route("/incomeedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+def incomeedit(table, entry_id):
+    #TODO: this does not work, halting work for now
+    #TODO: Generalize - use table variable
+    # - need to base available fields on table itself
+    # - IDs are not editable
+    # - some fields need to be from droplist
+    #Get edited entry from db
+    entry = db.get_or_404(entity=tables[table], ident=entry_id)
+    #Repopulate fields for edition https://stackoverflow.com/questions/26506566/check-the-version-of-wtforms-used-in-flask-wtforms
+    form = IncomeInputForm(
+        datetime=entry.DateTime.strftime("%Y-%m-%d"),
+        amount=entry.Amount,
+        comment=entry.Comment,
+        type=entry.Type,
+        source=entry.Source,
+    )
+    if request.method == "POST" and form.validate_on_submit():
+        entry.DateTime=date.fromisoformat(form.datetime.data)
+        entry.Amount=form.amount.data.real
+        entry.Type=form.type.data
+        entry.Source=form.source.data
+        entry.Comment=form.comment.data
+        #TODO: Return to table, currently returns to editor -
+        try:
+            db.session.commit()
+            flash("Data updated", "success")
+        except Exception as error:
+            print(error)
+            db.session.flush()
+            flash("Data not updated", "error")
+        return redirect(redirect_url("income"))
+    return render_template("incomeedit.html", title="Income Edit", form=form)
+
+@app.route("/billsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+def billsedit(table, entry_id):
+    #Get edited entry from db
+    entry = db.get_or_404(entity=tables[table], ident=entry_id)
+    #Repopulate fields for edition https://stackoverflow.com/questions/26506566/check-the-version-of-wtforms-used-in-flask-wtforms
+    form = BillsInputForm(
+        datetime=entry.DateTime.strftime("%Y-%m-%d"),
+        amount=entry.Amount,
+        comment=entry.Comment,
+        medium=entry.Medium
+    )
+    if request.method == "POST" and form.validate_on_submit():
+        entry.DateTime=date.fromisoformat(form.datetime.data)
+        entry.Amount=form.amount.data.real
+        entry.Medium=form.medium.data
+        entry.Comment=form.comment.data
+        try:
+            db.session.commit()
+            flash("Data updated", "success")
+        except Exception as error:
+            print(error)
+            db.session.flush()
+            flash("Data not updated", "error")
+        return redirect(redirect_url("bills"))
+    return render_template("billsedit.html", title="Bills Edit", form=form)
+
+@app.route("/expendituresedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+def expendituresedit(table, entry_id):
+    #Get edited entry from db
+    entry = db.get_or_404(entity=tables[table], ident=entry_id)
+    #Repopulate fields for edition https://stackoverflow.com/questions/26506566/check-the-version-of-wtforms-used-in-flask-wtforms
+    form = form = ExpenditureInputForm(
+        datetime=entry.DateTime.strftime("%Y-%m-%d"),
+        amount=entry.Amount,
+        comment=entry.Comment,
+        productID=entry.ProductID,
+        isCash=entry.isCash
+    )
+    if request.method == "POST" and form.validate_on_submit():
+        entry.DateTime=date.fromisoformat(form.datetime.data)
+        entry.Amount=form.amount.data.real
+        entry.ProductID=form.productID.data
+        entry.isCash=form.isCash.data
+        entry.Comment=form.comment.data
+        try:
+            db.session.commit()
+            flash("Data updated", "success")
+        except Exception as error:
+            print(error)
+            db.session.flush()
+            flash("Data not updated", "error")
+            #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
+            #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
+        return redirect(redirect_url("expenditures"))
+    return render_template("expendituresedit.html", title="Expenditures Edit", form=form)
+
+@app.route("/producttypesedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+def producttypesedit(table, entry_id):
+    #Get edited entry from db
+    entry = db.get_or_404(entity=tables[table], ident=entry_id)
+    #Repopulate fields for edition https://stackoverflow.com/questions/26506566/check-the-version-of-wtforms-used-in-flask-wtforms
+    form = form = ProductTypeInputForm(
+        type=entry.Type,
+        priority=entry.Priority,
+        comment=entry.Comment
+    )
+    if request.method == "POST" and form.validate_on_submit():
+        entry.Type=form.type.data
+        entry.Priority=form.priority.data
+        entry.Comment=form.comment.data
+        try:
+            db.session.commit()
+            flash("Data updated", "success")
+        except Exception as error:
+            print(error)
+            db.session.flush()
+            flash("Data not updated", "error")
+            #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
+            #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
+        return redirect(redirect_url("producttypes"))
+    return render_template("producttypesedit.html", title="Product Types edit", form=form)
+
+@app.route("/productsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+def productsedit(table, entry_id):
+    #Get edited entry from db
+    entry = db.get_or_404(entity=tables[table], ident=entry_id)
+    #Repopulate fields for edition https://stackoverflow.com/questions/26506566/check-the-version-of-wtforms-used-in-flask-wtforms
+    form = form = ProductInputForm(
+        product=entry.Product,
+        typeID=entry.TypeID,
+        priority=entry.Priority,
+        comment=entry.Comment
+    )
+    if request.method == "POST" and form.validate_on_submit():
+        entry.Product=form.product.data
+        entry.TypeID=form.typeID.data
+        entry.Priority=form.priority.data
+        entry.Comment=form.comment.data
+        try:
+            db.session.commit()
+            flash("Data updated", "success")
+        except Exception as error:
+            print(error)
+            db.session.flush()
+            flash("Data not updated", "error")
+            #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
+            #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
+        return redirect(redirect_url("products"))
+    return render_template("productsedit.html", title="Products Edit", form=form)
+
+#Manual pages ------------------------------------------------------------------
 
 @app.route("/manbasic", methods=["GET"])
 def manbasic():
@@ -335,44 +501,3 @@ def manaction():
 @app.route("/manQnA", methods=["GET"])
 def manQnA():
     return render_template("underconstruction.html", title="Basics")
-
-
-#TODO: Secure - at least hash it
-#TODO: FIX - producttypestable > edit - "ProductTypes has no DateTime column"*/
-@app.route("/edit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
-def edit(table, entry_id):
-    #TODO: this does not work, halting work for now
-    #TODO: Generalize - use table variable
-    # - need to base available fields on table itself
-    # - IDs are not editable
-    # - some fields need to be from droplist
-    form = IncomeInputForm()
-    #Get edited entry from db
-    entry = db.get_or_404(entity=tables[table], ident=entry_id)
-    #Set default values for edition form 
-    if request.method == "POST" and form.validate_on_submit():
-        #FIXME: for some unknown reason form data is converted into tuples while saving into class fields, thus commits are failing
-        entry.DateTime=date.fromisoformat(form.datetime.data)
-        entry.Amount=form.amount.data.real #FIXME: (builtins.TypeError) float() argument must be a string or a real number, not 'tuple'
-        #FIXME: (sqlite3.InterfaceError) Error binding parameter 1 - probably unsupported type.
-        entry.Type=str(form.type.data),    #FIXME: Arbitrary string works, form data even converted into string does not
-        entry.Source=str(form.source.data),
-        entry.Comment=str(form.comment.data)
-
-        try:
-            db.session.commit()
-            flash("Data updated", "success")
-        except Exception as error:
-            print(error)
-            db.session.flush()
-            flash("Data not updated", "error")
-        return redirect(redirect_url())
-    else:
-        form.datetime.data=entry.DateTime.strftime("%Y-%m-%d")
-        form.amount.data=entry.Amount,
-        form.type.data=entry.Type,
-        form.source.data=entry.Source,
-        form.comment.data=entry.Comment
-    
-    flash("Data editted", "success")
-    return render_template("incomeedit.html", title="Incomeedit", form=form)
