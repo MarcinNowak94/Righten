@@ -13776,17 +13776,23 @@ FROM (
 )
 GROUP BY "Type", "Month"
 ORDER BY "Month" DESC, "Sum" DESC;
-CREATE VIEW "MonthlyCommonProducts" AS
+CREATE VIEW "MonthlyProducts" AS
 SELECT *
 FROM (
 	SELECT	TO_CHAR("DateTime", 'YYYY-MM')	AS "Month",
 			"Product",
 			COUNT("Product")				AS "Items", 
-			ROUND(SUM("Amount"),2)			AS "Sum"
+			ROUND(SUM("Amount"),2)			AS "Amount"
 	FROM "ExpendituresEnriched"
 	GROUP BY "Product", "Month"
-	ORDER BY "Month" DESC, "Sum" DESC
-) WHERE "Items">=4;	--#TODO: zmienić na średnią
+	ORDER BY "Month" DESC, "Amount" DESC
+);
+CREATE VIEW "MonthlyCommonProducts" AS
+SELECT *
+FROM "MonthlyProducts" 
+WHERE "Items">(
+	SELECT AVG("Items")
+	FROM "MonthlyProducts");
 CREATE VIEW "ProductSummary" AS
 SELECT
 	"Products"."ID"							AS "ID"

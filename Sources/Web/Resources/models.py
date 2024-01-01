@@ -29,6 +29,7 @@ with app.app_context():
     MonthlyExpenditures=Table("MonthlyExpenditures", db.metadata, autoload_with=db.engine)
     MonthlyIncome=Table("MonthlyIncome", db.metadata, autoload_with=db.engine)
     MonthlyExpendituresbyType=Table("MonthlyExpendituresbyType", db.metadata, autoload_with=db.engine)
+    MonthlyProducts=Table("MonthlyProducts", db.metadata, autoload_with=db.engine)
     MonthlyCommonProducts=Table("MonthlyCommonProducts", db.metadata, autoload_with=db.engine)
     ProductSummary=Table("ProductSummary", db.metadata, autoload_with=db.engine)
     TypeSummary=Table("TypeSummary", db.metadata, autoload_with=db.engine)
@@ -57,6 +58,7 @@ tables={
     "MonthlyExpenditures" : MonthlyExpenditures,
     "MonthlyIncome" : MonthlyIncome,
     "MonthlyExpendituresbyType" : MonthlyExpendituresbyType,
+    "MonthlyProducts" : MonthlyProducts,
     "MonthlyCommonProducts" : MonthlyCommonProducts,
     "ProductSummary" : ProductSummary,
     "TypeSummary" : TypeSummary,
