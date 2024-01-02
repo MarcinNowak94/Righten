@@ -17,6 +17,4 @@ Sources/web/key.pem
 Sources/web/rightenlog.log
 Sources/Database/RightenDB/*
 Sources/.env
-Sources/Web/Resources/__pycache__/*
-Sources/__pycache__/*
-Sources/web/RightenWeb/__pycache__/*
+*__pycache__*
