@@ -1,6 +1,8 @@
 from Resources import app
 from Resources import db
+import flask
 from flask import render_template, flash, redirect, url_for, request
+import flask_login
 from Resources.models import *
 from Resources.forms import *
 from sqlalchemy import delete, union_all, func
@@ -25,7 +27,7 @@ def addtodb(entry):
     except Exception as error:
         print(error)
         db.session.flush()
-        flash("Data not added", "error")
+        flash("Data not added", "danger")
 
 def createchartdataset(dbdata, fill="false"):
     months=[]
@@ -54,7 +56,7 @@ def createchartdataset(dbdata, fill="false"):
 #FIXME: Does not work:
 # - original version - need to figure out how to use 'next' attribute
 # - modified version - delete does not know its referral, figure out callback 
-defaulturl="/"
+defaulturl="index" #Does not work
 def redirect_url(destination=""):
     return url_for(destination) or \
            request.referrer or \
@@ -68,11 +70,74 @@ def index():
 def layout():
     return render_template("layout.html")
 
+#User authentication -----------------------------------------------------------
+#https://pypi.org/project/Flask-Login/
+#TODO: Mock user, change it -get users from database
+users = {'user@righten.com': {'password': 'secret'}}
 
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+
+class User(flask_login.UserMixin):
+    pass
+
+@login_manager.user_loader
+def user_loader(user):
+    if user not in users:
+        return
+
+    currentuser = User()
+    currentuser.id = user
+    return currentuser
+
+@login_manager.request_loader
+def request_loader(request):
+    user = request.form.get('email')
+    if user not in users:
+        return
+
+    currentuser = User()
+    currentuser.id = user
+    return currentuser
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if flask.request.method == 'POST':
+        email = flask.request.form['email']
+        if email in users and flask.request.form['password'] == users[email]['password']:
+            user = User()
+            user.id = email
+            flask_login.login_user(user)
+            flash("User logged in", "success")
+            return redirect(redirect_url("index")) #FIXME: Workaround untill redirect_url is fixed
+
+        flash("User failed to log in", "danger")
+        return redirect(redirect_url("login")) #FIXME: Workaround untill redirect_url is fixed
+    if flask.request.method == 'GET':    
+        return render_template("login.html", title="Login")
+
+@app.route('/logout')
+def logout():
+    flask_login.logout_user()
+    flash("User logged out", "success")
+    return redirect(redirect_url("index"))
+
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    flash("Access denied - requires logon", "danger")
+    return redirect(redirect_url("index"))
+
+#mock
+@app.route('/protected')
+@flask_login.login_required
+def protected():
+    return 'Logged in as: ' + flask_login.current_user.id
 
 #Summaries and visualizations --------------------------------------------------
 
 @app.route("/incomesummary")
+@flask_login.login_required
 def incomesummary():
     IncomeSummarydata=db.session.query(TotalIncomeByType).all()
     incometypesummary=[]
@@ -100,6 +165,7 @@ def incomesummary():
                            )
 
 @app.route("/billssummary")
+@flask_login.login_required
 def billssummary():
     BillsTypeAmounts=[]
     BillsTypes=[]
@@ -132,6 +198,7 @@ def billssummary():
 #TODO: Add pie chart by 'Necessary'
 #TODO: Organize displays by Amount descending
 @app.route("/expendituressummary")
+@flask_login.login_required
 def expendituressummary():
     ExpendituresSummarydata=db.session.query(TypeSummary.columns.Type,
                                              TypeSummary.columns.Amount)\
@@ -165,6 +232,7 @@ def expendituressummary():
 #TODO: Financial posture
 #TODO: add average income year to date
 @app.route("/finances")
+@flask_login.login_required
 def finances():
     BilanceData=db.session.query(MonthlyBilanceSingle).all();
     Bilance=[]
@@ -212,6 +280,7 @@ def finances():
 # - spending by Product (move from expenditures?)
 # - Top 10 low priority product spending Calculate (Amount*(100-priority))
 @app.route("/productssummary")
+@flask_login.login_required
 def productssummary():
     return render_template("underconstruction.html",
                         title="Products"
@@ -219,6 +288,7 @@ def productssummary():
 
 #TODO: producttypessummary
 @app.route("/producttypessummary")
+@flask_login.login_required
 def producttypessummary():
         return render_template("underconstruction.html",
                            title="Product types"
@@ -232,6 +302,7 @@ def producttypessummary():
 #TODO: Paginate
 #NICE-TO-HAVE: Add data import option
 @app.route("/income", methods=["GET", "POST"])
+@flask_login.login_required
 def income():
     form = IncomeInputForm()
     entries = db.session.query(Income).order_by(Income.DateTime.desc(),Income.ID.desc()).all()
@@ -250,6 +321,7 @@ def income():
 #TODO: Paginate
 #NICE-TO-HAVE: Add data import option
 @app.route("/bills", methods=["GET", "POST"])
+@flask_login.login_required
 def bills():
     form = BillsInputForm()
     entries = db.session.query(Bills).order_by(Bills.DateTime.desc()).all()
@@ -268,6 +340,7 @@ def bills():
 #TODO: Paginate
 #NICE-TO-HAVE: Add data import option
 @app.route("/expenditures", methods=["GET", "POST"])
+@flask_login.login_required
 def expenditures():
     form = ExpenditureInputForm()
     entries = db.session.query(ExpendituresEnriched).order_by(ExpendituresEnriched.columns.DateTime.desc()).all()
@@ -284,6 +357,7 @@ def expenditures():
     return render_template("expenditurestable.html", title="Expenditures", entries=entries, form=form)
 
 @app.route("/products", methods=["GET", "POST"])
+@flask_login.login_required
 def products():
     form = ProductInputForm()
     entries = db.session.query(ProductSummary).all()
@@ -300,6 +374,7 @@ def products():
     return render_template("productstable.html", title="Products", entries=entries, form=form)
 
 @app.route("/producttypes", methods=["GET", "POST"])
+@flask_login.login_required
 def producttypes():
     form = ProductTypeInputForm()
     entries = db.session.query(TypeSummary).all()
@@ -322,6 +397,7 @@ def producttypes():
 #TODO: Fix - it does not work
 #TODO: Secure - at least hash it
 @app.route("/delete/<string:table>/<int:entry_id>")
+@flask_login.login_required
 def delete(table, entry_id):
     try:
         db.session.query(tables[table]).filter_by(ID=entry_id).delete()
@@ -330,13 +406,14 @@ def delete(table, entry_id):
     except Exception as error:
         print(error)
         db.session.flush()
-        flash("Data not removed", "error")
+        flash("Data not removed", "danger")
     
     return redirect(redirect_url())
 
 #TODO: Secure - at least hash it
 #TODO: set propper initial type & source based on record
 @app.route("/incomeedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+@flask_login.login_required
 def incomeedit(table, entry_id):
     #TODO: this does not work, halting work for now
     #TODO: Generalize - use table variable
@@ -366,11 +443,12 @@ def incomeedit(table, entry_id):
         except Exception as error:
             print(error)
             db.session.flush()
-            flash("Data not updated", "error")
+            flash("Data not updated", "danger")
         return redirect(redirect_url("income"))
     return render_template("incomeedit.html", title="Income Edit", form=form)
 
 @app.route("/billsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+@flask_login.login_required
 def billsedit(table, entry_id):
     #Get edited entry from db
     entry = db.get_or_404(entity=tables[table], ident=entry_id)
@@ -392,11 +470,12 @@ def billsedit(table, entry_id):
         except Exception as error:
             print(error)
             db.session.flush()
-            flash("Data not updated", "error")
+            flash("Data not updated", "danger")
         return redirect(redirect_url("bills"))
     return render_template("billsedit.html", title="Bills Edit", form=form)
 
 @app.route("/expendituresedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+@flask_login.login_required
 def expendituresedit(table, entry_id):
     #Get edited entry from db
     entry = db.get_or_404(entity=tables[table], ident=entry_id)
@@ -420,13 +499,14 @@ def expendituresedit(table, entry_id):
         except Exception as error:
             print(error)
             db.session.flush()
-            flash("Data not updated", "error")
+            flash("Data not updated", "danger")
             #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
             #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
         return redirect(redirect_url("expenditures"))
     return render_template("expendituresedit.html", title="Expenditures Edit", form=form)
 
 @app.route("/producttypesedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+@flask_login.login_required
 def producttypesedit(table, entry_id):
     #Get edited entry from db
     entry = db.get_or_404(entity=tables[table], ident=entry_id)
@@ -446,13 +526,14 @@ def producttypesedit(table, entry_id):
         except Exception as error:
             print(error)
             db.session.flush()
-            flash("Data not updated", "error")
+            flash("Data not updated", "danger")
             #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
             #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
         return redirect(redirect_url("producttypes"))
     return render_template("producttypesedit.html", title="Product Types edit", form=form)
 
 @app.route("/productsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
+@flask_login.login_required
 def productsedit(table, entry_id):
     #Get edited entry from db
     entry = db.get_or_404(entity=tables[table], ident=entry_id)
@@ -474,7 +555,7 @@ def productsedit(table, entry_id):
         except Exception as error:
             print(error)
             db.session.flush()
-            flash("Data not updated", "error")
+            flash("Data not updated", "danger")
             #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
             #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
         return redirect(redirect_url("products"))
