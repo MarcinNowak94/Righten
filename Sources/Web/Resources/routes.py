@@ -257,6 +257,35 @@ def expendituressummary():
                            TopProductsExpenditures=json.dumps(TopProductsExpenditures, cls=DecimalEncoder)
                            )
 
+@app.route("/spending")
+@flask_login.login_required
+def spending():
+    Spending=db.session.query(MonthlySpending).all()
+    #FIXME: Temporary
+    PriorityTarget=33 #db.session.query(UserSettings.columns.Setting).filter_by(Setting="ProductPriorityTarget")
+    MonthlySpendingData=[]
+    MonthlyPossibleSavingsData=[]
+    ProductPriorityData=[]
+    TypePriorityData=[]
+    PriorityTargetData=[]
+    for Month, AverageDaily, Total, AverageProductPriority, AverageTypePriority, PossibleSavings in Spending:
+        MonthlySpendingData.append({"x":Month,"y":Total})
+        MonthlyPossibleSavingsData.append({"x":Month,"y":PossibleSavings})
+        ProductPriorityData.append({"x":Month,"y":AverageProductPriority})
+        TypePriorityData.append({"x":Month,"y":AverageTypePriority})
+        #Priority target is deeming which products are deemed as unnecessary expense
+        #Priority data is average of month priorities, thus target priority is 100-target  
+        PriorityTargetData.append({"x":Month,"y":100-PriorityTarget})
+    
+    return render_template("spendingsummary.html",
+                           title="Spending",
+                           MonthlySpendingData=json.dumps(MonthlySpendingData, cls=DecimalEncoder),
+                           MonthlyPossibleSavingsData=json.dumps(MonthlyPossibleSavingsData, cls=DecimalEncoder),
+                           ProductPriorityData=json.dumps(ProductPriorityData, cls=DecimalEncoder),
+                           TypePriorityData=json.dumps(TypePriorityData, cls=DecimalEncoder),
+                           PriorityTargetData=json.dumps(PriorityTargetData, cls=DecimalEncoder)
+                           )
+
 #TODO: Financial posture
 #TODO: add average income year to date
 @app.route("/finances")

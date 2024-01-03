@@ -1,0 +1,115 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-10, col-sm-12">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="MonthlySpending"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="ProductPrioritychart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    {% block javascript %}
+        <script>
+            let MonthlySpendingData = JSON.parse({{ MonthlySpendingData | tojson }})
+            let MonthlyPossibleSavingsData = JSON.parse({{ MonthlyPossibleSavingsData | tojson }})
+            let ProductPriorityData = JSON.parse({{ ProductPriorityData | tojson }})
+            let TypePriorityData = JSON.parse({{ TypePriorityData | tojson }})
+            let PriorityTargetData = JSON.parse({{ PriorityTargetData | tojson }})
+            
+
+            let MonthlySpending = new Chart(document.getElementById("MonthlySpending"), {
+                type: "line",
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Spending analysis",
+                            fontSize: 20
+                        }
+                    }
+                },
+                data: {
+                    datasets: [{
+                        label: "Spending",
+                        data: MonthlySpendingData,
+                        borderColor: "rgb(75, 192, 192)",
+                        lineTension: 0.1,
+                        fill: {
+                            target: 1,
+                            below: 'rgb(75, 192, 192)'    // And blue below the origin
+                        }
+                    },
+                    {
+                        label: "Possible savings",
+                        data: MonthlyPossibleSavingsData,
+                        fill: false,
+                        borderColor: "rgb(192, 75, 75)",
+                        lineTension: 0.1,
+                        fill: {
+                            target: 'origin',
+                            above: 'rgb(192, 75, 75)',   // Area will be red above the origin
+                            below: 'rgb(75, 192, 192)'    // And blue below the origin
+                        }
+                    }
+                    ]
+                }
+            })
+
+            let ProductPrioritychart = new Chart(document.getElementById("ProductPrioritychart"), {
+                type: "line",
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Priority",
+                            fontSize: 20
+                        }
+                    }
+                },
+                data: {
+                    datasets: [{
+                        label: "Product priority",
+                        data: ProductPriorityData,
+                        borderColor: "rgb(0, 0, 0)",
+                        lineTension: 0.1,
+                        fill: false
+                    },
+                    {
+                        label: "Type priority",
+                        data: TypePriorityData,
+                        borderColor: "rgb(217,217,214)",
+                        lineTension: 0.1,
+                        fill: false
+                    },
+                    {
+                        label: "Target",
+                        data: PriorityTargetData,
+                        borderColor: "rgb(rgb(119,221,119))",
+                        lineTension: 0.1,
+                        fill: false
+                    }
+                    ]
+                }
+            })
+        </script>
+    {% endblock %}
+{% endblock %}

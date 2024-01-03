@@ -22,6 +22,8 @@ with app.app_context():
     #TODO: temporary table, can get rid of it if data added to this table is strictly verified
     ExpendituresTransitory=Base.classes.Expenditures
     Users=Base.classes.Users
+    #FIXME: Figure out why this does not work
+    #UserSettings=Base.classes.UserSettings
 
     #Views
     ExpendituresEnriched=Table("ExpendituresEnriched", db.metadata, autoload_with=db.engine)
@@ -43,6 +45,7 @@ with app.app_context():
     Top10ProductTypesMonthly = Table("Top10ProductTypesMonthly", db.metadata, autoload_with=db.engine)
     Top10ProductsMonthly = Table("Top10ProductsMonthly", db.metadata, autoload_with=db.engine)
     MonthlyBilanceSingle = Table("MonthlyBilanceSingle", db.metadata, autoload_with=db.engine)
+    MonthlySpending = Table("MonthlySpending", db.metadata, autoload_with=db.engine)
 
 #Map used to generalize functions - to refer to table by objectname alone
 tables={
@@ -52,6 +55,8 @@ tables={
     "Products" : Products,
     "Expenditures" : Expenditures,
     "ExpendituresTransitory" : ExpendituresTransitory,
+    "Users" : Users,
+    "UserSettings" : UserSettings,
 
     "ExpendituresEnriched" : ExpendituresEnriched,
     "MonthlyBilance" : MonthlyBilance,
@@ -71,5 +76,6 @@ tables={
     "MonthlyBillsByMedium" : MonthlyBillsByMedium,
     "Top10ProductTypesMonthly" : Top10ProductTypesMonthly,
     "Top10ProductsMonthly" : Top10ProductsMonthly,
-    "MonthlyBilanceSingle" : MonthlyBilanceSingle
+    "MonthlyBilanceSingle" : MonthlyBilanceSingle,
+    "MonthlySpending" : MonthlySpending
 }
