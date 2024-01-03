@@ -1,4 +1,4 @@
-from Resources import app
+from Resources import app, version
 from Resources import db
 import flask
 from flask import render_template, flash, redirect, url_for, request
@@ -26,10 +26,12 @@ def addtodb(entry):
         db.session.add(entry)
         db.session.commit()
         flash("Data added", "success")
+        return True
     except Exception as error:
         print(error)
         db.session.flush()
         flash("Data not added", "danger")
+        return False
 
 def createchartdataset(dbdata, fill="false"):
     months=[]
@@ -150,9 +152,13 @@ def register():
     if request.method == "POST" and form.validate_on_submit():
         user = Users(ID=str(uuid.uuid4()),
                 Username=form.username.data,
-                Password=bcrypt.generate_password_hash(form.password.data)
+                Password=bcrypt.generate_password_hash(form.password.data),
+                isActive=True
         )
-        addtodb(user)
+        useradded=addtodb(user)
+        if useradded and version!="debug_local":
+            #TODO: create schema in postgreSQL
+            print("TODO: create schema in postgreSQL")
         return redirect(redirect_url("login"))
     return render_template('register.html', title="Register", form=form)
 
