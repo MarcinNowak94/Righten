@@ -21,6 +21,7 @@ with app.app_context():
     Expenditures=Base.classes.Expenditures
     #TODO: temporary table, can get rid of it if data added to this table is strictly verified
     ExpendituresTransitory=Base.classes.Expenditures
+    Users=Base.classes.Users
 
     #Views
     ExpendituresEnriched=Table("ExpendituresEnriched", db.metadata, autoload_with=db.engine)

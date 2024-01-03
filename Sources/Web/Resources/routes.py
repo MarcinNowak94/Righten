@@ -3,11 +3,13 @@ from Resources import db
 import flask
 from flask import render_template, flash, redirect, url_for, request
 import flask_login
-from Resources.models import *
-from Resources.forms import *
 from sqlalchemy import delete, union_all, func
 from datetime import date
 import json
+import uuid
+from Resources.models import *
+from Resources.forms import *
+from Resources.__init__ import bcrypt
 #NICE-TO-HAVE: Add event logging
 
 #https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
@@ -72,27 +74,29 @@ def layout():
 
 #User authentication -----------------------------------------------------------
 #https://pypi.org/project/Flask-Login/
-#TODO: Mock user, change it -get users from database
-users = {'user@righten.com': {'password': 'secret'}}
 
-
-login_manager = flask_login.LoginManager()
+login_manager = flask_login.LoginManager(app=app)
 login_manager.init_app(app)
+login_manager.login_view="login"
+login_manager.login_message="Log In to access this feature"
+login_manager.session_protection="strong"
 
 class User(flask_login.UserMixin):
     pass
 
 @login_manager.user_loader
-def user_loader(user):
-    if user not in users:
-        return
-
-    currentuser = User()
-    currentuser.id = user
-    return currentuser
+def user_loader(checkeduser):
+    users=db.session.query(Users).all()
+    for user in users:
+        if checkeduser ==user.Username:
+            currentuser = User()
+            currentuser.id = checkeduser
+            return currentuser
+    return
 
 @login_manager.request_loader
 def request_loader(request):
+    users=db.session.query(Users).all()
     user = request.form.get('email')
     if user not in users:
         return
@@ -103,21 +107,26 @@ def request_loader(request):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if flask.request.method == 'POST':
-        email = flask.request.form['email']
-        if email in users and flask.request.form['password'] == users[email]['password']:
+    form=LoginForm()
+    users=db.session.query(Users).all()
+    if request.method == "POST" and form.validate_on_submit():
+        username=form.username.data
+        usr=db.session.query(Users).filter_by(Username=username).first()
+        #if user does not exist password is not checked
+        if usr and bcrypt.check_password_hash(usr.Password, form.password.data.encode('utf-8')):
             user = User()
-            user.id = email
+            user.id = username
             flask_login.login_user(user)
             flash("User logged in", "success")
             return redirect(redirect_url("index")) #FIXME: Workaround untill redirect_url is fixed
 
-        flash("User failed to log in", "danger")
+        flash("Failed to log in", "danger")
         return redirect(redirect_url("login")) #FIXME: Workaround untill redirect_url is fixed
-    if flask.request.method == 'GET':    
-        return render_template("login.html", title="Login")
+    return render_template("login.html", title="Login", form=form)
 
+#FIXME: Workaround - login and logout should be one button
 @app.route('/logout')
+@flask_login.login_required
 def logout():
     flask_login.logout_user()
     flash("User logged out", "success")
@@ -128,11 +137,24 @@ def unauthorized_handler():
     flash("Access denied - requires logon", "danger")
     return redirect(redirect_url("index"))
 
-#mock
-@app.route('/protected')
+#TODO
+@app.route('/settings')
 @flask_login.login_required
-def protected():
-    return 'Logged in as: ' + flask_login.current_user.id
+def settings():
+    return render_template("underconstruction.html")
+
+#User registration https://www.youtube.com/watch?v=71EU8gnZqZQ&t=45s
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    form=RegisterForm()
+    if request.method == "POST" and form.validate_on_submit():
+        user = Users(ID=str(uuid.uuid4()),
+                Username=form.username.data,
+                Password=bcrypt.generate_password_hash(form.password.data)
+        )
+        addtodb(user)
+        return redirect(redirect_url("login"))
+    return render_template('register.html', title="Register", form=form)
 
 #Summaries and visualizations --------------------------------------------------
 

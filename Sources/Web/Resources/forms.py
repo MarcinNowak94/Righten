@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, IntegerField, DecimalField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Regexp, NumberRange
+from wtforms import StringField, SelectField, IntegerField, DecimalField, SubmitField, BooleanField, PasswordField
+from wtforms.validators import DataRequired, Regexp, NumberRange, InputRequired, Length, ValidationError
 from datetime import date
 from Resources.models import *
 
@@ -63,7 +63,7 @@ class ProductTypeInputForm(FlaskForm):
     comment = StringField("Comment", validators=[])
     submit = SubmitField("SubmitField")
 
-class ProductInputForm(FlaskForm): 
+class ProductInputForm(FlaskForm):
     #FIXME: check for duplicates  - idea, build blacklist regex from existing data
     with app.app_context():
       typesquery=db.session.query(
@@ -79,4 +79,17 @@ class ProductInputForm(FlaskForm):
                       )
     priority=IntegerField("Priority (%)", validators=[DataRequired(), NumberRange(min=1,max=100)], default=50)
     comment = StringField("Comment", validators=[])
-    submit = SubmitField("SubmitField")
+    submit = SubmitField("Submit")
+
+#As per https://youtu.be/71EU8gnZqZQ?t=999
+class RegisterForm(FlaskForm):
+    username=StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    #NICE-TO-HAVE: enforce better passowrd policy
+    password=PasswordField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Password"})
+    submit=SubmitField("Submit")
+
+class LoginForm(FlaskForm):
+    username=StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    #NICE-TO-HAVE: enforce better passowrd policy
+    password=PasswordField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Password"})
+    submit=SubmitField("Submit")

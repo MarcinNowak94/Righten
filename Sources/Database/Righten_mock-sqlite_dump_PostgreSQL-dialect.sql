@@ -1,4 +1,18 @@
 BEGIN TRANSACTION;
+
+CREATE TABLE "Users"
+(
+    "ID"		UUID NOT NULL,
+    "Username"	TEXT NOT NULL,
+    "Password"	TEXT NOT NULL,
+    "isActive"	BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (ID)
+);
+INSERT INTO Users (ID, Username, Password, isActive) VALUES
+("0665fe1c-7e28-43eb-96c7-5a2677d6ae03", "inactive@righten.com", "$2b$12$W0pMd68kiAw/ZIFIoWLAiOKj2wTjfyhwJJ1sJHLEsMnJXJmJxWUDO", false),
+("9394d310-7bbc-4ef0-9d62-069604999d6a", "blocktest@righten.com", "$2b$12$W0pMd68kiAw/ZIFIoWLAiOKj2wTjfyhwJJ1sJHLEsMnJXJmJxWUDO", false),
+("722feb4a-45a6-46f1-ad33-288a52726dfa", "johndoe@righten.com", "$2b$12$.MqS4bshtc6eGy3qBDFVO.cAI2urJE.UN.Bw9.ZfnUgQpEnd05POO", true),
+("3f2968b3-f765-490e-99ec-6ab8236ea06e", "user@righten.com", "$2b$12$.MqS4bshtc6eGy3qBDFVO.cAI2urJE.UN.Bw9.ZfnUgQpEnd05POO", true)
 CREATE TABLE IF NOT EXISTS "Income" (
 	"ID"	SERIAL PRIMARY KEY,
 	"Amount"	NUMERIC(10,2),

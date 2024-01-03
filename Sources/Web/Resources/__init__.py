@@ -1,6 +1,6 @@
 from flask import Flask
-import flask_login
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 #from logging.handlers import SysLogHandler
 #Secure config as per https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
 #https://www.youtube.com/watch?v=L1h5gRxh8w8
@@ -12,6 +12,7 @@ load_dotenv(os.path.join(basepath, '.env'))
 app=Flask(__name__)
 app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
 db=SQLAlchemy(app)
+bcrypt=Bcrypt(app)
 
 if not app.config['SECRET_KEY']:
     raise ValueError("No SECRET_KEY set for Flask application")
