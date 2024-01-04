@@ -93,3 +93,9 @@ class LoginForm(FlaskForm):
     #NICE-TO-HAVE: enforce better passowrd policy
     password=PasswordField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Password"})
     submit=SubmitField("Submit")
+
+class SettingsForm(FlaskForm):
+    productprioritytarget=IntegerField(validators=[InputRequired(), NumberRange(min=1,max=100)],  default=33)
+    password=PasswordField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "Password"})
+    passwordrepeated=PasswordField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "Repeat password"})
+    submit=SubmitField("Submit")

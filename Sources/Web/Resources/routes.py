@@ -3,6 +3,7 @@ from Resources import db
 import flask
 from flask import render_template, flash, redirect, url_for, request
 import flask_login
+from flask_login import current_user
 from sqlalchemy import delete, union_all, func
 from datetime import date
 import json
@@ -57,14 +58,10 @@ def createchartdataset(dbdata, fill="false"):
     return dataset
 
 #As per https://stackoverflow.com/questions/14277067/redirect-back-in-flask
-#FIXME: Does not work:
-# - original version - need to figure out how to use 'next' attribute
-# - modified version - delete does not know its referral, figure out callback 
-defaulturl="index" #Does not work
-def redirect_url(destination=""):
-    return url_for(destination) or \
+def redirect_url(default='index'):
+    return request.args.get('next') or \
            request.referrer or \
-           url_for(defaulturl)
+           url_for(default)
 
 @app.route("/")
 def index():
@@ -93,6 +90,7 @@ def user_loader(checkeduser):
         if checkeduser ==user.Username:
             currentuser = User()
             currentuser.id = checkeduser
+            currentuser.uuid = user.ID
             return currentuser
     return
 
@@ -110,7 +108,6 @@ def request_loader(request):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form=LoginForm()
-    users=db.session.query(Users).all()
     if request.method == "POST" and form.validate_on_submit():
         username=form.username.data
         usr=db.session.query(Users).filter_by(Username=username).first()
@@ -120,13 +117,13 @@ def login():
             user.id = username
             flask_login.login_user(user)
             flash("User logged in", "success")
-            return redirect(redirect_url("index")) #FIXME: Workaround untill redirect_url is fixed
+            return redirect(redirect_url(url_for("index", next="index")))
 
         flash("Failed to log in", "danger")
-        return redirect(redirect_url("login")) #FIXME: Workaround untill redirect_url is fixed
+        return redirect(redirect_url(url_for("login", next="index")))
     return render_template("login.html", title="Login", form=form)
 
-#FIXME: Workaround - login and logout should be one button
+#TODO: Login and logout should be one button
 @app.route('/logout')
 @flask_login.login_required
 def logout():
@@ -137,13 +134,45 @@ def logout():
 @login_manager.unauthorized_handler
 def unauthorized_handler():
     flash("Access denied - requires logon", "danger")
-    return redirect(redirect_url("index"))
+    return redirect(url_for('index'))
 
 #TODO
 @app.route('/settings')
 @flask_login.login_required
 def settings():
-    return render_template("underconstruction.html")
+    #FIXME: Does not work - KeyError
+    #usrentry = db.session.get(entity=tables[Users], ident=current_user.id)
+    #settingsentry = db.get_or_404(entity=tables[UserSettings], ident="ProductPriorityTarget")
+    
+    form=SettingsForm(
+    #    productprioritytarget=int(settingsentry.Value)
+    )
+
+    if request.method == "POST" and form.validate_on_submit():
+        #Passwords are stored in Users
+        if form.password.data and (form.password.data==form.passwordrepeated.data):
+            #usrentry.Password=bcrypt.generate_password_hash(form.password.data)
+            #try:
+            #    db.session.commit()
+            #    flash("Data updated", "success")
+            #except Exception as error:
+            #    print(error)
+            #    db.session.flush()
+            #    flash("Data not updated", "danger")
+            pass
+        #Settings are stored in UserSettings
+        if form.productprioritytarget.data:
+            #settingsentry.Value=int(form.productprioritytarget.data)
+            #try:
+            #    db.session.commit()
+            #    flash("Data updated", "success")
+            #except Exception as error:
+            #    print(error)
+            #    db.session.flush()
+            #    flash("Data not updated", "danger")
+            pass
+        return redirect(redirect_url())
+    return render_template("settings.html", form=form)
 
 #User registration https://www.youtube.com/watch?v=71EU8gnZqZQ&t=45s
 @app.route("/register", methods=['GET', 'POST'])
@@ -159,7 +188,7 @@ def register():
         if useradded and version!="debug_local":
             #TODO: create schema in postgreSQL
             print("TODO: create schema in postgreSQL")
-        return redirect(redirect_url("login"))
+        return redirect(redirect_url(url_for("login", next="login")))
     return render_template('register.html', title="Register", form=form)
 
 #Summaries and visualizations --------------------------------------------------
@@ -261,8 +290,7 @@ def expendituressummary():
 @flask_login.login_required
 def spending():
     Spending=db.session.query(MonthlySpending).all()
-    #FIXME: Temporary
-    PriorityTarget=33 #db.session.query(UserSettings.columns.Setting).filter_by(Setting="ProductPriorityTarget")
+    PriorityTarget=db.session.query(UserSettings).filter_by(Setting="ProductPriorityTarget").first()
     MonthlySpendingData=[]
     MonthlyPossibleSavingsData=[]
     ProductPriorityData=[]
@@ -275,7 +303,7 @@ def spending():
         TypePriorityData.append({"x":Month,"y":AverageTypePriority})
         #Priority target is deeming which products are deemed as unnecessary expense
         #Priority data is average of month priorities, thus target priority is 100-target  
-        PriorityTargetData.append({"x":Month,"y":100-PriorityTarget})
+        PriorityTargetData.append({"x":Month,"y":100-int(PriorityTarget.Value)})
     
     return render_template("spendingsummary.html",
                            title="Spending",
@@ -371,7 +399,7 @@ def income():
                 Comment=form.comment.data
         )
         addtodb(entry)
-        return redirect(redirect_url())
+        return redirect(redirect_url(url_for("income", next="income")))
     return render_template("incometable.html", title="Income", entries=entries, form=form)
 
 #TODO: add average bills year to date
@@ -389,7 +417,7 @@ def bills():
                 Comment=form.comment.data
         )
         addtodb(entry)
-        return redirect(redirect_url())
+        return redirect(redirect_url(url_for("bills", next="bills")))
     
     return render_template("billstable.html", title="Bills", entries=entries, form=form)
 
@@ -411,6 +439,7 @@ def expenditures():
         )
         addtodb(entry)
         return redirect(redirect_url())
+    
     return render_template("expenditurestable.html", title="Expenditures", entries=entries, form=form)
 
 @app.route("/products", methods=["GET", "POST"])
@@ -427,7 +456,7 @@ def products():
         )
         addtodb(entry)
         return redirect(redirect_url())
-
+    
     return render_template("productstable.html", title="Products", entries=entries, form=form)
 
 @app.route("/producttypes", methods=["GET", "POST"])
@@ -443,7 +472,7 @@ def producttypes():
         )
         addtodb(entry)
         return redirect(redirect_url())
-
+    
     return render_template("producttypestable.html", title="Product Types", entries=entries, form=form)
 
 
@@ -451,7 +480,6 @@ def producttypes():
 #Deletion and edition pages ----------------------------------------------------
 
 #NICE-TO-HAVE: let user bulk delete records
-#TODO: Fix - it does not work
 #TODO: Secure - at least hash it
 @app.route("/delete/<string:table>/<int:entry_id>")
 @flask_login.login_required
@@ -467,13 +495,12 @@ def delete(table, entry_id):
     
     return redirect(redirect_url())
 
+#TODO: Generalize - use table variable
 #TODO: Secure - at least hash it
 #TODO: set propper initial type & source based on record
 @app.route("/incomeedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
 @flask_login.login_required
 def incomeedit(table, entry_id):
-    #TODO: this does not work, halting work for now
-    #TODO: Generalize - use table variable
     # - need to base available fields on table itself
     # - IDs are not editable
     # - some fields need to be from droplist
@@ -501,7 +528,7 @@ def incomeedit(table, entry_id):
             print(error)
             db.session.flush()
             flash("Data not updated", "danger")
-        return redirect(redirect_url("income"))
+        return redirect(redirect_url())
     return render_template("incomeedit.html", title="Income Edit", form=form)
 
 @app.route("/billsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -528,7 +555,7 @@ def billsedit(table, entry_id):
             print(error)
             db.session.flush()
             flash("Data not updated", "danger")
-        return redirect(redirect_url("bills"))
+        return redirect(redirect_url())
     return render_template("billsedit.html", title="Bills Edit", form=form)
 
 @app.route("/expendituresedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -559,7 +586,7 @@ def expendituresedit(table, entry_id):
             flash("Data not updated", "danger")
             #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
             #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
-        return redirect(redirect_url("expenditures"))
+        return redirect(redirect_url())
     return render_template("expendituresedit.html", title="Expenditures Edit", form=form)
 
 @app.route("/producttypesedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -586,7 +613,7 @@ def producttypesedit(table, entry_id):
             flash("Data not updated", "danger")
             #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
             #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
-        return redirect(redirect_url("producttypes"))
+        return redirect(redirect_url())
     return render_template("producttypesedit.html", title="Product Types edit", form=form)
 
 @app.route("/productsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -615,7 +642,7 @@ def productsedit(table, entry_id):
             flash("Data not updated", "danger")
             #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
             #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
-        return redirect(redirect_url("products"))
+        return redirect(redirect_url())
     return render_template("productsedit.html", title="Products Edit", form=form)
 
 #Manual pages ------------------------------------------------------------------
@@ -638,4 +665,8 @@ def manaction():
 
 @app.route("/manQnA", methods=["GET"])
 def manQnA():
+    return render_template("underconstruction.html", title="Basics")
+
+@app.route("/contact", methods=["GET"])
+def contact():
     return render_template("underconstruction.html", title="Basics")

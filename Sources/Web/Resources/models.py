@@ -1,5 +1,4 @@
-from Resources import db
-from Resources import app
+from Resources import db, app
 from sqlalchemy import Table
 from sqlalchemy.ext.automap import automap_base
 
@@ -11,7 +10,7 @@ from sqlalchemy.ext.automap import automap_base
 #Currently 'public' schema, need to figure out how to make and access separate schemas for each user
 #https://stackoverflow.com/questions/2342999/postgres-is-there-a-way-to-tie-a-user-to-a-schema
 with app.app_context():
-    Base = automap_base()
+    Base = automap_base() 
     Base.prepare(autoload_with=db.engine, reflect=True)
     #Tables
     Income=Base.classes.Income
@@ -23,7 +22,7 @@ with app.app_context():
     ExpendituresTransitory=Base.classes.Expenditures
     Users=Base.classes.Users
     #FIXME: Figure out why this does not work
-    #UserSettings=Base.classes.UserSettings
+    UserSettings=Base.classes.UserSettings
 
     #Views
     ExpendituresEnriched=Table("ExpendituresEnriched", db.metadata, autoload_with=db.engine)
@@ -56,7 +55,7 @@ tables={
     "Expenditures" : Expenditures,
     "ExpendituresTransitory" : ExpendituresTransitory,
     "Users" : Users,
-    "UserSettings" : UserSettings,
+    #"UserSettings" : UserSettings,
 
     "ExpendituresEnriched" : ExpendituresEnriched,
     "MonthlyBilance" : MonthlyBilance,
