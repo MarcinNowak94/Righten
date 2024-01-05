@@ -14042,7 +14042,11 @@ CREATE VIEW "Statistics" AS
 		'FIRE savings requirement' AS "Statistic"
 		,SUM("Value")*12*25  AS "Value"	
 	FROM "StatisticsBase"
-	WHERE "Statistic" IN ('Average bills year to date', 'Average expenditures year to date');
+	WHERE "Statistic" IN ('Average bills year to date', 'Average expenditures year to date')
+	UNION SELECT 
+		'Net Worth' as "Statistic",
+		SUM(Amount) as "Value"
+	FROM MonthlyBilance;
 CREATE VIEW "MonthlySpending" AS
 SELECT
     TO_CHAR("Day", 'YYYY-MM') 				AS "Month"

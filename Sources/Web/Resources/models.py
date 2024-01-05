@@ -45,6 +45,7 @@ with app.app_context():
     Top10ProductsMonthly = Table("Top10ProductsMonthly", db.metadata, autoload_with=db.engine)
     MonthlyBilanceSingle = Table("MonthlyBilanceSingle", db.metadata, autoload_with=db.engine)
     MonthlySpending = Table("MonthlySpending", db.metadata, autoload_with=db.engine)
+    Statistics = Table("Statistics", db.metadata, autoload_with=db.engine)
 
 #Map used to generalize functions - to refer to table by objectname alone
 tables={
@@ -76,5 +77,6 @@ tables={
     "Top10ProductTypesMonthly" : Top10ProductTypesMonthly,
     "Top10ProductsMonthly" : Top10ProductsMonthly,
     "MonthlyBilanceSingle" : MonthlyBilanceSingle,
-    "MonthlySpending" : MonthlySpending
+    "MonthlySpending" : MonthlySpending,
+    "Statistics" : Statistics
 }

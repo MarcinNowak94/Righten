@@ -338,12 +338,9 @@ def finances():
     BilanceTotal=db.session.query(MonthlyBilance.columns.Source,
                                   db.func.round(db.func.sum(MonthlyBilance.columns.Amount)))\
                                     .group_by(MonthlyBilance.columns.Source).all()
-    
-    #Calculate net income
-    NetIncome=0
+
     Total=0
     for Source, Amount in BilanceTotal:
-        NetIncome=NetIncome+Amount
         Total=Total+abs(Amount)
     BilanceTotalLabels=[]
     BilanceTotalValues=[]
@@ -351,13 +348,15 @@ def finances():
         BilanceTotalLabels.append(Source+' '+str(round((abs(Amount)/Total)*100,2))+'%')
         BilanceTotalValues.append(Amount)
 
+    StatisticData=db.session.query(Statistics).all()
+
     return render_template("financialposture.html",
                            title="Finances",
                            BilanceTotalLabels=json.dumps(BilanceTotalLabels, cls=DecimalEncoder),
                            BilanceTotalValues=json.dumps(BilanceTotalValues, cls=DecimalEncoder),
-                           NetIncome=NetIncome,
                            BilanceSourcesData=json.dumps(BilanceSourcesData, cls=DecimalEncoder),
-                           BilanceData=json.dumps(BilanceSet, cls=DecimalEncoder)
+                           BilanceData=json.dumps(BilanceSet, cls=DecimalEncoder),
+                           StatisticData=StatisticData
                            )
 
 #TODO: productssummary. Add panels:

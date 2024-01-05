@@ -33,9 +33,23 @@
             </div>
         </div>
         <div class="col-xs-10, col-sm-6">
-            <div class="card card-style mb-2">
-                <h1>Net worth: {{ NetIncome }}</h1>
-            </div>
+            <H2>Statistics</H2>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Statistic</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in StatisticData %}
+                            <tr>
+                                <td>{{entry.Statistic}}</td>
+                                <td>{{entry.Value}}</td>
+                            </tr>
+                    {% endfor %}
+            </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -46,6 +60,7 @@
             let BilanceTotalValues = JSON.parse({{ BilanceTotalValues | tojson }})
             let BilanceData = JSON.parse({{ BilanceData | tojson }})
             let BilanceSourcesData = JSON.parse({{ BilanceSourcesData | tojson }})
+            
             
             let BilanceTotal = new Chart(document.getElementById("BilanceTotalChart"), {
                     type: 'pie',
