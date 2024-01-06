@@ -24,6 +24,7 @@
 \usepackage{index}          % Create an index
 \usepackage{setspace}       % Spacing
 \usepackage{float}          % Forcing figure placement
+\usepackage{placeins}       % Barrier to floats so tables don't "sink
 \usepackage{tabularray}     % Tables with wrapping
 \usepackage{xcolor,listings}% Code listings
 \usepackage{textcomp}       % Code listings
@@ -291,7 +292,7 @@ gospodarkę. W momencie pisania tej pracy takimi wydarzeniami są pandemia Covid
 Zdarzenia te jak wynika z badań Krajowego Rejestru Długów 
  \cite{portfelpolakawpandemii} u prawie połowy polaków wywołała poczucie 
 zagrożenia biedą, podczas gdy jedynie 22\% twierdzi że jest spokojna o swoją 
-sytuację finansową. Raport Warsaw Enterprise Institute  \cite{weiinflacja} 
+sytuację finansową. Raport Warsaw Enterprise Institute \cite{weiinflacja} 
 wykazuje natomiast spadek realnych płac (uwzględniających zarobki oraz wydatki) 
 średnio o 2\%, a w niektórych grupach możliwe 5-11\% w latach 2020-2022 co 
 wskazuje na wysokie zapotrzebowanie na narzędzia i edukację w zakresie 
@@ -319,7 +320,7 @@ finansami. Dlatego dla osób rozpoczynających budżetowanie ważne jest
 przedstawienie w możliwie prostej, zwięzłej i przystępnej formie już gotowych 
 opracowanych rozwiązań które można zastosować aby świadomie zarządzać sytuacją 
 finansową własnego domostwa. W najprostszym wariancie na 
-budżet \cite{o24_budzetowanie}\cite{budget}\cite{iwućbudżet}\cite{mintbudget}\cite{ingbudżet} 
+budżet \cite{o24_budzetowanie}\cite{budget}\cite{iwućbudżet}\cite{mintbudget}\cite{ingbudżet}\cite{budzetdomowypodkontrola} 
 składają się: wpływy czyli dochody ze wszystkich źródeł, zobowiązania czyli 
 płatności stałe jak rachunki czy raty kredytów oraz wydatki które są 
 zróżnicowane. Skrupulatne zbieranie danych z pewnego okresu pozwala określić 
@@ -350,17 +351,17 @@ cele jak spłata zadłużenia, czy planowany znaczny wydatek, oraz limity
 pomagające ograniczyć wydatki i cele przychodów zwiększające ilość dostępnych 
 środków finansowych. W literaturze przedmiotowej opisano także wiele przydatnych
  podejść oraz zasad jak wstępny podział wydatków na podstawie 
-priorytetów \cite{najbogatszyczlowiekwbabilonie} czy uwzględnienie oszczędzania 
-w formie podejścia najpierw zapłać sobie \cite{najbogatszyczlowiekwbabilonie}
- \cite{finansowaforteca} które można zastosować jako strategie zarządzania 
-finansami domowymi aby usprawnić budżet lub osiągnąć zamierzony cel. Jednak aby 
-zastosować daną strategię trzeba ją najpierw znać, a jak wynika z informacji 
-opisanych wcześniej poziom wiedzy z zakresu finansów w Polsce oceniany jest jako
- słaby, dlatego narzędzia do zarządzania finansami powinny, w najprostszej 
-formie udostępniać takie informacje w łatwo przystępnej formie, lub przy 
-bardziej zaawansowanym podejściu posiadać zabudowane mechanizmy które 
-pozwoliłyby użytkownikowi wybrać i zastosować strategię bez potrzeby jej 
-dogłębnej znajomości.}
+priorytetów \cite{najbogatszyczlowiekwbabilonie}\cite{budzetdomowypodkontrola} 
+czy uwzględnienie oszczędzania w formie podejścia najpierw zapłać sobie 
+\cite{najbogatszyczlowiekwbabilonie}\cite{finansowaforteca} które można 
+zastosować jako strategie zarządzania finansami domowymi aby usprawnić budżet 
+lub osiągnąć zamierzony cel. Jednak aby zastosować daną strategię trzeba ją 
+najpierw znać, a jak wynika z informacji opisanych wcześniej poziom wiedzy z 
+zakresu finansów w Polsce oceniany jest jako słaby, dlatego narzędzia do 
+zarządzania finansami powinny, w najprostszej formie udostępniać takie 
+informacje w łatwo przystępnej formie, lub przy bardziej zaawansowanym podejściu
+ posiadać zabudowane mechanizmy które pozwoliłyby użytkownikowi wybrać i 
+zastosować strategię bez potrzeby jej dogłębnej znajomości.}
 
 {Z uwagi na tematykę zwyczajowo są to dane bardzo wrażliwe, zatem wymagają 
 odpowiednich zabezpieczeń. Idealną opcją dla potencjalnych użytkowników byłoby 
@@ -417,7 +418,7 @@ odpowiedniej opcji wymaga od użytkownika dokładnego przeglądu i porównania k
 które użytkownik posiada do innych celów. Przykładowe opcje obejmują proste 
 rozpiski i podsumowania na katrkach, arkusze kalkulacyjne jak Microsoft 
 Excel, Google Sheets, LibreOffice Calc - przykłady na rysunkach 
-\ref{budzetprzykladowyexcel} oraz \ref{budzetprzykladowypapier}. Największą 
+\ref{fig:budzetprzykladowyexcel} oraz \ref{fig:budzetprzykladowypapier}. Największą 
 zaletą tych rozwiązań jest prostota dzięki której z tego typu rozwiązania jest 
 w stanie skorzystać w zasadzie każdy jednakże odpowiedzialność za manualne 
 utrzymanie i dbanie o jakość czy spójność danych spoczywa wyłącznie na 
@@ -475,11 +476,11 @@ w analizie finansów i planowaniu budżetu.}
 \end{figure}
 
 {Jako przykład posłuży system Przegląd wydatków na portalu centrum24.pl banku 
-Santander zaprezentowany na grysunku \ref{santanderprzeglad}. Usługa stara się 
+Santander zaprezentowany na rysunku \ref{fig:santanderprzeglad}. Usługa stara się 
 na bieżąco przypisywać transakcje dokonane na koncie klienta do dość ogólnych 
 kategorii, jednocześnie użytkownik może je dowolnie zmienić. Kategorie mają dwa 
 poziomy szczegółowości, dzięki czemu są grupowane jednak w pewnym stopniu 
-pozwalają ukazać szczegóły. Jak widać na rysunku \ref{santanderkategoryzacja} 
+pozwalają ukazać szczegóły. Jak widać na rysunku \ref{fig:santanderkategoryzacja} 
 użytkownikowi prezentowany jest wykres słupkowy pokazujący ilość wydanych 
 pieniędzy na poszczególne kategorie lub grupy kategorii, oraz wykres pokazujący 
 sumę wydatków w danym okresie i wszystkie transakcje któe wchodzą w ich skład.}
@@ -497,7 +498,7 @@ sumę wydatków w danym okresie i wszystkie transakcje któe wchodzą w ich skł
 
 {System ma także swoje ograniczenia. Niestety prezentuje wyłącznie wydatki, tym 
 samym jedyne miejsce w którym użytkownik może podejrzeć swoje przychody jest 
-historia konta, jednak jak widać na rysunku \ref{santanderhistoria} jest to 
+historia konta, jednak jak widać na rysunku \ref{fig:santanderhistoria} jest to 
 jedynie suma w wybranym okresie, ewentualnie zestawienie transakcji wpływów 
 pozostawiając analizę w gestii użytkownika.}
 
@@ -531,11 +532,12 @@ recenzjach i poradnikach opublikowanych w internecie. W zakładce Transakcje
 zgromadzone są także wszystkie płatności zarejestrowane na udostępnionych 
 aplikacji kontach, z opinii długotrwałych użytkowników wynika że jakość 
 automatycznej kategoryzacji jest 
-słaba \cite{porownanieaplikacji1}\cite{porownanieaplikacji2}\cite{porownanieaplikacji3}\cite{porownanieaplikacji4}. 
-Użytkownik może je oznaczać etykietami (tag), dodawać do nich notatki czy wykluczać z zestawień. W zakładce 
-Miesiąc aplikacja generuje podsumowanie przychodów i wydatków, pozwala utworzyć 
-tygodniowe cele wydatków oraz budżet (a nawet kilka jednocześnie) przy użyciu 
-prostego kreatora. Kreator budżetu wydaje się bardzo prosty w obsłudze, 
+słaba \cite{porownanieaplikacji1}\cite{porownanieaplikacji2}
+\cite{porownanieaplikacji3}\cite{porownanieaplikacji4}. Użytkownik może je 
+oznaczać etykietami (tag), dodawać do nich notatki czy wykluczać z zestawień. W 
+zakładce Miesiąc aplikacja generuje podsumowanie przychodów i wydatków, pozwala 
+utworzyć tygodniowe cele wydatków oraz budżet (a nawet kilka jednocześnie) przy 
+użyciu prostego kreatora. Kreator budżetu wydaje się bardzo prosty w obsłudze, 
 samodzielnie szacuje przychód na podstawie dostępnych danych który następnie 
 użytkownik zatwierdza lub nadpisuje dowolną wartością, w drugim kroku użytkownik
  definiuje samodzielnie listę kategorii oraz podkategorii wydatków co niestety 
@@ -579,7 +581,6 @@ zawierają wiele wrażliwych danych co jest problemem z uwagi na prywatność,
 ponadto użytkownik musi samodzielnie z góry określić wydatki na poszczególne 
 kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
 
-% #TODO
 % 3.4. Koncepcja własnego rozwiązania (2-5 stron)
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/koncepcja-wlasnego-rozwiazania/
 % Migrate and modernise previous description https://github.com/MarcinNowak94/Righten/commit/d8c84ff1961b77599568fe220021e3e78387e193 
@@ -622,30 +623,38 @@ standardowym formacie jak CSV, a w dalszej perspektywie nawet funkcje ekstrakcji
 progów wydatków które będą uwzględniane na wizualizacjach, oraz celi finansowych
  których postęp realizacji będzie mógł śledzić.}
 
+{W fazie rozwoju na potrzeby pracy inżynierskiej projekt będzie udostępniony 
+publicznie w wersji OpenSource, dlatego wstępnie interfejs powinien być w 
+języku angielskim aby poszerzyć grono potencjalnych użytkowników, poprawić 
+czytelnośćprojektu i ułatwić współpracę podczas rozwijania kodu w dalszych 
+etapach. Nie jest to natomiast docelowa jedyna wersja językowa - implementację 
+wyboru wersji językowej, tłumaczenie interfejsu na kilka popularnych języków 
+(manualnie lub maszynowo) pozostawiono jako funkcję dodatkową, opcjonalną.}
+
 % postać aplikacji - www/mobilna/desktop/hybrydowa?
 % ogólny szkic architektury
 % krótko narzędzia realizacji 
 % opcjonalne: dyskusja możliwych metod, technik i narzędzi realizacji pracy 
 % Nie wchodzić głęboko w zagadnienia technologiczne
 \section{\customstylesection{Koncepcja rozwiązania technologicznego}}
-{Projekt zostanie zrealizowany w metodologii prac Kanban\cite{Kanban} z 
-wykorzystaniem usługi Trello\cite{Trello}, priorytet zadań określać będzie 
-klasyfikacja MoSCoW\cite{MOSCOW}. Zgodnie ze standardem panującym w Informatyce
+{Projekt zostanie zrealizowany w metodologii prac Kanban \cite{Kanban} z 
+wykorzystaniem usługi Trello \cite{Trello}, priorytet zadań określać będzie 
+klasyfikacja MoSCoW \cite{MOSCOW}. Zgodnie ze standardem panującym w Informatyce
 w trakcie rozwoju aplikacji wykorzystany zostanie system kontroli źródła 
-git\cite{GIT}, a kod projektu przechowywany będzie na potralu 
-GitHub\cite{GitHub} (w repozytorium Righten\cite{GITRighten} - z poprzednimi 
+git \cite{GIT}, a kod projektu przechowywany będzie na potralu 
+GitHub \cite{GitHub} (w repozytorium Righten \cite{GITRighten} - z poprzednimi 
 wersjami projektu można się zapoznać w repozytorium 
-DatabaseShenanigans\cite{GITBudgeterApp} a jego dokumentacją w 
-Budgeter\cite{GITBudgeterDoc}). W projektowanym rozwiązaniu preferowane będą 
+DatabaseShenanigans \cite{GITBudgeterApp} a jego dokumentacją w 
+Budgeter \cite{GITBudgeterDoc}). W projektowanym rozwiązaniu preferowane będą 
 technologie i rozwiązania darmowe oraz opensource.}
 
 \medskip
 {Proponowane rozwiążanie powinno przyjąć formę trójwarstwowej aplikacji 
 przeglądarkowej, rysunek \ref{fig:architeturatrojwarstwowa} przedstawia 
 poglądową architekturę. Ponieważ z aplikacji ma korzystać wielu użytkowników 
-jednocześnie wymagana jest architektura multitenant\cite{multitenant}, któa 
+jednocześnie wymagana jest architektura multitenant \cite{multitenant}, któa 
 pozwala korzystajać wielu użytkownikom z tej samej bazy aplikacji - proponowana 
-technologia to PostgreSQL\cite{PostgreSQL}. Z uwagi na prywatność danych każdy 
+technologia to PostgreSQL \cite{PostgreSQL}. Z uwagi na prywatność danych każdy 
 z użytkowników docelowo będzie korzystał z własnego schmeatu w bazie danych 
 aplikacji przechowywanej na serwerze co przedstawia rysunek 
 \ref{fig:multitenant}, jest to jednak rozwiązanie które trudno wdrożyć, dlatego 
@@ -667,35 +676,294 @@ postaci pojedynczego domyślnego schematu danych dla każdego użytkownika
     \label{fig:multitenant}
 \end{figure}
 
-\medskip
-{Jest to projekt w głównej mierze edukacjyny więc wykorzystany zostanie język 
-programowania Python\cite{Python}, którego autor ma nadzieję dzięki niemu się 
-nauczyć.}
 
-{W warstwie interfejsu użytkownika (frontend) wykorzystane zostaną szablony 
-HTML z wykorzystaniem silnika szablonów jinja2\cite{jinja}, wzbogacone o funkcje
- udostępniane przez framework Bootstrap\cite{Bootstrap} który umożliwi 
+% 3.5. Projekt ogólny (10-25 stron.)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/projekt-ogolny/
+\chapter{\customstylechapter{Projekt ogólny}}
+{Rozdział ten opisuje ogólną koncepcję organizacji systemu, plan jego 
+architektury, przechowywanie danych, ogólny plan interfejsu użytkownika oraz 
+metody i narzędzia realizacji.}
+
+%opis funkcji udostępnianych przez system
+% - mile widziany diagram przypadkó użycia - Funkcje systemu odpowiadają 
+%   zazwyczaj przypadkom użycia
+% - można zaprezentować wymagania jako numerowaną listę, tabelę
+% - wymagania niefunkcjonalne - aspekty systemu które nie przekładają się 
+%   bezpośrednio na akcje wykonywane przez system (architektura, bezpieczeństwo,
+%   ergonomia, kolorystyka itd.)
+
+\section{\customstylesection{Specyfikacja wymagań funkcjonalnych i niefunkcjonalnych}}
+{Zestawienie funkcji które powinien spełniać program, wraz z informacją któe 
+z nich zostały spełnione. Nagłówki z powodu objętości zostały skrócone, legenda:}
+
+{PRIO - Priorytet w jednej z kategorii MOSCOW \cite{MOSCOW}}
+
+{IMPL - Oznaczenie czy funkcję wdrożono}
+
+%#TODO: try tabularray as suggested
+% Wrapping as per: https://stackoverflow.com/questions/790932/how-to-wrap-text-in-latex-tables
+\begin{table}[H] %https://www.overleaf.com/learn/latex/Positioning_images_and_tables
+    \caption{Wymagania niefunkcjonalne}
+    \label{Wymagania niefunkcjonalne}
+    \footnotesize
+    \begin{tabular}{|p{0.2\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}|p{0.52\linewidth}|}  % | draws verical line
+    % \usepackage{booktabs} provides different line thicknesses
+    % \toprule, \midrule, \bottomrule
+    \hline                  % Draw horizontal line
+    % & Defines the breaks in the table 
+    \customstyletable{Funkcja} & \customstyletablecentered{PRIO} & \customstyletablecentered{IMPL}& \customstyletable{Opis} \\
+    \hline
+    {Plik konfiguracji} & {M} & {TAK} & {Osobny plik konfiguracyjny}\\
+    \hline
+    {Rejestr zdarzeń} & {S} & {NIE} & {Logi z działania aplikacji}\\
+    \hline
+    {Instalator} & {W} & {NIE} & {Prosty instalator aplikacji}\\
+    \hline
+    {Aktualizacje} & {W} & {NIE} & {Automatyczne sprawdzanie wersji i aktualizacja}\\
+    \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H] %https://www.overleaf.com/learn/latex/Positioning_images_and_tables
+    \caption{Wymagania funkcjonalne}
+    \label{Wymagania funkcjonalne}
+    \footnotesize
+    \begin{tabular}{|p{0.2\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}|p{0.52\linewidth}|}  % | draws verical line
+    % \usepackage{booktabs} provides different line thicknesses
+    % \toprule, \midrule, \bottomrule
+    \hline                  % Draw horizontal line
+    % & Defines the breaks in the table 
+    \customstyletable{Funkcja} & \customstyletablecentered{PRIO} & \customstyletablecentered{IMPL}& \customstyletable{Opis} \\
+    \hline
+    {Dodawanie danych} & {M} & {TAK} & {Dodawanie danych}\\
+    \hline
+    {Podsumowanie wydatków} & {M} & {TAK} & {Okresowe podsumowanie wydatków}\\
+    \hline
+    {Podsumowanie przychodów} & {M} & {TAK} & {Okresowe podsumowanie przychodów}\\
+    \hline
+    {Statystyki typów} & {C} & {TAK} & {Statystyki wydatków na dany typ produktu}\\
+    \hline
+    {Statystyki produktów} & {C} & {TAK} & {Statystyki wydatków na dany produkt}\\
+    \hline
+    {Bilans okresowy} & {M} & {TAK} & {Okresowy bilnas zysków i strat}\\
+    \hline
+    {Definiowanie produktów} & {M} & {TAK} & {Definiowanie produktów}\\
+    \hline
+    {Definiowanie przychodów} & {M} & {TAK} & {Definiowanie przychodów}\\
+    \hline
+    {Definiowanie typów produktów} & {M} & {TAK} & {Definiowanie typów produktów}\\
+    \hline
+    {Definiowanie typów przychodów} & {C} & {NIE} & {Definiowanie typów przychodów}\\
+    \hline
+    {Panel konfiguracyjny} & {S} & {TAK} & {Osobny panel konfiguracyjny}\\
+    \hline
+    {Dostęp zdalny} & {M} & {TAK} & {Dostęp do zdalnych baz danych}\\
+    \hline
+    {Import danych} & {S} & {NIE} & {Import danych w standardowym formacie}\\
+    \hline
+    {Walidacja danych} & {M} & {TAK} & {Potwierdzenie jakości danych}\\
+    \hline
+    {Eksport danych} & {C} & {NIE} & {Eksport danych do standardowego formatu}\\
+    \hline
+    {Trendy} & {W} & {NIE} & {Predykcja trendów wydatkó i wpływów}\\
+    \hline
+    {Porady} & {C} & {TAK} & {Porady dla użytkownika dotyczące usprawnień budżetu}\\
+    \hline
+    {Wiele użytkowników} & {M} & {TAK} & {Wsparcie dla wielu użytkowników jednocześnie}\\
+    \hline
+    {Lokalizacje} & {C} & {NIE} & {Wersje językowe interfejsu do wyboru}\\
+    \hline
+    {Personalizacja interfejsu} & {W} & {NIE} & {Personalizacja interfejsu użytkownika}\\
+    \hline
+    \end{tabular}
+\end{table}
+
+%(system klasy desktop, mobilny, internetowy)
+%rysunki ideowe i poglądowe
+%Ogólny opis przeznaczenia i roli poszczególnych elementów i komunikacja między nimi
+\section{\customstylesection{Architektura systemu}}
+{Przedmiotem projektu będzie system klasy internetowej - aplikacja internetowa 
+dostępna w przeglądarce w architekturze trójwarstwowej. Aplikację będzie można 
+umieścić na dedykowanym serwerze lub jeśli dodatkowy cel konteneryzacji zostanie
+ zrealizowany - na dowolnej maszynie na której udostępniony będzie kod źródłowy 
+oraz zainstalowany Docker. Aplikacja podzielona będzie na interfejs użytkownika 
+(frontend) odpowiadający za interakcję z użytkownikiem i walidację danych, kod 
+na serwerze (backend) zawierający logikę działania aplikacji i komunikację z 
+warstwą dostępu do danych którą będzie baza danych z danymi aplikacji i 
+użytkowników. Wszystkie komponenty aplikacji docelowo działać będą na 
+pojedynczej maszynie, jednak nic nie stoi na przeszkodzie aby w przyszłości 
+jeżeli zajdzie taka potrzeba wydzielić poszczególne komponenty na osobnych 
+maszynach.}
+
+{Aby uprościć logikę aplikacji i zwiększyć jej wydajność ciężar przetwarzania 
+danych zostanie przerzucony na warstwę bazy danych. Zadanie to przejmą widoki 
+które odpytane przez aplikacje przetwarzają aplikacje w locie w bardzo wydajny 
+sposób.}
+
+%Przegląd możliwych metod i narzędzi realizacji
+%Wybrać jedno rozwiązanie i/lub uzasadnić wybór rozwiązania
+%Krótka charakterystyka narzędzi i określenie wersji
+%krótko i konkretnie, szczegóły tylko jeśli są istotne dla projektu
+\section{\customstylesection{Metody i narzędzia realizacji}}
+{Do implementacji kodu aplikacji użyty zostanie język Python \cite{Python}, 
+głównie ze względó walorów edukacyjnych i prostej, ekspresywnej składni co 
+zwiększy czytelność kodu i zmniejszy poziom złożoności aplikacji. Funkcje }
+
+{Warstwa interfejsu użytkownika (frontend) składać się będzie z szablonów HTML z
+ wykorzystaniem silnika szablonów jinja2 \cite{jinja}, wzbogacone o funkcje 
+udostępniane przez framework Bootstrap \cite{Bootstrap} który umożliwi 
 uzupełnianie danych w interfejsie użytkownika funkcjami napisanymi w 
-JavaScript\cite{Java}. Do obsługi formularzy wprowadzania danych posłuży 
-framework WTForms\cite{WTForms}, a wizualizacja danych będzie obługiwana dzięki 
-bibliotece chart.js\cite{chart.js}.}
+JavaScript \cite{JavaScript}. Do obsługi formularzy wprowadzania danych posłuży 
+framework WTForms \cite{WTForms}, a wizualizacja danych będzie obługiwana dzięki
+ bibliotece chart.js \cite{chart.js}.}
 
 {Do implementacji funkcji serwera sieciowego (backend) posłuży framework
- Flask\cite{Flask} wraz z dodatkowymi wtyczkami do obsługi poszczególnych 
-funkcji (m.in.: Flask-Login\cite{Flask-Login}) oraz określonymi w trakcie 
+ Flask \cite{Flask} wraz z dodatkowymi wtyczkami do obsługi poszczególnych 
+funkcji (m.in.: Flask-Login \cite{Flask-Login}) oraz określonymi w trakcie 
 pisania aplikacji wymaganymi bibliotekami.}
 
 {Wstępna warstwa bazy danych przygotowana na lokalnej instancji 
-SQLite3\cite{SQLite}, w dalszej części projektu zostanie zmigrowana do docelowej
- technologii jaką jest PostgreSQL\cite{PostgreSQL} - rozwiązanie takie przyjęto 
-ponieważ instancja PostgreSQL do działania wymaga serwera oraz osobnej aplikacji
- pgadmin\cite{pgAdmin} do zarządzania nią.}
+SQLite3 \cite{SQLite}, w dalszej części projektu zostanie zmigrowana do 
+docelowej technologii jaką jest PostgreSQL \cite{PostgreSQL} - rozwiązanie takie
+ przyjęto ponieważ instancja PostgreSQL do działania wymaga serwera oraz osobnej
+ aplikacji pgadmin \cite{pgAdmin} do zarządzania nią.}
 
- {Domyślnie rozwiązanie będzie działało natywnie na serwerze lub maszynie 
- wirtualnej, jednak opcjonalnie w ramach dalszego rozwoju przewidziano aby 
- środowisko aplikacji powoływać dynamicznie z wykorzystaniem platformy 
- uruchomieniowej Docker\cite{Docker}.}
+{Domyślnie rozwiązanie będzie działało natywnie na serwerze lub maszynie 
+wirtualnej, jednak opcjonalnie w ramach dalszego rozwoju przewidziano aby 
+środowisko aplikacji powoływać dynamicznie z wykorzystaniem platformy 
+uruchomieniowej Docker \cite{Docker}.}
 
+%#TODO: Continue from here
+%jak będziemy zapisywać dane trwale
+%model bazy danych i jego szczegóły
+%dla baz relacyjnych - konceptualny, logiczny i fizyczny, jeśli dużo się nie różnią ten najbardziej pełny
+%ERD (Entity-Relationship Diagram) i opis przenzaczenia tabel, klucze główne i obce
+\section{\customstylesection{Koncepcja przechowywania danych}}
+{W warstwie przechowywania danych aplikacji do trwałego zapisu posłuży baza 
+danych w technologii PostgreSQL \cite{PostgreSQL}. Podstawowy model schematu 
+bazy danych przedstawia rysunek \ref{fig:rightenerdtabele}, który prezentmuje Diagram 
+Związków Encji (ERD, Entity-Relationship Diagram) tabel w szablonowym schemacie bazy 
+danych aplikacji. Widoki przezentuje rysunek \ref{fig:rightenerdwidoki}, 
+przetwarzają one dane które prezentowane są użytkownikowi w aplikacji.}
+
+\begin{figure}[H]           %requires float package
+    \centering  
+    \includegraphics[width=12cm]{figures/RightenDB_EntityRelationDiagram.png}
+    \caption{Diagram Związków Encji (ERD, Entity-Relationship Diagram)}
+    \label{fig:rightenerdtabele}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering  
+    \includegraphics[width=12cm]{figures/Righten_Finances-db_Views.png}
+    \caption{Widoki w bazie danych aplikacji}
+    \label{fig:rightenerdwidoki}
+\end{figure}
+
+{Podstawowe tabele aplikacji: Tabela Income to zbiór przychodów, natomiast 
+tabela Bills to zbiór okresowych wydatków stałych. Tabela ProductTypes zawiera 
+dane o typach produktów, Tabela Products zawiera dane o Produktach które 
+powiązane są z typami. Tabela Expenditures przechowuje zbiór wydatków 
+okazjonalnych na określone produkty.}
+
+{Tabele dotyczące użytkownika: W tabeli Users przechowywane są dane o 
+użytkownikach aplikacji jak UUID, nazwa, hash hasła i ustawienia 
+administracyjne, ich identyfikatorem jest UUID. Tabela UserSettings zawiera 
+ustawienia prywatne użytkownika - jej struktura jest rozwijana wraz z rozwojem 
+funkcji projektu.}
+
+{Tabele pomocnicze i tymczasowe: są to tabele robocze do zarządzania danymi w 
+trakcie rozwoju, ich ilość, nazwy, struktura oraz przeznaczenie mogą się 
+zmieniać. Kiedy projektowana funkcja zostanie ukończona tabela wchodzi do użytku
+ w ramach którejś z wcześniej opisanych  kategorii.}
+
+%Organizacja interfejsu użytkownika - rysunki z komentarzem
+%szkice(mockup) i projekty, nie gotowe zrzuty ekranu
+%dla aplikacji responsywnych przykłady na różnych urządzeniach 
+\section{\customstylesection{Projekt interfejsu użytkownika}}
+{Interfejs użytkownika będzie prosty, minimalistyczny aby ułatwić użytkownikowi 
+poruszanie się po aplikacji i zmniejszyć obciążenie poznawcze. Dzięki temu opcje
+ powinny być łatwo dostępne, a ryzyko że użytkownik nie znajdzie opcji której 
+poszukuje minimalne.}
+
+{Pierwszym ekranem który napotka użytkownik jest tak zwany splashscreen którego 
+projekt prezentuje rysunek \ref*{fig:uiprojectsplash}. Rysunek 
+\ref*{fig:uiprojectlogin} prezentuje ekran logowania. Zalogowany użytkownik 
+będzie mógł zmienić swoje ustawienia na ekranie ustawień zobrazowanym przez 
+rysunek \ref*{fig:uiprojectsettings} - funkcja ta jest funkcją dodatkową, 
+zostanie zrealizowana jeśli wszystkie funkcje spełniające podstawowe założenia 
+i wymagane do prawidłowego działania aplikacji zostaną wdrożone. Dodatkowo w 
+aplikacji powstaną ekranu poradnika na wzór prezentowanego na rysunku 
+\ref*{fig:uiprojectguide} z podstawowymi informacjami o zarządzaniu finansami - 
+we wstępnej fazie aby pokazać potencjał rozwiązania ekran będzie tylko jeden, 
+pozostałe pozostaną puste lub zostaną wypełnione domyślnym tekstem, który w 
+miarę rozwoju aplikacji zastąpią docelowe informacje ze sprawdzonych źródeł o 
+dobrej reputacji.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_startscreen.png}
+    \caption{Projekt ekranu początkowego (splashscreen)}
+    \label{fig:uiprojectsplash}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_loginscreen.png}
+    \caption{Projekt ekranu logowania}
+    \label{fig:uiprojectlogin}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_settings.png}
+    \caption{Projekt ekranu dodawania danych}
+    \label{fig:uiprojectsettings}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_guide.png}
+    \caption{Projekt ekranu poradnika}
+    \label{fig:uiprojectguide}
+\end{figure}
+
+{Ekran zarządzania danymi prezentuje rysunek \ref*{fig:uiprojectdatamanagement},
+jest to ekran który pozwala edytować dane dodane przez ekran dodawania danych 
+przedstawiony na rysunku \ref*{fig:uiprojectadddata}. W obu ekranach dane 
+wprowadzane do aplikacji będą walidowane po stronie klienta przez logikę zaszytą
+ w formularzach do wprowadzania danych dostarczoną przez wybrane rozwiązanie.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_datamanagement.png}
+    \caption{Projekt ekranu zarządzania danymi}
+    \label{fig:uiprojectdatamanagement}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_adddata.png}
+    \caption{Projekt ekranu dodawania danych}
+    \label{fig:uiprojectadddata}
+\end{figure}
+
+{Na pozostałe ekrany aplikacji składać się będą różnego typu wizualizacje, 
+poglądowo prezentowane przez projekt na rysunku 
+\ref*{fig:uiprojectvisualizations}. Liczba i złożoność wizualizacji zależeć 
+będzie od nakładów pracy wymaganych do ich wdrożenia. Na wstępie użytkownikom 
+udostępnione zostaną wyłacznie podstawowe wizualizacje, natomiast bardziej 
+złożone i nowe uzupełniane będą z czasem w trakcie rozwoju aplikacji, w oparciu 
+o uwagi użytkowników. Takie podejście zagwarantuje że aplikacja będzie 
+maksymalnie przydatna do celów do których zostałą stworzona - pomocy 
+użytkownikom przy zarządzaniu budżetem.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_viusalizations.png}
+    \caption{Projekt ekranu dodawania danych}
+    \label{fig:uiprojectvisualizations}
+\end{figure}
 
 %Trimmed content, leaving it here in case 3 examples are not enough 
 %\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
@@ -708,8 +976,6 @@ ponieważ instancja PostgreSQL do działania wymaga serwera oraz osobnej aplikac
 %ręczna kategoryzacja, [ręczny?] import danych,}
 
 % [#TODO]:
-% 3.4. Koncepcja własnego rozwiązania
-% 3.5. Projekt ogólny
 % 3.6. Dokumentacja techniczna
 % 3.7. Testy i weryfikacja systemu
 % 3.8. Przykładowy scenariusz wykorzystania systemu
@@ -800,9 +1066,9 @@ ponieważ instancja PostgreSQL do działania wymaga serwera oraz osobnej aplikac
         https://en.wikipedia.org/wiki/SQL}
     \bibitem{PostgreSQL} postgresql.org, PostgreSQL \raggedright\url{
         https://www.postgresql.org/}
-    bibitem{pgAdmin} pgadmin.org, pgAdmin \raggedright\url{
+    \bibitem{pgAdmin} pgadmin.org, pgAdmin \raggedright\url{
         https://www.pgadmin.org/}
-    bibitem{Docker} docker.com, Docker \raggedright\url{
+    \bibitem{Docker} docker.com, Docker \raggedright\url{
         https://www.docker.com/}
     \bibitem{Python} python.org, Python \raggedright\url{
         https://www.python.org/}

@@ -1,0 +1,913 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="PostgreSQL" id="Project-1648" database="PostgreSQL" >
+	<schema name="public" >
+		<comment><![CDATA[standard public schema]]></comment>
+		<view name="BillsSummary" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT DISTINCT "Bills"."Medium",
+    COALESCE("Summary"."Amount", (0)::numeric) AS "Amount",
+    COALESCE("Summary"."BoughtTimes", (0)::bigint) AS "Times",
+    "Summary"."FirstBought" AS "First",
+    "Summary"."LastBought" AS "Last",
+    "Summary"."Minimum",
+    "Summary"."Average",
+    "Summary"."Maximum",
+    COALESCE("Summary"."Common", 'Absent'::text) AS "Common"
+   FROM ("Bills"
+     LEFT JOIN ( SELECT unnamed_subquery."Medium",
+            unnamed_subquery."Amount",
+            unnamed_subquery."BoughtTimes",
+            unnamed_subquery."LastBought",
+            unnamed_subquery."FirstBought",
+            unnamed_subquery."Average",
+            unnamed_subquery."Minimum",
+            unnamed_subquery."Maximum",
+                CASE
+                    WHEN ((unnamed_subquery."BoughtTimes")::numeric > ( SELECT avg(unnamed_subquery_1."BoughtTimes") AS "Average"
+                       FROM ( SELECT "Bills_1"."Medium",
+                                round(sum("Bills_1"."Amount"), 2) AS "Amount",
+                                count("Bills_1"."DateTime") AS "BoughtTimes",
+                                max("Bills_1"."DateTime") AS "LastBought",
+                                min("Bills_1"."DateTime") AS "FirstBought"
+                               FROM "Bills" "Bills_1"
+                              GROUP BY "Bills_1"."Medium"
+                              ORDER BY (count("Bills_1"."DateTime")) DESC) unnamed_subquery_1)) THEN 'Common'::text
+                    ELSE 'Uncommon'::text
+                END AS "Common"
+           FROM ( SELECT "Bills_1"."Medium",
+                    round(sum("Bills_1"."Amount"), 2) AS "Amount",
+                    count("Bills_1"."DateTime") AS "BoughtTimes",
+                    max("Bills_1"."DateTime") AS "LastBought",
+                    min("Bills_1"."DateTime") AS "FirstBought",
+                    round(avg("Bills_1"."Amount"), 2) AS "Average",
+                    min("Bills_1"."Amount") AS "Minimum",
+                    max("Bills_1"."Amount") AS "Maximum"
+                   FROM "Bills" "Bills_1"
+                  GROUP BY "Bills_1"."Medium"
+                  ORDER BY (count("Bills_1"."DateTime")) DESC) unnamed_subquery) "Summary" ON (("Bills"."Medium" = "Summary"."Medium")))]]></view_script>
+			<column name="Medium" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Times" type="bigint" />
+			<column name="First" type="date" />
+			<column name="Last" type="date" />
+			<column name="Minimum" type="numeric" />
+			<column name="Average" type="numeric" />
+			<column name="Maximum" type="numeric" />
+			<column name="Common" type="text" />
+		</view>
+		<view name="ExpendituresEnriched" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "Expenditures"."ID",
+    "Expenditures"."DateTime",
+    "Expenditures"."Amount",
+    "Products"."Product",
+    "ProductTypes"."Type",
+        CASE
+            WHEN ("Expenditures"."isCash" = false) THEN 'NO'::text
+            ELSE 'YES'::text
+        END AS "Cash",
+    "Expenditures"."Comment",
+    "Products"."Priority" AS "ProductPriority",
+    "ProductTypes"."Priority" AS "TypePriority"
+   FROM (("Expenditures"
+     LEFT JOIN "Products" ON (("Expenditures"."ProductID" = "Products"."ID")))
+     LEFT JOIN "ProductTypes" ON (("Products"."TypeID" = "ProductTypes"."ID")))
+  ORDER BY "Expenditures"."DateTime"]]></view_script>
+			<column name="ID" type="integer" />
+			<column name="DateTime" type="date" />
+			<column name="Amount" type="numeric" />
+			<column name="Product" type="text" />
+			<column name="Type" type="text" />
+			<column name="Cash" type="text" />
+			<column name="Comment" type="text" />
+			<column name="ProductPriority" type="integer" />
+			<column name="TypePriority" type="integer" />
+		</view>
+		<view name="IncomeSummary" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT DISTINCT "Income"."Source",
+    "Summary"."Type",
+    COALESCE("Summary"."Amount", (0)::numeric) AS "Amount",
+    COALESCE("Summary"."Times", (0)::bigint) AS "Times",
+    "Summary"."Minimum",
+    "Summary"."Average",
+    "Summary"."Maximum",
+    "Summary"."First",
+    "Summary"."Last",
+    ("Summary"."Last" - "Summary"."First") AS "Duration",
+    COALESCE("Summary"."Common", 'Absent'::text) AS "Common"
+   FROM ("Income"
+     LEFT JOIN ( SELECT unnamed_subquery."Source",
+            unnamed_subquery."Type",
+            unnamed_subquery."Amount",
+            unnamed_subquery."Times",
+            unnamed_subquery."Last",
+            unnamed_subquery."First",
+            unnamed_subquery."Average",
+            unnamed_subquery."Minimum",
+            unnamed_subquery."Maximum",
+                CASE
+                    WHEN ((unnamed_subquery."Times")::numeric > ( SELECT avg(unnamed_subquery_1."Times") AS "Average"
+                       FROM ( SELECT "Income_1"."Source",
+                                "Income_1"."Type",
+                                round(sum("Income_1"."Amount"), 2) AS "Amount",
+                                count("Income_1"."DateTime") AS "Times",
+                                max("Income_1"."DateTime") AS "Last",
+                                min("Income_1"."DateTime") AS "First"
+                               FROM "Income" "Income_1"
+                              GROUP BY "Income_1"."Source", "Income_1"."Type"
+                              ORDER BY "Income_1"."Source" DESC) unnamed_subquery_1)) THEN 'Common'::text
+                    ELSE 'Uncommon'::text
+                END AS "Common"
+           FROM ( SELECT "Income_1"."Source",
+                    "Income_1"."Type",
+                    round(sum("Income_1"."Amount"), 2) AS "Amount",
+                    count("Income_1"."DateTime") AS "Times",
+                    max("Income_1"."DateTime") AS "Last",
+                    min("Income_1"."DateTime") AS "First",
+                    round(avg("Income_1"."Amount"), 2) AS "Average",
+                    min("Income_1"."Amount") AS "Minimum",
+                    max("Income_1"."Amount") AS "Maximum"
+                   FROM "Income" "Income_1"
+                  GROUP BY "Income_1"."Source", "Income_1"."Type"
+                  ORDER BY (count("Income_1"."DateTime")) DESC) unnamed_subquery) "Summary" ON (("Income"."Source" = "Summary"."Source")))]]></view_script>
+			<column name="Source" type="text" />
+			<column name="Type" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Times" type="bigint" />
+			<column name="Minimum" type="numeric" />
+			<column name="Average" type="numeric" />
+			<column name="Maximum" type="numeric" />
+			<column name="First" type="date" />
+			<column name="Last" type="date" />
+			<column name="Duration" type="integer" />
+			<column name="Common" type="text" />
+		</view>
+		<view name="IncomeSummaryByType" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT DISTINCT "Summary"."Type",
+    COALESCE("Summary"."Amount", (0)::numeric) AS "Amount",
+    COALESCE("Summary"."Times", (0)::bigint) AS "Times",
+    "Summary"."First",
+    "Summary"."Last",
+    COALESCE("Summary"."Common", 'Absent'::text) AS "Common"
+   FROM ("Income"
+     LEFT JOIN ( SELECT unnamed_subquery."Type",
+            unnamed_subquery."Amount",
+            unnamed_subquery."Times",
+            unnamed_subquery."Last",
+            unnamed_subquery."First",
+                CASE
+                    WHEN ((unnamed_subquery."Times")::numeric > ( SELECT avg(unnamed_subquery_1."Times") AS "Average"
+                       FROM ( SELECT "Income_1"."Type",
+                                round(sum("Income_1"."Amount"), 2) AS "Amount",
+                                count(to_char(("Income_1"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text)) AS "Times",
+                                max(to_char(("Income_1"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text)) AS "Last",
+                                min(to_char(("Income_1"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text)) AS "First"
+                               FROM "Income" "Income_1"
+                              GROUP BY "Income_1"."Type"
+                              ORDER BY "Income_1"."Type" DESC) unnamed_subquery_1)) THEN 'Common'::text
+                    ELSE 'Uncommon'::text
+                END AS "Common"
+           FROM ( SELECT "Income_1"."Type",
+                    round(sum("Income_1"."Amount"), 2) AS "Amount",
+                    count(to_char(("Income_1"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text)) AS "Times",
+                    max("Income_1"."DateTime") AS "Last",
+                    min("Income_1"."DateTime") AS "First"
+                   FROM "Income" "Income_1"
+                  GROUP BY "Income_1"."Type"
+                  ORDER BY (count(to_char(("Income_1"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text))) DESC) unnamed_subquery) "Summary" ON (("Income"."Type" = "Summary"."Type")))
+  ORDER BY COALESCE("Summary"."Times", (0)::bigint) DESC]]></view_script>
+			<column name="Type" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Times" type="bigint" />
+			<column name="First" type="date" />
+			<column name="Last" type="date" />
+			<column name="Common" type="text" />
+		</view>
+		<view name="LedgerComparison" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "DateTime",
+    "Amount"
+   FROM ( SELECT unnamed_subquery_1."DateTime",
+            round(sum(unnamed_subquery_1."Amount"), 2) AS "Amount"
+           FROM ( SELECT "LedgerComparisonData"."Table",
+                    "LedgerComparisonData"."ID",
+                    "LedgerComparisonData"."DateTime",
+                    "LedgerComparisonData"."Month",
+                    "LedgerComparisonData"."Amount",
+                    "LedgerComparisonData"."Tytuł operacji",
+                    "LedgerComparisonData"."Rachunek strony operacji",
+                    "LedgerComparisonData"."Dane strony operacji"
+                   FROM "LedgerComparisonData") unnamed_subquery_1
+          GROUP BY unnamed_subquery_1."DateTime"
+          ORDER BY unnamed_subquery_1."DateTime") unnamed_subquery
+  WHERE (("Amount" > (1)::numeric) OR ("Amount" < ('-1'::integer)::numeric))]]></view_script>
+			<column name="DateTime" type="date" />
+			<column name="Amount" type="numeric" />
+		</view>
+		<view name="LedgerComparisonData" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT 'Account data'::text AS "Table",
+    "AccountData"."Pozycje historii" AS "ID",
+    "AccountData"."Data operacji" AS "DateTime",
+    "substring"(to_char(("AccountData"."Data operacji")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7) AS "Month",
+    "AccountData"."Kwota" AS "Amount",
+    "AccountData"."Tytuł operacji",
+    "AccountData"."Rachunek strony operacji",
+    "AccountData"."Dane strony operacji"
+   FROM "AccountData"
+UNION
+ SELECT 'ExpendituresEnriched'::text AS "Table",
+    "ExpendituresEnriched"."ID",
+    "ExpendituresEnriched"."DateTime",
+    to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM'::text) AS "Month",
+    "ExpendituresEnriched"."Amount",
+    "ExpendituresEnriched"."Product" AS "Tytuł operacji",
+    "ExpendituresEnriched"."Comment" AS "Rachunek strony operacji",
+    '-'::text AS "Dane strony operacji"
+   FROM "ExpendituresEnriched"
+  WHERE (("ExpendituresEnriched"."Cash" <> 'YES'::text) AND ("ExpendituresEnriched"."Product" <> 'Automat'::text))
+  ORDER BY 3]]></view_script>
+			<column name="Table" type="text" />
+			<column name="ID" type="integer" />
+			<column name="DateTime" type="date" />
+			<column name="Month" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Tytuł operacji" type="text" />
+			<column name="Rachunek strony operacji" type="text" />
+			<column name="Dane strony operacji" type="text" />
+		</view>
+		<view name="MonthlyBilance" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text) AS "Month",
+    round(sum("Amount"), 2) AS "Amount",
+    "Source"
+   FROM ( SELECT "Income"."DateTime",
+            "Income"."Amount",
+            'Income'::text AS "Source"
+           FROM "Income"
+        UNION
+         SELECT "ExpendituresEnriched"."DateTime",
+            (- "ExpendituresEnriched"."Amount") AS "Amount",
+            'Expenditures'::text AS "Source"
+           FROM "ExpendituresEnriched"
+        UNION
+         SELECT "Bills"."DateTime",
+            (- "Bills"."Amount") AS "Amount",
+            'Bills'::text AS "Source"
+           FROM "Bills") unnamed_subquery
+  GROUP BY (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text)), "Source"
+  ORDER BY (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text))]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Source" type="text" />
+		</view>
+		<view name="MonthlyBilanceSingle" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "Month",
+    round(sum("Amount"), 2) AS "Amount"
+   FROM "MonthlyBilance"
+  GROUP BY "Month"
+  ORDER BY "Month"]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Amount" type="numeric" />
+		</view>
+		<view name="MonthlyBills" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7) AS "Month",
+    round(sum("Amount"), 2) AS "Amount"
+   FROM "Bills"
+  GROUP BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7))
+  ORDER BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7))]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Amount" type="numeric" />
+		</view>
+		<view name="MonthlyBillsByMedium" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7) AS "Month",
+    round(sum("Amount"), 2) AS "Amount",
+    "Medium"
+   FROM "Bills"
+  GROUP BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7)), "Medium"
+  ORDER BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7))]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Medium" type="text" />
+		</view>
+		<view name="MonthlyCharge" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "Month",
+    "Charge"
+   FROM ( SELECT to_char(("Income"."DateTime")::timestamp with time zone, 'YYYY-MM'::text) AS "Month",
+            round((sum("Income"."Amount") / sum("Income"."Hours")), 2) AS "Charge"
+           FROM "Income"
+          WHERE ("Income"."Type" = ANY (ARRAY['Praca'::text, 'Premia'::text]))
+          GROUP BY (to_char(("Income"."DateTime")::timestamp with time zone, 'YYYY-MM'::text))
+          ORDER BY (to_char(("Income"."DateTime")::timestamp with time zone, 'YYYY-MM'::text))) unnamed_subquery
+  WHERE ("Charge" IS NOT NULL)]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Charge" type="numeric" />
+		</view>
+		<view name="MonthlyCommonProducts" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "Month",
+    "Product",
+    "Items",
+    "Amount"
+   FROM "MonthlyProducts"
+  WHERE (("Items")::numeric > ( SELECT avg("MonthlyProducts_1"."Items") AS avg
+           FROM "MonthlyProducts" "MonthlyProducts_1"))]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Product" type="text" />
+			<column name="Items" type="bigint" />
+			<column name="Amount" type="numeric" />
+		</view>
+		<view name="MonthlyExpenditures" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text) AS "Month",
+    round(sum("Amount"), 2) AS "Amount"
+   FROM "ExpendituresEnriched"
+  GROUP BY (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text))
+  ORDER BY (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text))]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Amount" type="numeric" />
+		</view>
+		<view name="MonthlyExpendituresbyType" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text) AS "Month",
+    round(sum("Amount"), 2) AS "Sum",
+    "Type"
+   FROM ( SELECT "ExpendituresEnriched"."DateTime",
+            "ExpendituresEnriched"."Type",
+            "ExpendituresEnriched"."Amount"
+           FROM "ExpendituresEnriched") unnamed_subquery
+  GROUP BY "Type", (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text))
+  ORDER BY (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text)) DESC, (round(sum("Amount"), 2)) DESC]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Sum" type="numeric" />
+			<column name="Type" type="text" />
+		</view>
+		<view name="MonthlyIncome" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7) AS "Month",
+    round(sum("Amount"), 2) AS "Amount"
+   FROM "Income"
+  GROUP BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7))
+  ORDER BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7))]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Amount" type="numeric" />
+		</view>
+		<view name="MonthlyIncomeBySource" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7) AS "Month",
+    round(sum("Amount"), 2) AS "Amount",
+    "Source"
+   FROM "Income"
+  GROUP BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7)), "Source"
+  ORDER BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7))]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Source" type="text" />
+		</view>
+		<view name="MonthlyIncomeByType" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7) AS "Month",
+    round(sum("Amount"), 2) AS "Amount",
+    "Type"
+   FROM "Income"
+  GROUP BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7)), "Type"
+  ORDER BY ("substring"(to_char(("DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text), 1, 7))]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Type" type="text" />
+		</view>
+		<view name="MonthlyProducts" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "Month",
+    "Product",
+    "Items",
+    "Amount"
+   FROM ( SELECT to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM'::text) AS "Month",
+            "ExpendituresEnriched"."Product",
+            count("ExpendituresEnriched"."Product") AS "Items",
+            round(sum("ExpendituresEnriched"."Amount"), 2) AS "Amount"
+           FROM "ExpendituresEnriched"
+          GROUP BY "ExpendituresEnriched"."Product", (to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM'::text))
+          ORDER BY (to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM'::text)) DESC, (round(sum("ExpendituresEnriched"."Amount"), 2)) DESC) unnamed_subquery]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Product" type="text" />
+			<column name="Items" type="bigint" />
+			<column name="Amount" type="numeric" />
+		</view>
+		<view name="MonthlySpending" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT to_char(("Day")::timestamp with time zone, 'YYYY-MM'::text) AS "Month",
+    round(avg("DailyAount")) AS "AverageDaily",
+    round(sum("DailyAount")) AS "Total",
+    round(avg("AverageDailyProductPriority")) AS "AverageProductPriority",
+    round(avg("AverageDailyTypePriority")) AS "AverageTypePriority",
+    round(sum("PossibleSavings"), 2) AS "PossibleSavings"
+   FROM ( SELECT "ExpendituresEnriched"."DateTime" AS "Day",
+            sum("ExpendituresEnriched"."Amount") AS "DailyAount",
+            (sum(("ExpendituresEnriched"."Amount" * ("ExpendituresEnriched"."ProductPriority")::numeric)) / sum("ExpendituresEnriched"."Amount")) AS "AverageDailyProductPriority",
+            (sum(("ExpendituresEnriched"."Amount" * ("ExpendituresEnriched"."TypePriority")::numeric)) / sum("ExpendituresEnriched"."Amount")) AS "AverageDailyTypePriority",
+            sum(
+                CASE
+                    WHEN (("ExpendituresEnriched"."ProductPriority")::numeric < (( SELECT "UserSettings"."Value"
+                       FROM "UserSettings"
+                      WHERE ("UserSettings"."Setting" = 'ProductPriorityTarget'::text)))::numeric) THEN "ExpendituresEnriched"."Amount"
+                    ELSE (0)::numeric
+                END) AS "PossibleSavings"
+           FROM "ExpendituresEnriched"
+          GROUP BY "ExpendituresEnriched"."DateTime") unnamed_subquery
+  GROUP BY (to_char(("Day")::timestamp with time zone, 'YYYY-MM'::text))
+  ORDER BY (to_char(("Day")::timestamp with time zone, 'YYYY-MM'::text))]]></view_script>
+			<column name="Month" type="text" />
+			<column name="AverageDaily" type="numeric" />
+			<column name="Total" type="numeric" />
+			<column name="AverageProductPriority" type="numeric" />
+			<column name="AverageTypePriority" type="numeric" />
+			<column name="PossibleSavings" type="numeric" />
+		</view>
+		<view name="ProductSummary" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "Products"."ID",
+    "Products"."Product",
+    "ProductTypes"."Type",
+    "Products"."Comment",
+    COALESCE("Summary"."Amount", (0)::numeric) AS "Amount",
+    COALESCE("Summary"."BoughtTimes", (0)::bigint) AS "Times",
+    "Summary"."FirstBought" AS "First",
+    "Summary"."LastBought" AS "Last",
+    "Summary"."Minimum",
+    "Summary"."Average",
+    "Summary"."Maximum",
+    "Products"."Priority" AS "ProductPriority",
+    "ProductTypes"."Priority" AS "TypePriority",
+    COALESCE("Summary"."Common", 'Absent'::text) AS "Common"
+   FROM (("Products"
+     LEFT JOIN ( SELECT unnamed_subquery."Product",
+            unnamed_subquery."Amount",
+            unnamed_subquery."BoughtTimes",
+            unnamed_subquery."LastBought",
+            unnamed_subquery."FirstBought",
+            unnamed_subquery."Average",
+            unnamed_subquery."Minimum",
+            unnamed_subquery."Maximum",
+                CASE
+                    WHEN ((unnamed_subquery."BoughtTimes")::numeric > ( SELECT avg(unnamed_subquery_1."BoughtTimes") AS "Average"
+                       FROM ( SELECT "ExpendituresEnriched"."Product",
+                                round(sum("ExpendituresEnriched"."Amount"), 2) AS "Amount",
+                                count(to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text)) AS "BoughtTimes",
+                                max(to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text)) AS "LastBought",
+                                min(to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text)) AS "FirstBought"
+                               FROM "ExpendituresEnriched"
+                              GROUP BY "ExpendituresEnriched"."Product"
+                              ORDER BY (count(to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text))) DESC) unnamed_subquery_1)) THEN 'Common'::text
+                    ELSE 'Uncommon'::text
+                END AS "Common"
+           FROM ( SELECT "ExpendituresEnriched"."Product",
+                    round(sum("ExpendituresEnriched"."Amount"), 2) AS "Amount",
+                    count(to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text)) AS "BoughtTimes",
+                    max("ExpendituresEnriched"."DateTime") AS "LastBought",
+                    min("ExpendituresEnriched"."DateTime") AS "FirstBought",
+                    round(avg("ExpendituresEnriched"."Amount"), 2) AS "Average",
+                    min("ExpendituresEnriched"."Amount") AS "Minimum",
+                    max("ExpendituresEnriched"."Amount") AS "Maximum"
+                   FROM "ExpendituresEnriched"
+                  GROUP BY "ExpendituresEnriched"."Product"
+                  ORDER BY (count(to_char(("ExpendituresEnriched"."DateTime")::timestamp with time zone, 'YYYY-MM-DD'::text))) DESC) unnamed_subquery) "Summary" ON (("Products"."Product" = "Summary"."Product")))
+     LEFT JOIN "ProductTypes" ON (("Products"."TypeID" = "ProductTypes"."ID")))]]></view_script>
+			<column name="ID" type="integer" />
+			<column name="Product" type="text" />
+			<column name="Type" type="text" />
+			<column name="Comment" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Times" type="bigint" />
+			<column name="First" type="date" />
+			<column name="Last" type="date" />
+			<column name="Minimum" type="numeric" />
+			<column name="Average" type="numeric" />
+			<column name="Maximum" type="numeric" />
+			<column name="ProductPriority" type="integer" />
+			<column name="TypePriority" type="integer" />
+			<column name="Common" type="text" />
+		</view>
+		<view name="ProductsToFix" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "ID",
+    "DateTime",
+    "Amount",
+    "Product",
+    "Type",
+    "Cash",
+    "Comment",
+    "ProductPriority",
+    "TypePriority"
+   FROM "ExpendituresEnriched"
+  WHERE (("Product" = ANY (ARRAY[NULL::text, 'UNKNOWN'::text])) OR ("Comment" ~~ '%"TODO"%'::text) OR ("Comment" ~~ '%"do wyjaśnienia"%'::text) OR ("Comment" ~~ '%"?"%'::text))]]></view_script>
+			<column name="ID" type="integer" />
+			<column name="DateTime" type="date" />
+			<column name="Amount" type="numeric" />
+			<column name="Product" type="text" />
+			<column name="Type" type="text" />
+			<column name="Cash" type="text" />
+			<column name="Comment" type="text" />
+			<column name="ProductPriority" type="integer" />
+			<column name="TypePriority" type="integer" />
+		</view>
+		<view name="Statistics" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS WITH "StatisticsBase" AS (
+         SELECT 'Average income year to date'::text AS "Statistic",
+            round(avg(unnamed_subquery."Amount"), 2) AS "Value"
+           FROM ( SELECT "MonthlyIncome"."Month",
+                    "MonthlyIncome"."Amount"
+                   FROM "MonthlyIncome"
+                  WHERE ("MonthlyIncome"."Month" < to_char(now(), 'YYYY-MM'::text))
+                  ORDER BY "MonthlyIncome"."Month" DESC
+                 LIMIT 12) unnamed_subquery
+        UNION
+         SELECT 'Average bills year to date'::text AS "Statistic",
+            round(avg(unnamed_subquery."Amount"), 2) AS "Value"
+           FROM ( SELECT "MonthlyBills"."Month",
+                    "MonthlyBills"."Amount"
+                   FROM "MonthlyBills"
+                  WHERE ("MonthlyBills"."Month" < to_char(now(), 'YYYY-MM'::text))
+                  ORDER BY "MonthlyBills"."Month" DESC
+                 LIMIT 12) unnamed_subquery
+        UNION
+         SELECT 'Average expenditures year to date'::text AS "Statistic",
+            round(avg(unnamed_subquery."Amount"), 2) AS "Value"
+           FROM ( SELECT "MonthlyExpenditures"."Month",
+                    "MonthlyExpenditures"."Amount"
+                   FROM "MonthlyExpenditures"
+                  WHERE ("MonthlyExpenditures"."Month" < to_char(now(), 'YYYY-MM'::text))
+                  ORDER BY "MonthlyExpenditures"."Month" DESC
+                 LIMIT 12) unnamed_subquery
+        )
+ SELECT "StatisticsBase"."Statistic",
+    "StatisticsBase"."Value"
+   FROM "StatisticsBase"
+UNION
+ SELECT 'Average spending year to date'::text AS "Statistic",
+    sum("StatisticsBase"."Value") AS "Value"
+   FROM "StatisticsBase"
+  WHERE ("StatisticsBase"."Statistic" = ANY (ARRAY['Average bills year to date'::text, 'Average expenditures year to date'::text]))
+UNION
+ SELECT 'FIRE savings requirement'::text AS "Statistic",
+    ((sum("StatisticsBase"."Value") * (12)::numeric) * (25)::numeric) AS "Value"
+   FROM "StatisticsBase"
+  WHERE ("StatisticsBase"."Statistic" = ANY (ARRAY['Average bills year to date'::text, 'Average expenditures year to date'::text]))
+UNION
+ SELECT 'Net Worth'::text AS "Statistic",
+    sum("MonthlyBilance"."Amount") AS "Value"
+   FROM "MonthlyBilance"]]></view_script>
+			<column name="Statistic" type="text" />
+			<column name="Value" type="numeric" />
+		</view>
+		<view name="TempCheck" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "Temp_ID",
+    "Temp_Product",
+    "Product_ID"
+   FROM ( SELECT "ExpendituresTransitory"."ID" AS "Temp_ID",
+            "ExpendituresTransitory"."Product" AS "Temp_Product",
+            "Products"."ID" AS "Product_ID"
+           FROM ("ExpendituresTransitory"
+             LEFT JOIN "Products" ON (("ExpendituresTransitory"."Product" = "Products"."Product")))) unnamed_subquery
+  WHERE ("Product_ID" IS NULL)]]></view_script>
+			<column name="Temp_ID" type="integer" />
+			<column name="Temp_Product" type="text" />
+			<column name="Product_ID" type="integer" />
+		</view>
+		<view name="Top10ProductTypesMonthly" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text) AS "Month",
+    round(sum("Amount"), 2) AS "Sum",
+    "Type"
+   FROM ( SELECT "ExpendituresEnriched"."DateTime",
+            "ExpendituresEnriched"."Type",
+            "ExpendituresEnriched"."Amount"
+           FROM "ExpendituresEnriched") unnamed_subquery
+  WHERE ("Type" IN ( SELECT "TypeSummary"."Type"
+           FROM "TypeSummary"
+          ORDER BY "TypeSummary"."Times" DESC
+         LIMIT 10))
+  GROUP BY "Type", (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text))
+  ORDER BY (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text)) DESC, (round(sum("Amount"), 2)) DESC]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Sum" type="numeric" />
+			<column name="Type" type="text" />
+		</view>
+		<view name="Top10ProductsMonthly" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text) AS "Month",
+    round(sum("Amount"), 2) AS "Sum",
+    "Product"
+   FROM ( SELECT "ExpendituresEnriched"."DateTime",
+            "ExpendituresEnriched"."Product",
+            "ExpendituresEnriched"."Amount"
+           FROM "ExpendituresEnriched") unnamed_subquery
+  WHERE ("Product" IN ( SELECT "ProductSummary"."Product"
+           FROM "ProductSummary"
+          ORDER BY "ProductSummary"."Times" DESC
+         LIMIT 10))
+  GROUP BY "Product", (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text))
+  ORDER BY (to_char(("DateTime")::timestamp with time zone, 'YYYY-MM'::text)) DESC, (round(sum("Amount"), 2)) DESC]]></view_script>
+			<column name="Month" type="text" />
+			<column name="Sum" type="numeric" />
+			<column name="Product" type="text" />
+		</view>
+		<view name="TotalIncomeByType" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT sum("Amount") AS "Amount",
+    "Type"
+   FROM "IncomeSummaryByType"
+  GROUP BY "Type"
+  ORDER BY (sum("Amount")) DESC]]></view_script>
+			<column name="Amount" type="numeric" />
+			<column name="Type" type="text" />
+		</view>
+		<view name="TypeSummary" >
+			<view_script><![CDATA[CREATE VIEW ${nameWithSchemaName} AS SELECT "ProductTypes"."ID",
+    "ProductTypes"."Type",
+    COALESCE("Summary"."Amount", (0)::numeric) AS "Amount",
+    COALESCE("Summary"."Times", (0)::bigint) AS "Times",
+    "Summary"."First",
+    "Summary"."Last",
+    "Summary"."Minimum",
+    "Summary"."Average",
+    "Summary"."Maximum",
+    "ProductTypes"."Priority",
+    COALESCE("Summary"."Common", 'Absent'::text) AS "Common",
+    "ProductTypes"."Comment"
+   FROM ("ProductTypes"
+     LEFT JOIN ( SELECT unnamed_subquery."Type",
+            unnamed_subquery."Amount",
+            unnamed_subquery."Times",
+            unnamed_subquery."Last",
+            unnamed_subquery."First",
+            unnamed_subquery."Minimum",
+            unnamed_subquery."Average",
+            unnamed_subquery."Maximum",
+                CASE
+                    WHEN ((unnamed_subquery."Times")::numeric > ( SELECT avg(unnamed_subquery_1."Times") AS "Average"
+                       FROM ( SELECT "ExpendituresEnriched"."Type",
+                                round(sum("ExpendituresEnriched"."Amount"), 2) AS "Amount",
+                                count("ExpendituresEnriched"."DateTime") AS "Times",
+                                max("ExpendituresEnriched"."DateTime") AS "Last",
+                                min("ExpendituresEnriched"."DateTime") AS "First"
+                               FROM "ExpendituresEnriched"
+                              GROUP BY "ExpendituresEnriched"."Type"
+                              ORDER BY (count("ExpendituresEnriched"."DateTime")) DESC) unnamed_subquery_1)) THEN 'Common'::text
+                    ELSE 'Uncommon'::text
+                END AS "Common"
+           FROM ( SELECT "ExpendituresEnriched"."Type",
+                    round(sum("ExpendituresEnriched"."Amount"), 2) AS "Amount",
+                    count("ExpendituresEnriched"."DateTime") AS "Times",
+                    max("ExpendituresEnriched"."DateTime") AS "Last",
+                    min("ExpendituresEnriched"."DateTime") AS "First",
+                    min("ExpendituresEnriched"."Amount") AS "Minimum",
+                    round(avg("ExpendituresEnriched"."Amount"), 2) AS "Average",
+                    max("ExpendituresEnriched"."Amount") AS "Maximum"
+                   FROM "ExpendituresEnriched"
+                  GROUP BY "ExpendituresEnriched"."Type"
+                  ORDER BY (count("ExpendituresEnriched"."DateTime")) DESC) unnamed_subquery) "Summary" ON (("ProductTypes"."Type" = "Summary"."Type")))]]></view_script>
+			<column name="ID" type="integer" />
+			<column name="Type" type="text" />
+			<column name="Amount" type="numeric" />
+			<column name="Times" type="bigint" />
+			<column name="First" type="date" />
+			<column name="Last" type="date" />
+			<column name="Minimum" type="numeric" />
+			<column name="Average" type="numeric" />
+			<column name="Maximum" type="numeric" />
+			<column name="Priority" type="integer" />
+			<column name="Common" type="text" />
+			<column name="Comment" type="text" />
+		</view>
+	</schema>
+	<layout name="Layout" id="Layout-1d0" show_relation="columns" >
+		<comment><![CDATA[Layout]]></comment>
+		<entity schema="public" name="BillsSummary" color="3986C1" x="1888" y="336" />
+		<entity schema="public" name="ExpendituresEnriched" color="3986C1" x="48" y="80" />
+		<entity schema="public" name="IncomeSummary" color="3986C1" x="1216" y="336" />
+		<entity schema="public" name="IncomeSummaryByType" color="3986C1" x="1344" y="336" />
+		<entity schema="public" name="LedgerComparison" color="3986C1" x="48" y="864" />
+		<entity schema="public" name="LedgerComparisonData" color="3986C1" x="224" y="864" />
+		<entity schema="public" name="MonthlyBilance" color="3986C1" x="2240" y="672" />
+		<entity schema="public" name="MonthlyBilanceSingle" color="3986C1" x="2368" y="672" />
+		<entity schema="public" name="MonthlyBills" color="3986C1" x="1888" y="672" />
+		<entity schema="public" name="MonthlyBillsByMedium" color="3986C1" x="2000" y="672" />
+		<entity schema="public" name="MonthlyCharge" color="3986C1" x="1680" y="672" />
+		<entity schema="public" name="MonthlyCommonProducts" color="3986C1" x="592" y="672" />
+		<entity schema="public" name="MonthlyExpenditures" color="3986C1" x="48" y="672" />
+		<entity schema="public" name="MonthlyExpendituresbyType" color="3986C1" x="224" y="672" />
+		<entity schema="public" name="MonthlyIncome" color="3986C1" x="1216" y="672" />
+		<entity schema="public" name="MonthlyIncomeBySource" color="3986C1" x="1504" y="672" />
+		<entity schema="public" name="MonthlyIncomeByType" color="3986C1" x="1344" y="672" />
+		<entity schema="public" name="MonthlyProducts" color="3986C1" x="464" y="672" />
+		<entity schema="public" name="MonthlySpending" color="3986C1" x="48" y="336" />
+		<entity schema="public" name="ProductSummary" color="3986C1" x="464" y="336" />
+		<entity schema="public" name="ProductsToFix" color="3986C1" x="464" y="80" />
+		<entity schema="public" name="Statistics" color="3986C1" x="2240" y="80" />
+		<entity schema="public" name="TempCheck" color="3986C1" x="448" y="864" />
+		<entity schema="public" name="Top10ProductTypesMonthly" color="3986C1" x="960" y="672" />
+		<entity schema="public" name="Top10ProductsMonthly" color="3986C1" x="784" y="672" />
+		<entity schema="public" name="TotalIncomeByType" color="3986C1" x="1520" y="336" />
+		<entity schema="public" name="TypeSummary" color="3986C1" x="960" y="336" />
+		<group name="Podsumowania" color="C4E0F9" >
+			<entity schema="public" name="IncomeSummaryByType" />
+			<entity schema="public" name="BillsSummary" />
+			<entity schema="public" name="TypeSummary" />
+			<entity schema="public" name="ProductSummary" />
+			<entity schema="public" name="IncomeSummary" />
+			<entity schema="public" name="MonthlySpending" />
+			<entity schema="public" name="TotalIncomeByType" />
+		</group>
+		<group name="Wzbogacanie danych" color="C4E0F9" >
+			<entity schema="public" name="Statistics" />
+			<entity schema="public" name="ProductsToFix" />
+			<entity schema="public" name="ExpendituresEnriched" />
+		</group>
+		<group name="Raporty miesięczne" color="C4E0F9" >
+			<entity schema="public" name="MonthlyBilance" />
+			<entity schema="public" name="MonthlyBilanceSingle" />
+			<entity schema="public" name="MonthlyBills" />
+			<entity schema="public" name="MonthlyBillsByMedium" />
+			<entity schema="public" name="MonthlyCharge" />
+			<entity schema="public" name="MonthlyCommonProducts" />
+			<entity schema="public" name="MonthlyExpenditures" />
+			<entity schema="public" name="MonthlyIncome" />
+			<entity schema="public" name="MonthlyIncomeBySource" />
+			<entity schema="public" name="MonthlyIncomeByType" />
+			<entity schema="public" name="MonthlyProducts" />
+			<entity schema="public" name="Top10ProductTypesMonthly" />
+			<entity schema="public" name="Top10ProductsMonthly" />
+			<entity schema="public" name="MonthlyExpendituresbyType" />
+		</group>
+		<group name="Widoki dodatkowe" color="C4E0F9" >
+			<entity schema="public" name="LedgerComparisonData" />
+			<entity schema="public" name="TempCheck" />
+			<entity schema="public" name="LedgerComparison" />
+		</group>
+	</layout>
+	<layout name="Main Layout" id="Layout-2de" show_relation="columns" >
+		<entity schema="public" name="BillsSummary" color="BED3F4" x="496" y="416" />
+		<entity schema="public" name="ExpendituresEnriched" color="BED3F4" x="656" y="352" />
+		<entity schema="public" name="IncomeSummary" color="BED3F4" x="688" y="704" />
+		<entity schema="public" name="IncomeSummaryByType" color="BED3F4" x="896" y="1024" />
+		<entity schema="public" name="LedgerComparison" color="BED3F4" x="464" y="704" />
+		<entity schema="public" name="LedgerComparisonData" color="BED3F4" x="400" y="880" />
+		<entity schema="public" name="MonthlyBilance" color="BED3F4" x="288" y="512" />
+		<entity schema="public" name="MonthlyBilanceSingle" color="F4DDBE" x="1488" y="256" />
+		<entity schema="public" name="MonthlyBills" color="C7F4BE" x="2560" y="96" />
+		<entity schema="public" name="MonthlyBillsByMedium" color="C7F4BE" x="2752" y="80" />
+		<entity schema="public" name="MonthlyCharge" color="C7F4BE" x="2544" y="272" />
+		<entity schema="public" name="MonthlyCommonProducts" color="C7F4BE" x="2272" y="448" />
+		<entity schema="public" name="MonthlyExpenditures" color="F4DDBE" x="1728" y="80" />
+		<entity schema="public" name="MonthlyExpendituresbyType" color="F4DDBE" x="1968" y="80" />
+		<entity schema="public" name="MonthlyIncome" color="C7F4BE" x="2752" y="272" />
+		<entity schema="public" name="MonthlyIncomeBySource" color="C7F4BE" x="3200" y="272" />
+		<entity schema="public" name="MonthlyIncomeByType" color="C7F4BE" x="2960" y="272" />
+		<entity schema="public" name="MonthlyProducts" color="F4DDBE" x="1728" y="256" />
+		<entity schema="public" name="MonthlySpending" color="C7F4BE" x="2688" y="448" />
+		<entity schema="public" name="ProductSummary" color="BED3F4" x="48" y="416" />
+		<entity schema="public" name="ProductsToFix" color="BED3F4" x="272" y="128" />
+		<entity schema="public" name="Statistics" color="BED3F4" x="496" y="240" />
+		<entity schema="public" name="TempCheck" color="BED3F4" x="688" y="224" />
+		<entity schema="public" name="Top10ProductTypesMonthly" color="BED3F4" x="1184" y="416" />
+		<entity schema="public" name="Top10ProductsMonthly" color="BED3F4" x="928" y="416" />
+		<entity schema="public" name="TotalIncomeByType" color="BED3F4" x="928" y="704" />
+		<entity schema="public" name="TypeSummary" color="BED3F4" x="928" y="80" />
+		<group name="BillsSummary" color="ECF0F7" >
+			<entity schema="public" name="BillsSummary" />
+			<entity schema="public" name="IncomeSummary" />
+			<entity schema="public" name="LedgerComparison" />
+			<entity schema="public" name="MonthlyBilance" />
+			<entity schema="public" name="ProductsToFix" />
+			<entity schema="public" name="Statistics" />
+			<entity schema="public" name="TempCheck" />
+			<entity schema="public" name="Top10ProductsMonthly" />
+			<entity schema="public" name="TotalIncomeByType" />
+			<entity schema="public" name="TypeSummary" />
+			<entity schema="public" name="ProductSummary" />
+			<entity schema="public" name="Top10ProductTypesMonthly" />
+			<entity schema="public" name="IncomeSummaryByType" />
+			<entity schema="public" name="LedgerComparisonData" />
+			<entity schema="public" name="ExpendituresEnriched" />
+		</group>
+		<group name="MonthlyExpenditures" color="F7F2EC" >
+			<entity schema="public" name="MonthlyExpenditures" />
+			<entity schema="public" name="MonthlyExpendituresbyType" />
+			<entity schema="public" name="MonthlyProducts" />
+			<entity schema="public" name="MonthlyBilanceSingle" />
+		</group>
+		<group name="MonthlyIncome" color="EEF7EC" >
+			<entity schema="public" name="MonthlyIncome" />
+			<entity schema="public" name="MonthlyIncomeByType" />
+			<entity schema="public" name="MonthlyIncomeBySource" />
+			<entity schema="public" name="MonthlySpending" />
+			<entity schema="public" name="MonthlyCharge" />
+			<entity schema="public" name="MonthlyBills" />
+			<entity schema="public" name="MonthlyBillsByMedium" />
+			<entity schema="public" name="MonthlyCommonProducts" />
+		</group>
+	</layout>
+	<layout name="~Layout with Sample Tools" id="Layout-153e" show_column_type="y" show_relation="columns" >
+		<entity schema="public" name="BillsSummary" color="BED3F4" x="592" y="240" />
+		<entity schema="public" name="ExpendituresEnriched" color="BED3F4" x="832" y="240" />
+		<entity schema="public" name="IncomeSummary" color="BED3F4" x="832" y="528" />
+		<entity schema="public" name="IncomeSummaryByType" color="BED3F4" x="832" y="848" />
+		<entity schema="public" name="LedgerComparison" color="BED3F4" x="592" y="528" />
+		<entity schema="public" name="LedgerComparisonData" color="BED3F4" x="528" y="848" />
+		<entity schema="public" name="MonthlyBilance" color="BED3F4" x="352" y="528" />
+		<entity schema="public" name="MonthlyBilanceSingle" color="F4DDBE" x="1392" y="224" />
+		<entity schema="public" name="MonthlyBills" color="C7F4BE" x="2432" y="64" />
+		<entity schema="public" name="MonthlyBillsByMedium" color="C7F4BE" x="2672" y="48" />
+		<entity schema="public" name="MonthlyCharge" color="C7F4BE" x="2448" y="240" />
+		<entity schema="public" name="MonthlyCommonProducts" color="C7F4BE" x="2176" y="416" />
+		<entity schema="public" name="MonthlyExpenditures" color="F4DDBE" x="1632" y="48" />
+		<entity schema="public" name="MonthlyExpendituresbyType" color="F4DDBE" x="1872" y="48" />
+		<entity schema="public" name="MonthlyIncome" color="C7F4BE" x="2672" y="240" />
+		<entity schema="public" name="MonthlyIncomeBySource" color="C7F4BE" x="3152" y="240" />
+		<entity schema="public" name="MonthlyIncomeByType" color="C7F4BE" x="2912" y="240" />
+		<entity schema="public" name="MonthlyProducts" color="F4DDBE" x="1632" y="224" />
+		<entity schema="public" name="MonthlySpending" color="C7F4BE" x="2592" y="416" />
+		<entity schema="public" name="ProductSummary" color="BED3F4" x="48" y="528" />
+		<entity schema="public" name="ProductsToFix" color="BED3F4" x="320" y="240" />
+		<entity schema="public" name="Statistics" color="BED3F4" x="368" y="64" />
+		<entity schema="public" name="TempCheck" color="BED3F4" x="592" y="48" />
+		<entity schema="public" name="Top10ProductTypesMonthly" color="BED3F4" x="1088" y="48" />
+		<entity schema="public" name="Top10ProductsMonthly" color="BED3F4" x="832" y="48" />
+		<entity schema="public" name="TotalIncomeByType" color="BED3F4" x="1104" y="240" />
+		<entity schema="public" name="TypeSummary" color="BED3F4" x="1104" y="528" />
+		<script name="SQL Editor" id="Editor-1eb9" language="SQL" >
+			<string><![CDATA[SELECT
+	"Medium", "Amount", "Times", "First", "Last", "Minimum", "Average", "Maximum", "Common"
+FROM
+	"public"."BillsSummary" y;]]></string>
+		</script>
+		<browser id="Browse-1512" name="Relational Data Explorer" confirm_updates="y" >
+			<browse_table schema="public" entity="BillsSummary" x="-2147483648" y="-2147483648" width="-2147483648" height="-2147483648" />
+		</browser>
+		<query id="Query-2079" name="Query Builder" >
+			<query_table schema="public" name="BillsSummary" alias="b" x="48" y="48" >
+				<column name="Medium" />
+				<column name="Amount" />
+				<column name="Times" />
+				<column name="First" />
+				<column name="Last" />
+				<column name="Minimum" />
+				<column name="Average" />
+				<column name="Maximum" />
+				<column name="Common" />
+			</query_table>
+		</query>
+		<form name="Report" id="Report-16a2" template="Page" css="container-fluid" view="frame" >
+			<var name="samplePageNumber" type="4" value="0" mandatory="n" />
+			<var name="sampleRecordsPerPage" type="4" value="100" mandatory="n" />
+			<body name="Body" template="Grid" max_records="100" pos="0,0,0,0,f,f" layout="{{-2,-2,-2,-2,-1},{-2,-2,-2,-2}}" scroll="n" html="n" header_rows="0" footer_rows="0" >
+				<cell type="label" name="Billssummary Data" template="H3" pos="0,0,1,0,l,c" />
+				<cell type="chart" name="Pie" template="Pie" pos="0,1,4,1,l,c" max_records="20" >
+					<form_script type="DataSource" language="SQL" >
+						<var name="Medium" />
+						<var name="Amount" type="2" />
+						<var name="Times" type="-5" />
+						<var name="First" type="91" />
+						<var name="Last" type="91" />
+						<var name="Minimum" type="2" />
+						<var name="Average" type="2" />
+						<var name="Maximum" type="2" />
+						<var name="Common" />
+						<script ><![CDATA[SELECT * FROM "public"."BillsSummary"]]></script>
+					</form_script>
+					<param name="item" value="Medium" />
+					<param name="width" value="100%" />
+					<param name="title" value="Sample Chart" />
+					<param name="value" value="Amount" />
+					<param name="height" value="400px" />
+				</cell>
+				<tableview name="sample" template="Table" max_records="100" css="sortable table table-striped table-sm table-hover" pos="0,2,4,2,f,f" layout="{{-2,-2,-2,-2,-2,-2,-2,-2,-2,-2},{-2,-2}}" scroll="n" html="n" header_rows="1" footer_rows="0" >
+					<form_script type="DataSource" language="SQL" >
+						<var name="Medium" />
+						<var name="Amount" type="2" />
+						<var name="Times" type="-5" />
+						<var name="First" type="91" />
+						<var name="Last" type="91" />
+						<var name="Minimum" type="2" />
+						<var name="Average" type="2" />
+						<var name="Maximum" type="2" />
+						<var name="Common" />
+						<script ><![CDATA[SELECT * FROM "public"."BillsSummary"]]></script>
+					</form_script>
+					<cell type="label" name="Medium" pos="0,0,0,0,c,c" />
+					<cell type="label" name="Amount" pos="1,0,1,0,c,c" />
+					<cell type="label" name="Times" pos="2,0,2,0,c,c" />
+					<cell type="label" name="First" pos="3,0,3,0,c,c" />
+					<cell type="label" name="Last" pos="4,0,4,0,c,c" />
+					<cell type="label" name="Minimum" pos="5,0,5,0,c,c" />
+					<cell type="label" name="Average" pos="6,0,6,0,c,c" />
+					<cell type="label" name="Maximum" pos="7,0,7,0,c,c" />
+					<cell type="label" name="Common" pos="8,0,8,0,c,c" />
+					<cell type="label" name="${Medium}" template="Plain" pos="0,1,0,1,l,c" />
+					<cell type="label" name="${Amount}" template="Plain" pos="1,1,1,1,l,c" />
+					<cell type="label" name="${Times}" template="Plain" pos="2,1,2,1,l,c" />
+					<cell type="label" name="${First}" template="Plain" pos="3,1,3,1,l,c" />
+					<cell type="label" name="${Last}" template="Plain" pos="4,1,4,1,l,c" />
+					<cell type="label" name="${Minimum}" template="Plain" pos="5,1,5,1,l,c" />
+					<cell type="label" name="${Average}" template="Plain" pos="6,1,6,1,l,c" />
+					<cell type="label" name="${Maximum}" template="Plain" pos="7,1,7,1,l,c" />
+					<cell type="label" name="${Common}" template="Plain" pos="8,1,8,1,l,c" />
+					<cell type="button" name="More" template="Plain" css="btn btn-sm btn-secondary" pos="9,1,9,1,c,c" ref_id="Report-16a2" />
+				</tableview>
+				<cell type="href" name="" disabled="${samplePageNumber&lt;1}" pos="0,3,0,3,l,c" glyph="bi-chevron_double_left" ref_id="Report-16a2" >
+					<var name="samplePageNumber" value="0" />
+				</cell>
+				<cell type="href" name="" disabled="${samplePageNumber&lt;1}" pos="1,3,1,3,l,c" glyph="bi-chevron_left" ref_id="Report-16a2" >
+					<var name="samplePageNumber" value="${Math.max(0,samplePageNumber-1)}" />
+				</cell>
+				<cell type="label" name="Page ${samplePageNumber+1}" pos="2,3,2,3,l,c" />
+				<cell type="href" name="" disabled="${!sampleHasNextPage}" pos="3,3,3,3,l,c" glyph="bi-chevron_right" ref_id="Report-16a2" >
+					<var name="samplePageNumber" value="${( samplePageNumber+1 )}" />
+				</cell>
+			</body>
+		</form>
+	</layout>
+</project>
