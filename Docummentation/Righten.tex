@@ -599,45 +599,56 @@ podstawie wniosków wyciągniętych z analizy istniejących rozwiązań tak, by
 wkorzystywało możliwie jak najwięcej zalet, adresowało jak najwięcej uwag i 
 uzupełniało braki funckji w obecnie dostępnych na ruynku aplikacjach.}
 
-%m.in: 
-% mile widziane schematy ideowe, graficzne ilustracje przedtswionych koncepcji
+%#NICE-TO-HAVE: Diagram ideowy działania aplikacji
+%m.in:
+% mile widziane schematy ideowe, graficzne ilustracje przedstawionych koncepcji
 % można wskazać zagadnienia możliwe do wykonania, choć wykraczające poza ramy prac
 % wskazać i uzasadnić wybór metod i narzędzi pracy
 % koncepcja licencjonowania, dystrybucji, jacy odbiorcy
 \section{\customstylesection{Koncepcja rozwiązania użytkowego}}
-{Rozwiązaniem powinna być aplikacja przeglądarkowa, co pozwoli trafić do 
-szerszej grupy użytkowników minimalizując próg wejścia. Projekt aplikacji 
-zakłada interakcję z wieloma użytkownikami jednocześnie. Aplikacja przechowywać 
-będzie dane finansowe które są danymi wrażliwymi. Dostęp do danych będzie 
-wymagany w krótkich okresach zapisu danych z pamięci podręcznej aplikacji do 
-bazy oraz odpytania bazy o dane. Aplikacja udostępniać będzie użytkownikom 
-interfejs do wprowadzania, edycji i usuwania danych jak przychody, rachunki 
-(płatności stałe), wydatki oraz kategorie po których będą grupowane - typy 
-produktów i produkty. Użytkownikom udostępnione zostaną predefiniowane raporty 
-złożone z wizualizacji, statystyk i danych analitycznych.}
+{Projekt aplikacji zakłada aplikację przeglądarkową która umożliwi interakcję z 
+wieloma użytkownikami jednocześnie. Aplikacja przechowywać będzie dane finansowe
+ które są danymi wrażliwymi więc wymagają szczególnej ochrony, dlatego dostęp do
+ nich zostanie ograniczony do minimum - będzie wymagany w krótkich okresach 
+ komunikacji aplikacji z bazą podczas zapisu danych z pamięci podręcznej 
+aplikacji oraz pobierania danych do wyświetlenia użytkownikowi. Aplikacja 
+udostępniać będzie użytkownikom interfejs do wprowadzania, edycji i usuwania 
+danych finansowych jak przychody, rachunki (płatności stałe), wydatki oraz 
+kategorie po których będą grupowane - typy produktów i produkty. Użytkownikom 
+udostępnione zostaną predefiniowane raporty złożone z wizualizacji, statystyk i 
+danych analitycznych oraz podane w przystępny sposób informacje o podstawach 
+zarządzania finansami i budżetem.}
 
 \medskip
-{Istnieje też garstka mile widzianych funkcji które są obecnie poza zakresem 
-projektu, są to między innymi: Możliwość oceny funkcji przez 
-użytkownika oraz panel zgłoszeń propozycji i problemów, co pozwoli na 
-ukierunkowanie rozwoju aplikacji w stronę najbardziej przydatnych i potrzebnych 
-w danym momencie rozwiązań. W dalszym etapie rozwoju aplikacji można także 
-wdrożyć moduł predykcji przyszłych wydatków w oparciu o dane historyczne. 
-Kolejnym obszarem z potencjałem rozwoju jest wprowadzanie danych - aby ułatwić 
-użytkowanie aplikacji można utworzyć moduł importu danych z plików w popularnym 
-standardowym formacie jak CSV \cite{CSV}, a w dalszej perspektywie nawet funkcje
- ekstrakcji danych z obrazów co pozwala na wprowadzanie danych bezpośrednio z 
-faktur, zdjęć, rachunków, paragonów, pasków wynagrodzenia. Możliwość określenia 
-własnych progów wydatków które będą uwzględniane na wizualizacjach, oraz celi 
-finansowych których postęp realizacji będzie mógł śledzić.}
+{Istnieje też garstka mile widzianych funkcji które z uwagi na poziom złożoności
+ systemu i stosunkowo krótki czas implementacji są obecnie poza zakresem 
+projektu, jednak mogą w przyszłości zostać zrealizowane. Są to między innymi: 
+modyfikacja interfejsu tak, by użytkownik mógł ocenić użyteczność funkcji oraz 
+panel zgłoszeń propozycji i problemów, co pozwoli ukierunkować rozwój aplikacji 
+w stronę najbardziej przydatnych i potrzebnych w danym momencie rozwiązań. W 
+dalszym etapie rozwoju aplikacji można także wdrożyć moduł predykcji przyszłych 
+wydatków w oparciu o dane historyczne. Kolejnym obszarem z potencjałem rozwoju 
+jest wzbogacenie wachlarza metod wprowadzania danych - aby ułatwić użytkowanie 
+aplikacji można utworzyć moduł importu danych z plików w popularnym standardowym
+ formacie jak CSV \cite{CSV}, a w dalszej perspektywie nawet funkcje ekstrakcji 
+danych z obrazów co umożliwi wprowadzanie danych bezpośrednio z faktur, zdjęć, 
+rachunków, paragonów, pasków wynagrodzenia. Możliwość określenia własnych progów
+ wydatków które będą uwzględniane na wizualizacjach. Można także wdrożyć 
+automatyczną kategoryzację wydatków na proponowane w literaturze przedmiotowej 
+zbiory wydatków niezbędnych, potrzebnych i zachcianek 
+\cite{budzetdomowypodkontrola}. Ostatnią przewidzianą na ten moment funkcją 
+dodatkową jest możliwość definiowania celi finansowych które wpłyną na 
+prezentację danych w raportach aby użytkownik mógł śledzić ich postępy i 
+realizację.}
 
 {W fazie rozwoju na potrzeby pracy inżynierskiej projekt będzie udostępniony 
-publicznie w wersji open source, dlatego wstępnie interfejs powinien być w 
+publicznie na licencji open source, dlatego wstępny projekt interfejsu będzie w 
 języku angielskim aby poszerzyć grono potencjalnych użytkowników, poprawić 
 czytelność projektu i ułatwić współpracę podczas rozwijania kodu w dalszych 
 etapach. Nie jest to natomiast docelowa jedyna wersja językowa - implementację 
 wyboru wersji językowej, tłumaczenie interfejsu na kilka popularnych języków 
 (manualnie lub maszynowo) pozostawiono jako funkcję dodatkową, opcjonalną.}
+
 
 % postać aplikacji - www/mobilna/desktop/hybrydowa?
 % ogólny szkic architektury
@@ -645,12 +656,210 @@ wyboru wersji językowej, tłumaczenie interfejsu na kilka popularnych języków
 % opcjonalne: dyskusja możliwych metod, technik i narzędzi realizacji pracy
 % Nie wchodzić głęboko w zagadnienia technologiczne
 \section{\customstylesection{Koncepcja rozwiązania technologicznego}}
+{Proponowane rozwiązanie powinno przyjąć formę trójwarstwowej aplikacji 
+przeglądarkowej jak zaprezentowano na rysunku \ref{fig:architeturatrojwarstwowa}.
+ Ponieważ z aplikacji ma korzystać wielu użytkowników jednocześnie rodzi to 
+wymóg wielodostępności o podejściu architektury multitenant \cite{multitenant}, 
+która pozwala korzystać wielu użytkownikom z tej samej bazy aplikacji o różnym 
+stopniu prywatności danych zależnym od zastosowanego poziomu separacji - osobne 
+bazy, wspólna baza i osobne schematy, wspólny schemat podział na poziomie 
+rekordu. Z uwagi na prywatność danych każdy z użytkowników docelowo będzie 
+korzystał z własnego schematu w bazie danych aplikacji przechowywanej na 
+serwerze co przedstawia rysunek \ref{fig:multitenant}, jest to jednak 
+rozwiązanie które trudno wdrożyć, dlatego w fazie projektowej która jest 
+przedmiotem tej pracy zastosowano uproszczenie w postaci pojedynczego domyślnego
+ schematu danych dla każdego użytkownika (słowem: wszyscy użytkownicy mają 
+dostęp do tych samych danych). Jest to jednak pierwsza poważna zmiana której 
+wymaga system po udostępnieniu wszystkich funkcji które określono jako krytyczne
+ dla pełnego działania minimalnej wersji aplikacji.}
+
+ {Etap projektowania bazy danych wymagać będzie sporych nakładów pracy dlatego 
+ aby go uprościć początkowo zastosowana zostanie technologia SQLite 
+ \cite{SQLite}. Jest to jednak technologia maksymalnie uproszczona, nie ma w 
+ niej funkcji tworzenia osobnych schematów ani zarządzania dostępem do danych, 
+ dlatego docelowo struktura bazy zostanie przeniesiona do PostgreSQL 
+ \cite{PostgreSQL}. Dopiero po migracji do nowej technologii możliwe będzie 
+ zastosowanie podejścia z osobnymi schematami jednak będzie to zmiana stosunkowo
+ pracochłonna.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/multitenant_4.png}
+    \caption{Microsoft, Architektura współdzielona baza, rozdzielne schematy}
+    \label{fig:multitenant}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/framwork-gigr-pl_architektura_www.jpg}
+    \caption{http://framework.gigr.pl/ Architektura Trójwarstwowa}
+    \label{fig:architeturatrojwarstwowa}
+\end{figure}
+
+%#NICE-TO-HAVE: page empty in ~70%, some more content will fit in nicely
+
+% 3.5. Projekt ogólny (10-25 stron.)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/projekt-ogolny/
+\chapter{\customstylechapter{Projekt ogólny}}
+{Rozdział ten opisuje ogólną koncepcję organizacji systemu, plan jego 
+architektury, przechowywanie danych, ogólny plan interfejsu użytkownika oraz 
+metody i narzędzia realizacji.}
+
+%#NICE-TO-HAVE: Diagram przypadków użycia
+%opis funkcji udostępnianych przez system
+% - mile widziany diagram przypadków użycia - Funkcje systemu odpowiadają 
+%   zazwyczaj przypadkom użycia
+% - można zaprezentować wymagania jako numerowaną listę, tabelę
+% - wymagania niefunkcjonalne - aspekty systemu które nie przekładają się 
+%   bezpośrednio na akcje wykonywane przez system (architektura, bezpieczeństwo,
+%   ergonomia, kolorystyka itd.)
+
+\section{\customstylesection{Specyfikacja wymagań funkcjonalnych i niefunkcjonalnych}}
+{Zestawienie funkcji które powinien spełniać program, wzbogacone o informacje 
+które z nich zostały spełnione. Podzielone na listy wymagań niefunkcjonalnych i 
+funkcjonalnych. Nagłówki z powodu objętości zostały skrócone, legenda:}
+
+{PRIO - Priorytet w kategorii MoSCoW \cite{MOSCOW}, rysunek \ref{fig:moscow}}
+
+{IMPL - Oznaczenie czy funkcję wdrożono (Implemented)}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/MoSCoW-01.png}
+    \caption{Pirorytetyzacja MoSCoW}
+    \label{fig:moscow}
+\end{figure}
+
+%#TODO: try tabularray as suggested
+% Wrapping as per: https://stackoverflow.com/questions/790932/how-to-wrap-text-in-latex-tables
+\begin{table}[H] %https://www.overleaf.com/learn/latex/Positioning_images_and_tables
+    \caption{Wymagania niefunkcjonalne}
+    \label{Wymagania niefunkcjonalne}
+    \footnotesize
+    \begin{tabular}{|p{0.2\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}|p{0.52\linewidth}|}  % | draws verical line
+    % \usepackage{booktabs} provides different line thicknesses
+    % \toprule, \midrule, \bottomrule
+    \hline                  % Draw horizontal line
+    % & Defines the breaks in the table 
+    \customstyletable{Funkcja} & \customstyletablecentered{PRIO} & \customstyletablecentered{IMPL}& \customstyletable{Opis} \\
+    \hline
+    {Prosty interfejs} & {M} & {TAK} & {Prosty, minimalistyczny interfejs}\\
+    \hline
+    {Plik konfiguracji} & {M} & {TAK} & {Konfiguracja ustawień użytkownika}\\
+    \hline
+    {Poradniki} & {M} & {TAK} & {Poradniki zarządzania finansami}\\
+    \hline
+    {Rejestr zdarzeń} & {S} & {NIE} & {Logi z działania aplikacji}\\
+    \hline
+    {Informacja zwrotna} & {S} & {NIE} & {Kontrolki informacji zwrotnej i opinii użytkownika}\\
+    \hline
+    {Lokalizacje} & {C} & {NIE} & {Wersje językowe interfejsu do wyboru}\\
+    \hline
+    {Personalizacja interfejsu} & {W} & {NIE} & {Personalizacja interfejsu użytkownika np. kolorystyka, układ}\\
+    \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H] %https://www.overleaf.com/learn/latex/Positioning_images_and_tables
+    \caption{Wymagania funkcjonalne}
+    \label{Wymagania funkcjonalne}
+    \footnotesize
+    \begin{tabular}{|p{0.2\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}|p{0.52\linewidth}|}  % | draws verical line
+    % \usepackage{booktabs} provides different line thicknesses
+    % \toprule, \midrule, \bottomrule
+    \hline                  % Draw horizontal line
+    % & Defines the breaks in the table
+    \customstyletable{Funkcja} & \customstyletablecentered{PRIO} & \customstyletablecentered{IMPL}& \customstyletable{Opis} \\
+    \hline
+    {Aplikacja WEB} & {M} & {TAK} & {Dostęp do aplikacji z poziomu przeglądarki}\\
+    \hline
+    {Wiele użytkowników} & {M} & {TAK} & {Wsparcie dla wielu użytkowników jednocześnie}\\
+    \hline
+    {Dodawanie danych} & {M} & {TAK} & {Dodawanie danych}\\
+    \hline
+    {Podsumowanie wydatków} & {M} & {TAK} & {Okresowe podsumowanie wydatków}\\
+    \hline
+    {Podsumowanie przychodów} & {M} & {TAK} & {Okresowe podsumowanie przychodów}\\
+    \hline
+    {Bilans okresowy} & {M} & {TAK} & {Okresowy bilans zysków i strat}\\
+    \hline
+    {Definiowanie produktów} & {M} & {TAK} & {Definiowanie produktów}\\
+    \hline
+    {Definiowanie przychodów} & {M} & {TAK} & {Definiowanie przychodów}\\
+    \hline
+    {Definiowanie typów produktów} & {M} & {TAK} & {Definiowanie typów produktów}\\
+    \hline
+    {Walidacja danych} & {M} & {TAK} & {Potwierdzenie jakości danych}\\
+    \hline
+    {Panel konfiguracyjny} & {S} & {TAK} & {Osobny panel konfiguracyjny}\\
+    \hline
+    {Import danych} & {S} & {NIE} & {Import danych w standardowym formacie np.CSV}\\
+    \hline
+    {Konteneryzacja} & {S} & {TAK} & {Konteneryzacja aplikacji w środowisku Docker}\\
+    \hline
+    {Statystyki typów} & {C} & {TAK} & {Statystyki wydatków na dany typ produktu}\\
+    \hline
+    {Statystyki produktów} & {C} & {TAK} & {Statystyki wydatków na dany produkt}\\
+    \hline
+    {Zaawansowane wprowadzanie danych} & {C} & {NIE} & {Zaawansowane metody wprowadzania danych np.: zdjęcia, skany}\\
+    \hline
+    {Definiowanie typów przychodów} & {C} & {NIE} & {Definiowanie typów przychodów}\\
+    \hline
+    {Eksport danych} & {C} & {NIE} & {Eksport danych do standardowego formatu}\\
+    \hline
+    {Własne progi} & {C} & {NIE} & {Progi wydatków określane przez użytkownika w ustawieniach}\\
+    \hline
+    {Cele oszczędnościowe} & {C} & {NIE} & {Cele oszczędnościowe określane przez użytkownika w ustawieniach}\\
+    \hline
+    {Porady} & {C} & {TAK} & {Porady na podstawie danych wprowadzonych do aplikacji 
+    pomagające użytkownikom w poprawie usprawnień budżetu}\\
+    \hline
+    {Predykcja} & {W} & {NIE} & {Predykcja trendów na podstawie wprowadzonych danych}\\
+    \hline
+    {Autokategoryzacja} & {W} & {NIE} & {Automatyczna kategoryzacja wydatków na niezbędne, potrzebne i zachcianki}\\
+    \hline
+    \end{tabular}
+\end{table}
+
+%#TODO: Proofread from here
+%(system klasy desktop, mobilny, internetowy)
+%rysunki ideowe i poglądowe
+%Ogólny opis przeznaczenia i roli poszczególnych elementów i komunikacja między nimi
+\section{\customstylesection{Architektura systemu}}
+{Przedmiotem projektu będzie system klasy internetowej - monolityczna aplikacja 
+internetowa dostępna w przeglądarce w architekturze trójwarstwowej, którą można 
+będzie umieścić na dedykowanym serwerze lub jeśli dodatkowy cel konteneryzacji 
+zostanie zrealizowany - na dowolnej maszynie na której udostępniony będzie kod 
+źródłowy oraz zainstalowany Docker. Aplikacja podzielona będzie na interfejs 
+użytkownika (frontend) odpowiadający za interakcję z użytkownikiem i walidację 
+danych, kod na serwerze (backend) zawierający logikę działania aplikacji i 
+komunikację z warstwą dostępu do danych którą będzie baza danych z danymi 
+aplikacji i użytkowników. Warstwy aplikacji będą komunikowały się między sobą 
+zgodnie z przyjętymi standardami - frontend będzie mieć dostęp wyłącznie do 
+backendu, z kolei backend poza odpowiadaniem na żądania frontendu komunikować 
+się będzie z warstwą przechowywania danych którą stanowi baza. Wszystkie 
+komponenty aplikacji docelowo działać będą na pojedynczej maszynie, jednak nic 
+nie stoi na przeszkodzie aby w przyszłości jeżeli zajdzie taka potrzeba 
+wydzielić poszczególne komponenty na osobnych maszynach, natomiast 
+konteneryzacja aplikacji umożliwi zmianę modelu z monolitycznego na 
+mikroserwisy i skalowanie horyzontalne.}
+
+{Aby uprościć logikę aplikacji i zwiększyć jej wydajność ciężar przetwarzania 
+danych zostanie przerzucony na warstwę bazy danych. Zadanie to przejmą widoki 
+napisane w języku SQL \cite{SQL} które odpytane przez aplikacje przetwarzają 
+aplikacje w locie w bardzo wydajny sposób.}
+
+%Przegląd możliwych metod i narzędzi realizacji
+%Wybrać jedno rozwiązanie i/lub uzasadnić wybór rozwiązania
+%Krótka charakterystyka narzędzi i określenie wersji
+%krótko i konkretnie, szczegóły tylko jeśli są istotne dla projektu
+\section{\customstylesection{Metody i narzędzia realizacji}}
 {Projekt zostanie zrealizowany w podejściu LEAN \cite{LEAN} i metodologii prac 
 Kanban \cite{Kanban} z wykorzystaniem usługi Trello \cite{Trello} widocznej na 
 rysunku \ref*{fig:trello}. Jako że wybrano model przyrostowy 
 \cite{Model Przyrostowy} priorytet zadań określać będzie klasyfikacja MoSCoW 
 \cite{MOSCOW} poglądowo przedstawiony na rysunku wspierana podejściem opartym 
-o matrycę Eisenhowera\cite{MatrycaEisenhowera} co pozwoli dostarczyć tak zwany 
+o matrycę Eisenhowera \cite{MatrycaEisenhowera} co pozwoli dostarczyć tak zwany 
 Minimalny Wystarczający Produkt (MVP, Minimal Viable Product) \cite{MVP}. 
 Zgodnie z dobrymi praktykami panującymi w inżynierii informatycznej w trakcie 
 rozwoju aplikacji wykorzystany zostanie system kontroli źródła git \cite{GIT}, 
@@ -667,170 +876,6 @@ preferowane będą technologie i rozwiązania darmowe oraz open source.}
     \label{fig:trello}
 \end{figure}
 
-\begin{figure}[H]           %requires float package
-    \centering
-    \includegraphics[width=12cm]{figures/MoSCoW-01.png}
-    \caption{Pirorytetyzacja MoSCoW}
-    \label{fig:moscow}
-\end{figure}
-
-\medskip
-{Proponowane rozwiązanie powinno przyjąć formę trójwarstwowej aplikacji 
-przeglądarkowej, rysunek \ref{fig:architeturatrojwarstwowa} przedstawia 
-poglądową architekturę. Ponieważ z aplikacji ma korzystać wielu użytkowników 
-jednocześnie wymagana jest architektura multitenant \cite{multitenant}, która 
-pozwala korzystać wielu użytkownikom z tej samej bazy aplikacji - proponowana 
-technologia to PostgreSQL \cite{PostgreSQL}. Z uwagi na prywatność danych każdy 
-z użytkowników docelowo będzie korzystał z własnego schematu w bazie danych 
-aplikacji przechowywanej na serwerze co przedstawia rysunek 
-\ref{fig:multitenant}, jest to jednak rozwiązanie które trudno wdrożyć, dlatego 
-w fazie projektowej która jest przedmiotem tej pracy zastosowano uproszczenie w 
-postaci pojedynczego domyślnego schematu danych dla każdego użytkownika 
-(słowem: wszyscy użytkownicy mają dostęp do tych samych danych).}
-
-\begin{figure}[H]           %requires float package
-    \centering
-    \includegraphics[width=12cm]{figures/framwork-gigr-pl_architektura_www.jpg}
-    \caption{http://framework.gigr.pl/ Architektura Trójwarstwowa}
-    \label{fig:architeturatrojwarstwowa}
-\end{figure}
-
-\begin{figure}[H]           %requires float package
-    \centering
-    \includegraphics[width=12cm]{figures/multitenant_4.png}
-    \caption{Microsoft, Architektura współdzielona baza, rozdzielne schematy}
-    \label{fig:multitenant}
-\end{figure}
-
-
-% 3.5. Projekt ogólny (10-25 stron.)
-% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/projekt-ogolny/
-\chapter{\customstylechapter{Projekt ogólny}}
-{Rozdział ten opisuje ogólną koncepcję organizacji systemu, plan jego 
-architektury, przechowywanie danych, ogólny plan interfejsu użytkownika oraz 
-metody i narzędzia realizacji.}
-
-%opis funkcji udostępnianych przez system
-% - mile widziany diagram przypadkó użycia - Funkcje systemu odpowiadają 
-%   zazwyczaj przypadkom użycia
-% - można zaprezentować wymagania jako numerowaną listę, tabelę
-% - wymagania niefunkcjonalne - aspekty systemu które nie przekładają się 
-%   bezpośrednio na akcje wykonywane przez system (architektura, bezpieczeństwo,
-%   ergonomia, kolorystyka itd.)
-
-\section{\customstylesection{Specyfikacja wymagań funkcjonalnych i niefunkcjonalnych}}
-{Zestawienie funkcji które powinien spełniać program, wraz z informacją które 
-z nich zostały spełnione. Nagłówki z powodu objętości zostały skrócone, legenda:}
-
-{PRIO - Priorytet w jednej z kategorii MOSCOW \cite{MOSCOW}}
-
-{IMPL - Oznaczenie czy funkcję wdrożono}
-
-%#TODO: try tabularray as suggested
-% Wrapping as per: https://stackoverflow.com/questions/790932/how-to-wrap-text-in-latex-tables
-\begin{table}[H] %https://www.overleaf.com/learn/latex/Positioning_images_and_tables
-    \caption{Wymagania niefunkcjonalne}
-    \label{Wymagania niefunkcjonalne}
-    \footnotesize
-    \begin{tabular}{|p{0.2\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}|p{0.52\linewidth}|}  % | draws verical line
-    % \usepackage{booktabs} provides different line thicknesses
-    % \toprule, \midrule, \bottomrule
-    \hline                  % Draw horizontal line
-    % & Defines the breaks in the table 
-    \customstyletable{Funkcja} & \customstyletablecentered{PRIO} & \customstyletablecentered{IMPL}& \customstyletable{Opis} \\
-    \hline
-    {Plik konfiguracji} & {M} & {TAK} & {Osobny plik konfiguracyjny}\\
-    \hline
-    {Rejestr zdarzeń} & {S} & {NIE} & {Logi z działania aplikacji}\\
-    \hline
-    {Instalator} & {W} & {NIE} & {Prosty instalator aplikacji}\\
-    \hline
-    {Aktualizacje} & {W} & {NIE} & {Automatyczne sprawdzanie wersji i aktualizacja}\\
-    \hline
-    \end{tabular}
-\end{table}
-
-\begin{table}[H] %https://www.overleaf.com/learn/latex/Positioning_images_and_tables
-    \caption{Wymagania funkcjonalne}
-    \label{Wymagania funkcjonalne}
-    \footnotesize
-    \begin{tabular}{|p{0.2\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}|p{0.52\linewidth}|}  % | draws verical line
-    % \usepackage{booktabs} provides different line thicknesses
-    % \toprule, \midrule, \bottomrule
-    \hline                  % Draw horizontal line
-    % & Defines the breaks in the table 
-    \customstyletable{Funkcja} & \customstyletablecentered{PRIO} & \customstyletablecentered{IMPL}& \customstyletable{Opis} \\
-    \hline
-    {Dodawanie danych} & {M} & {TAK} & {Dodawanie danych}\\
-    \hline
-    {Podsumowanie wydatków} & {M} & {TAK} & {Okresowe podsumowanie wydatków}\\
-    \hline
-    {Podsumowanie przychodów} & {M} & {TAK} & {Okresowe podsumowanie przychodów}\\
-    \hline
-    {Statystyki typów} & {C} & {TAK} & {Statystyki wydatków na dany typ produktu}\\
-    \hline
-    {Statystyki produktów} & {C} & {TAK} & {Statystyki wydatków na dany produkt}\\
-    \hline
-    {Bilans okresowy} & {M} & {TAK} & {Okresowy bilans zysków i strat}\\
-    \hline
-    {Definiowanie produktów} & {M} & {TAK} & {Definiowanie produktów}\\
-    \hline
-    {Definiowanie przychodów} & {M} & {TAK} & {Definiowanie przychodów}\\
-    \hline
-    {Definiowanie typów produktów} & {M} & {TAK} & {Definiowanie typów produktów}\\
-    \hline
-    {Definiowanie typów przychodów} & {C} & {NIE} & {Definiowanie typów przychodów}\\
-    \hline
-    {Panel konfiguracyjny} & {S} & {TAK} & {Osobny panel konfiguracyjny}\\
-    \hline
-    {Dostęp zdalny} & {M} & {TAK} & {Dostęp do zdalnych baz danych}\\
-    \hline
-    {Import danych} & {S} & {NIE} & {Import danych w standardowym formacie}\\
-    \hline
-    {Walidacja danych} & {M} & {TAK} & {Potwierdzenie jakości danych}\\
-    \hline
-    {Eksport danych} & {C} & {NIE} & {Eksport danych do standardowego formatu}\\
-    \hline
-    {Trendy} & {W} & {NIE} & {Predykcja trendów wydatków i wpływów}\\
-    \hline
-    {Porady} & {C} & {TAK} & {Porady dla użytkownika dotyczące usprawnień budżetu}\\
-    \hline
-    {Wiele użytkowników} & {M} & {TAK} & {Wsparcie dla wielu użytkowników jednocześnie}\\
-    \hline
-    {Lokalizacje} & {C} & {NIE} & {Wersje językowe interfejsu do wyboru}\\
-    \hline
-    {Personalizacja interfejsu} & {W} & {NIE} & {Personalizacja interfejsu użytkownika}\\
-    \hline
-    \end{tabular}
-\end{table}
-
-%(system klasy desktop, mobilny, internetowy)
-%rysunki ideowe i poglądowe
-%Ogólny opis przeznaczenia i roli poszczególnych elementów i komunikacja między nimi
-\section{\customstylesection{Architektura systemu}}
-{Przedmiotem projektu będzie system klasy internetowej - aplikacja internetowa 
-dostępna w przeglądarce w architekturze trójwarstwowej. Aplikację będzie można 
-umieścić na dedykowanym serwerze lub jeśli dodatkowy cel konteneryzacji zostanie
- zrealizowany - na dowolnej maszynie na której udostępniony będzie kod źródłowy 
-oraz zainstalowany Docker. Aplikacja podzielona będzie na interfejs użytkownika 
-(frontend) odpowiadający za interakcję z użytkownikiem i walidację danych, kod 
-na serwerze (backend) zawierający logikę działania aplikacji i komunikację z 
-warstwą dostępu do danych którą będzie baza danych z danymi aplikacji i 
-użytkowników. Wszystkie komponenty aplikacji docelowo działać będą na 
-pojedynczej maszynie, jednak nic nie stoi na przeszkodzie aby w przyszłości 
-jeżeli zajdzie taka potrzeba wydzielić poszczególne komponenty na osobnych 
-maszynach.}
-
-{Aby uprościć logikę aplikacji i zwiększyć jej wydajność ciężar przetwarzania 
-danych zostanie przerzucony na warstwę bazy danych. Zadanie to przejmą widoki 
-napisane w języku SQL\cite{SQL} które odpytane przez aplikacje przetwarzają 
-aplikacje w locie w bardzo wydajny sposób.}
-
-%Przegląd możliwych metod i narzędzi realizacji
-%Wybrać jedno rozwiązanie i/lub uzasadnić wybór rozwiązania
-%Krótka charakterystyka narzędzi i określenie wersji
-%krótko i konkretnie, szczegóły tylko jeśli są istotne dla projektu
-\section{\customstylesection{Metody i narzędzia realizacji}}
 {Do implementacji kodu aplikacji użyty zostanie język Python \cite{Python}, 
 głównie przez wzgląd na walory edukacyjne i prostej, ekspresywnej składni co 
 zwiększy czytelność kodu i zmniejszy poziom złożoności aplikacji. Funkcje }
