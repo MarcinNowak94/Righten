@@ -248,12 +248,11 @@ narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automaty
 kategoryzujące wprowadzone dane. W zamierzeniu aby ułatwić obsługę wymagać 
 będzie minimalnej wiedzy i konfiguracji ze strony użytkownika, dostarczając mu 
 jedonocześnie możliwie najlepsze narzędzia. Będzie to aplikacja przeglądarkowa napisana w 
-języku Python, wykorzystująca frameworki: Bootstrap \cite{Bootstrap}, 
-Flask \cite{Flask}, WTForms \cite{WTForms}, jinja2 \cite{jinja}, oraz bibliotekę 
-chart.js \cite{chart.js}.}
+języku Python \cite{Python}\cite{pythonautomate}, wykorzystująca frameworki: 
+Bootstrap \cite{Bootstrap}, Flask \cite{Flask}, WTForms \cite{WTForms}, jinja2 
+\cite{jinja}, oraz bibliotekę chart.js \cite{chart.js}.}
 
 \medskip
-% #TODO: Uzupełniać w trakcie "Streszczenie zawartości kolejnych rozdziałów (...) Ten fragment to zakres pracy."
 {Rozdział drugi zawiera rozwinięcie charakterystyki i motywacji problemu krótko 
 zaznaczonej we wstępie pracy. Rozdział trzeci to analiza istniejących rozwiązań.
  Rozdział czwarty opisuje koncepcję własnego rozwiązania. Rozdział piąty to 
@@ -412,7 +411,6 @@ odpowiedniej opcji wymaga od użytkownika dokładnego przeglądu i porównania k
  aplikacji.}
 
 %#TODO: Describe what criteria will be evaluated
-
 \section{\customstylesection{Budżet papierowy lub arkusz kalkulacyjny}}
 {Grupa ta obejmuje wiele różnorodnych narzędzi, nierzadko darmowych, lub takich, 
 które użytkownik posiada do innych celów. Przykładowe opcje obejmują proste 
@@ -833,7 +831,6 @@ wirtualnej, jednak opcjonalnie w ramach dalszego rozwoju przewidziano aby
 środowisko aplikacji powoływać dynamicznie z wykorzystaniem platformy 
 uruchomieniowej Docker \cite{Docker}.}
 
-%#TODO: Continue from here
 %jak będziemy zapisywać dane trwale
 %model bazy danych i jego szczegóły
 %dla baz relacyjnych - konceptualny, logiczny i fizyczny, jeśli dużo się nie różnią ten najbardziej pełny
@@ -965,6 +962,76 @@ użytkownikom przy zarządzaniu budżetem.}
     \label{fig:uiprojectvisualizations}
 \end{figure}
 
+%#TODO:
+%3.6. Dokumentacja techniczna
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/projekt-techniczny/
+%struktura zależna od wybranych rozwiązań, metod i architektury
+%diagramy projektowe - np.: diagram hierarchii klas, diagramy sekwencji, kolaboracji
+%opisy metod i stosowane algorytmy
+\chapter{\customstylechapter{Dokumentacja techniczna}}
+{}
+
+%zaprezentować: pakiety, moduły, biblioteki, klasy
+%składowe omówić, jej: nazwa, rola w projekcie, przeznaczenie, struktura wewnętrzna, opis
+%przedstawić wybrane (istotne, ciekawe, nietypowe) fragmenty kodu, pomijać trywialne
+%listingi wstawić jako sformatowany tekst
+%nie zamieszczać długich listingów - kilka linijek, opis, kilka linijek, opis
+
+\section{\customstylesection{Schemat rzeczywistej struktury systemu}}
+{}
+
+\section{\customstylesection{Wybrane fragmenty kodu aplikacji}}
+{}
+
+\section{\customstylesection{Wybrane fragmenty kodu obiektów bazy danych}}
+{}
+
+%3.7. Testy i weryfikacja systemu (2-5str)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/testy/
+%brak tego rozdziału jest istotnym mankamentem pracy co obniży jej ocenę
+%Jakie testy zaplanowano i przygotowano, jak je zrealizowano i jakie były rezultaty
+%Jednostkowe, integracyjne, akceptacyjne i responsywności - jeśli TDD tylko wybrane testy
+%Tylko wybrane testy, zwłąszcza tam gdzie pojawiły się błędy, ich przyczyna i usunięcie
+%forma: tekst i tabelki przypadków testowych
+\chapter{\customstylechapter{Testy i weryfikacja systemu}}
+{}
+
+%#TODO:opisać problem z solą przy szyfrowaniu haseł bcrypt
+\section{\customstylesection{Najciekawsze wykryte błędy}}
+{}
+
+%3.8. Przykładowy scenariusz wykorzystania systemu (4-10str)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/scenariusz/
+%efekty pracy, skoncentrować się na użytkowych aspektach rozwiązania
+%przedstawienie typowego wykorzystania systemu, krok po kroku z czytelnymi grafikami
+%wybrać elementy najciekawsze, nietypowe, ważne
+%zrealizować przypadki użycia Jeśli opisano  w Koncepcji własnego rozwiązania lub opisie wymagań funkcjonalnych
+%poglądowo, nie drobiazgowo ani nie samymi grafikami. rysunek/dwa +5-6 zdań
+\chapter{\customstylechapter{Przykładowy scenariusz wykorzystania systemu}}
+{}
+
+%3.9. Zakończenie (1-2str, najlepiej 1,5str)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/zakonczenie/
+%Podsumowanie wyników pracy, potwierdzenie realizacji celu
+%Wady i zalety rozwiązania i możliwości jego rozwoju - nie dzielić na podpunkty
+%Komplementarne do wstępu - zarówno wstęp jak i zakończenie będą uważnie czytane
+% przez recenzenta 
+% -"Celem pracy było..."
+% -0,3-0,5str Opis właściwości funkcjonalnych zaproponowanego rozwiązania
+% -0,3-0,5str Przypomnienie technologii, narzędzi, bibliotek
+% - Negatywne i pozytywne spostrzeżenia z realizacji pracy - ciekawe, zaskakujące, trudności.
+%   Jak rozwiązanie sprawdza się w praktyce (wdrożone - opinie użytkowników, niewdrożone - czy i kiedy)
+%  pochwalić co dobrze wyszło, nie ukrywać wad - wymienić je i opisać jak je poprawić.
+% - Opis kierunkó rozwoju funkcjonalnego i technologicznego
+\chapter{\customstylechapter{Zakończenie}}
+{Celem pracy było zaprojektowanie i realizacja modułu analitycznego aplikacji 
+ułatwiającej jej użytkownikom zarządzanie budżetem domowym dostarczając 
+narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
+kategoryzującej wprowadzone dane.}
+
+
+
+
 %Trimmed content, leaving it here in case 3 examples are not enough 
 %\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
 %Worknotes
@@ -976,10 +1043,6 @@ użytkownikom przy zarządzaniu budżetem.}
 %ręczna kategoryzacja, [ręczny?] import danych,}
 
 % [#TODO]:
-% 3.6. Dokumentacja techniczna
-% 3.7. Testy i weryfikacja systemu
-% 3.8. Przykładowy scenariusz wykorzystania systemu
-% 3.9. Zakończenie
 % 3.13.Ewentualne załączniki
 
 
@@ -989,9 +1052,11 @@ użytkownikom przy zarządzaniu budżetem.}
     %Books
     \bibitem{najbogatszyczlowiekwbabilonie} George S. Clason, (2021) Najbogatszy człowiek w Babilonie, ISBN: 978-83-67060-04-2
     \bibitem{finansowaforteca} Marcin Iwuć, (2020) Finansowa Forteca, ISBN: 978-83-958468-0-9
-    \bibitem{budzetdomowypodkontrola} Krzysztof Piotr Łabenda, (2011) Budżet domowy pod kontrolą, ISBN: 978-83-246-3626-6
+    \bibitem{budzetdomowypodkontrola} Krzysztof Piotr Łabenda, (2011) Budżet domowy pod kontrolą. Jak rozsądnie wydawać, oszczędzać i inwestować pieniądze, ISBN: 978-83-246-3626-6
 
     %Network resources
+    \bibitem{pythonautomate} Al Sweigart, Automate the Boring Stuff with Python \raggedright\url{
+        https://automatetheboringstuff.com/#toc}    
     \bibitem{wiki_ekonomia} Wikipedia, Nauki Ekonomiczne \raggedright\url{
         https://pl.wikipedia.org/wiki/Nauki_ekonomiczne}
     \bibitem{zapaśćekonomiczna} Wikipedia, Economic collapse \raggedright\url{
@@ -1022,7 +1087,6 @@ użytkownikom przy zarządzaniu budżetem.}
         https://www.simplypsychology.org/positive-reinforcement.html}
     \bibitem{multitenant} Frederick Chong, Gianpaolo Carraro, and Roger Wolter, Microsoft Corporation, Multi‐Tenant Data Architecture \raggedright\url{
         https://ramblingsofraju.com/wp-content/uploads/2016/08/Multi-Tenant-Data-Architecture.pdf}
-        
 
     %Evaluated solutions
     \bibitem{santandercentrum24} Santander, Centrum24.pl \raggedright\url{
@@ -1047,7 +1111,6 @@ użytkownikom przy zarządzaniu budżetem.}
         https://www.nerdwallet.com/article/finance/best-budget-apps}
     \bibitem{tiller} Tiller Inc., Tiller \raggedright\url{
         https://www.tillerhq.com/}
-       
 
     %Tools and technologies
     \bibitem{MOSCOW} Product Plan, MOSCOW Prioritetization \raggedright\url{
@@ -1074,8 +1137,6 @@ użytkownikom przy zarządzaniu budżetem.}
         https://www.python.org/}
     \bibitem{JSON} json.org, Introducing JSON \raggedright\url{
         https://www.json.org/json-en.html}
-    \bibitem{Python_read-file} pythonspot.com, Python tutorials, How to Read a File in Python \raggedright\url{
-        https://pythonspot.com/read-file/}
     \bibitem{Trello} Atlassian, Trello.com \raggedright\url{
         https://trello.com/}
     \bibitem{StarUML} MKLabs Co.,Ltd, StarUML \raggedright\url{
@@ -1139,6 +1200,7 @@ użytkownikom przy zarządzaniu budżetem.}
 % 3.1. Wstęp <-[sections moved here: Motywacja, cel i plan działania]
 % 3.2. Charakterystyka/analiza problemu
 % 3.3. Analiza istniejących rozwiązań
+% 3.4. Koncepcja własnego rozwiązania (2-5 stron)
 % 3.10.Bibliografia
 % 3.11.Spis rysunków
 % 3.12.Spis tabel
