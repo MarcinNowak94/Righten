@@ -36,7 +36,7 @@
 \makeindex
 \graphicspath{ {./} }       %Was ./figures/ changed so i can peek in VS Code
 %Widow and orphan control as per https://tex.stackexchange.com/questions/4152/how-do-i-prevent-widow-orphan-lines/4167#4167?newreg=87e476a8b11e44e2bd285df0190a69e0
-\widowpenalty10000          
+\widowpenalty10000
 \clubpenalty10000
 
 % Code listings
@@ -44,13 +44,13 @@
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{HTML}{C42043}
 \definecolor{backcolour}{HTML}{F2F2F2}
-\definecolor{bookColor}{cmyk}{0,0,0,0.90}  
+\definecolor{bookColor}{cmyk}{0,0,0,0.90}
 \color{bookColor}
 
 \lstset{upquote=true}
 
 \lstdefinestyle{mystyle}{
-    backgroundcolor=\color{backcolour},   
+    backgroundcolor=\color{backcolour},
     commentstyle=\color{codegreen},
     keywordstyle=\color{codepurple},
     numberstyle=\numberstyle,
@@ -114,15 +114,15 @@
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % horizontal lines
 
 \newtcbox{\inlinecode}{
-    on line, 
-    boxrule=0pt, 
-    boxsep=0pt, 
-    top=2pt, 
-    left=2pt, 
-    bottom=2pt, 
-    right=2pt, 
-    colback=gray!15, 
-    colframe=white, 
+    on line,
+    boxrule=0pt,
+    boxsep=0pt,
+    top=2pt,
+    left=2pt,
+    bottom=2pt,
+    right=2pt,
+    colback=gray!15,
+    colframe=white,
     fontupper={\ttfamily \footnotesize}
 }
 
@@ -222,7 +222,7 @@
 %http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/wstep/
 \chapter{\customstylechapter{Wstęp}}
 {Finanse są dziedziną nauki ekonomicznej która zajmuje się rozporządzaniem 
-pieniędzmi  \cite{wiki_ekonomia}. Nauka ta w podobnym zakresie a różnej skali 
+pieniędzmi \cite{wiki_ekonomia}. Nauka ta w podobnym zakresie a różnej skali 
 dotyczy państw, dużych przedsiębiorstw, małych działalności gospodarczych jak i 
 zwykłych obywateli - w efekcie jest to dziedzina o stosunkowo prostych 
 podstawach jednak niesamowicie skomplikowana w każdym aspekcie w którym można ją
@@ -283,13 +283,13 @@ spokojna - zmiana podejścia pozwala wtedy co prawda więcej zaoszczędzić, jed
 w zasadzie jest to opcjonalne. Kiedy jednak na rynku czy to lokalnym czy 
 globalnym sytuacja staje się trudniejsza, co może powodować nagły wzrost 
 inflacji przeważnie koszta życia rosną niewspółmiernie do 
-zarobków \cite{gussytuacjabudzetowa}, a tym samym dopięcie finansów osobistych i 
-domowych tak, by bilans wyszedł dodatni wymaga więcej uwagi i wiedzy. W 
-ostatnich latach (2019-2023) miało miejsce kilka zdarzeń któe dotknęły światową 
-gospodarkę. W momencie pisania tej pracy takimi wydarzeniami są pandemia Covid 
-19, działania zbrojne nw terenie Ukrainy oraz wojna na bliskim wschodzie. 
-Zdarzenia te jak wynika z badań Krajowego Rejestru Długów 
- \cite{portfelpolakawpandemii} u prawie połowy polaków wywołała poczucie 
+zarobków \cite{gussytuacjabudzetowa}\cite{koszty2010-22}, a tym samym dopięcie 
+finansów osobistych i domowych tak, by bilans wyszedł dodatni wymaga więcej 
+uwagi i wiedzy. W ostatnich latach (2019-2023) miało miejsce kilka zdarzeń któe 
+dotknęły światową gospodarkę. W momencie pisania tej pracy takimi wydarzeniami 
+są pandemia Covid 19, działania zbrojne nw terenie Ukrainy oraz wojna na bliskim
+ wschodzie. Zdarzenia te jak wynika z badań Krajowego Rejestru Długów 
+\cite{portfelpolakawpandemii} u prawie połowy polaków wywołała poczucie 
 zagrożenia biedą, podczas gdy jedynie 22\% twierdzi że jest spokojna o swoją 
 sytuację finansową. Raport Warsaw Enterprise Institute \cite{weiinflacja} 
 wykazuje natomiast spadek realnych płac (uwzględniających zarobki oraz wydatki) 
@@ -529,25 +529,25 @@ jest to także główny powód dlaczego przegląd tej aplikacji oparty jest na
 recenzjach i poradnikach opublikowanych w internecie. W zakładce Transakcje 
 zgromadzone są także wszystkie płatności zarejestrowane na udostępnionych 
 aplikacji kontach, z opinii długotrwałych użytkowników wynika że jakość 
-automatycznej kategoryzacji jest 
-słaba \cite{porownanieaplikacji1}\cite{porownanieaplikacji2}
-\cite{porownanieaplikacji3}\cite{porownanieaplikacji4}. Użytkownik może je 
-oznaczać etykietami (tag), dodawać do nich notatki czy wykluczać z zestawień. W 
-zakładce Miesiąc aplikacja generuje podsumowanie przychodów i wydatków, pozwala 
-utworzyć tygodniowe cele wydatków oraz budżet (a nawet kilka jednocześnie) przy 
-użyciu prostego kreatora. Kreator budżetu wydaje się bardzo prosty w obsłudze, 
-samodzielnie szacuje przychód na podstawie dostępnych danych który następnie 
-użytkownik zatwierdza lub nadpisuje dowolną wartością, w drugim kroku użytkownik
- definiuje samodzielnie listę kategorii oraz podkategorii wydatków co niestety 
-wymaga od wcześniejszego przzygotowania.Użytkownik może dodać cel finansowy 
-podając nazwę, wartość, oraz datę kiedy powinien być spełniony, następnie 
-wybiera konto bankowe które chce z nim powiązać - jego spełnienie śledzi 
-porównując ilość środkó na koncie z wyznaczonym celem. Dodatkową opcją są 
-przypomnienia o opłacie nadchodzących rachunków w postaci powiadomień push, 
-wiadomości email lub wydarzeń w kalendarzu.}
+automatycznej kategoryzacji jest słaba \cite{porownanieaplikacji1}
+\cite{porownanieaplikacji2}\cite{porownanieaplikacji3}
+\cite{porownanieaplikacji4}\cite{porownanieaplikacji5}. Użytkownik może je 
+oznaczać etykietami (tag), dodawać do nich notatki czy wykluczać z zestawień. 
+W zakładce Miesiąc aplikacja generuje podsumowanie przychodów i wydatków, 
+pozwala utworzyć tygodniowe cele wydatków oraz budżet (a nawet kilka 
+jednocześnie) przy użyciu prostego kreatora. Kreator budżetu wydaje się bardzo 
+prosty w obsłudze, samodzielnie szacuje przychód na podstawie dostępnych danych 
+który następnie użytkownik zatwierdza lub nadpisuje dowolną wartością, w drugim 
+kroku użytkownik definiuje samodzielnie listę kategorii oraz podkategorii 
+wydatków co niestety wymaga od wcześniejszego przygotowania. Użytkownik może 
+dodać cel finansowy podając nazwę, wartość, oraz datę kiedy powinien być 
+spełniony, następnie wybiera konto bankowe które chce z nim powiązać - jego 
+spełnienie śledzi porównując ilość środków na koncie z wyznaczonym celem. 
+Dodatkową opcją są przypomnienia o opłacie nadchodzących rachunków w postaci 
+powiadomień push, wiadomości email lub wydarzeń w kalendarzu.}
 
 \begin{figure}[H]           %requires float package
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/pcmag_mintmobile_05OMSsUmroXJ6F6sETKpH9R-50.fit_lim.size_1152x.jpg}
     \caption{https://www.pcmag.com/reviews/mintcom Mint w wersji mobilnej}
     \label{mintmobile}
@@ -560,7 +560,7 @@ kilka predefiniownych wykresów wizualizujących dane, zawierających dość og�
 dane.}
 
 \begin{figure}[H]           %requires float package
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/pcmag_mintweb_05OMSsUmroXJ6F6sETKpH9R-51.fit_lim.size_1152x.jpg}
     \caption{https://www.pcmag.com/reviews/mintcom Mint w wersji na przeglądarki}
     \label{fig:mintweb}
@@ -579,6 +579,16 @@ zawierają wiele wrażliwych danych co jest problemem z uwagi na prywatność,
 ponadto użytkownik musi samodzielnie z góry określić wydatki na poszczególne 
 kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
 
+%Trimmed content, leaving it here in case 3 examples are not enough 
+%\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
+%Worknotes
+%{mobilna i desktopowa, darmowa (historia rok wstecz) i płatna 
+%(rozszerzona, historia 7 lat wstecz), system kopertowy (dzielenie przychodów na 
+%koszyki) z priorytetyzacją i monitoringiem, dobra do współdzielonego budżetu 
+%(synchronizacja między kontami wielu użytkowników), wskazuje źródła edukacyjne, 
+%dobre wsparcie i często rozszerzana, ręczne dodawanie wydatków, automatyczna i 
+%ręczna kategoryzacja, [ręczny?] import danych,}
+
 % 3.4. Koncepcja własnego rozwiązania (2-5 stron)
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/koncepcja-wlasnego-rozwiazania/
 % Migrate and modernise previous description https://github.com/MarcinNowak94/Righten/commit/d8c84ff1961b77599568fe220021e3e78387e193 
@@ -593,7 +603,6 @@ uzupełniało braki funckji w obecnie dostępnych na ruynku aplikacjach.}
 % można wskazać zagadnienia możliwe do wykonania, choć wykraczające poza ramy prac
 % wskazać i uzasadnić wybór metod i narzędzi pracy
 % koncepcja licencjonowania, dystrybucji, jacy odbiorcy
-
 \section{\customstylesection{Koncepcja rozwiązania użytkowego}}
 {Rozwiązaniem powinna być aplikacja przeglądarkowa, co pozwoli trafić do 
 szerszej grupy użytkowników minimalizując próg wejścia. Projekt aplikacji 
@@ -615,11 +624,11 @@ w danynm momencie rozwiązań. W dalszym etapie rozwoju aplikacji można także
 wdrożyć moduł predykcji przyszłych wydatków w oparciu o dane historyczne. 
 Kolejnym obszarem z potencjałem rozwoju jest wprowadzanie danych - aby ułatwić 
 użytkowanie aplikacji można utworzyć moduł importu danych z plików w popularnym 
-standardowym formacie jak CSV, a w dalszej perspektywie nawet funkcje ekstrakcji
- danych z obrazów co pozwoli na wprowadzanie danych bezpośrednio z faktur, zdjęć
-, rachunków, paragonów, pasków wynagrodzenia. Możliwość określenia własnych 
-progów wydatków które będą uwzględniane na wizualizacjach, oraz celi finansowych
- których postęp realizacji będzie mógł śledzić.}
+standardowym formacie jak CSV \cite{CSV}, a w dalszej perspektywie nawet funkcje
+ ekstrakcji danych z obrazów co pozwoli na wprowadzanie danych bezpośrednio z 
+faktur, zdjęć, rachunków, paragonów, pasków wynagrodzenia. Możliwość określenia 
+własnych progów wydatków które będą uwzględniane na wizualizacjach, oraz celi 
+finansowych których postęp realizacji będzie mógł śledzić.}
 
 {W fazie rozwoju na potrzeby pracy inżynierskiej projekt będzie udostępniony 
 publicznie w wersji OpenSource, dlatego wstępnie interfejs powinien być w 
@@ -631,20 +640,38 @@ wyboru wersji językowej, tłumaczenie interfejsu na kilka popularnych języków
 
 % postać aplikacji - www/mobilna/desktop/hybrydowa?
 % ogólny szkic architektury
-% krótko narzędzia realizacji 
-% opcjonalne: dyskusja możliwych metod, technik i narzędzi realizacji pracy 
+% krótko narzędzia realizacji
+% opcjonalne: dyskusja możliwych metod, technik i narzędzi realizacji pracy
 % Nie wchodzić głęboko w zagadnienia technologiczne
 \section{\customstylesection{Koncepcja rozwiązania technologicznego}}
-{Projekt zostanie zrealizowany w metodologii prac Kanban \cite{Kanban} z 
-wykorzystaniem usługi Trello \cite{Trello}, priorytet zadań określać będzie 
-klasyfikacja MoSCoW \cite{MOSCOW}. Zgodnie ze standardem panującym w Informatyce
-w trakcie rozwoju aplikacji wykorzystany zostanie system kontroli źródła 
-git \cite{GIT}, a kod projektu przechowywany będzie na potralu 
-GitHub \cite{GitHub} (w repozytorium Righten \cite{GITRighten} - z poprzednimi 
-wersjami projektu można się zapoznać w repozytorium 
-DatabaseShenanigans \cite{GITBudgeterApp} a jego dokumentacją w 
-Budgeter \cite{GITBudgeterDoc}). W projektowanym rozwiązaniu preferowane będą 
-technologie i rozwiązania darmowe oraz opensource.}
+{Projekt zostanie zrealizowany w podejściu LEAN \cite{LEAN} i metodologii prac 
+Kanban \cite{Kanban} z wykorzystaniem usługi Trello \cite{Trello} widocznej na 
+rysunku \ref*{fig:trello}. Jako że wybrano model przyrostowy 
+\cite{Model Przyrostowy} priorytet zadań określać będzie klasyfikacja MoSCoW 
+\cite{MOSCOW} poglądowo przedstawiony na rysunku wspierana podejściem opartym 
+o matrycę Eisenhowera\cite{MatrycaEisenhowera} co pozwoli dostarczyć tak zwany 
+Minimalny Wystarczający Produkt (MVP, Minimal Viable Product) \cite{MVP}. 
+Zgodnie z dobrymi praktykami panującymi w inżynierii informatycznej w trakcie 
+rozwoju aplikacji wykorzystany zostanie system kontroli źródła git \cite{GIT}, 
+a kod projektu przechowywany będzie na potralu GitHub \cite{GitHub} (w 
+repozytorium Righten \cite{GITRighten} - z poprzednimi wersjami projektu można 
+się zapoznać w repozytorium DatabaseShenanigans \cite{GITBudgeterApp} a jego 
+dokumentacją w Budgeter \cite{GITBudgeterDoc}). W projektowanym rozwiązaniu 
+preferowane będą technologie i rozwiązania darmowe oraz opensource.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/trello_kanban.png}
+    \caption{Pirorytetyzacja MoSCoW}
+    \label{fig:trello}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/MoSCoW-01.png}
+    \caption{Pirorytetyzacja MoSCoW}
+    \label{fig:moscow}
+\end{figure}
 
 \medskip
 {Proponowane rozwiążanie powinno przyjąć formę trójwarstwowej aplikacji 
@@ -661,14 +688,14 @@ postaci pojedynczego domyślnego schematu danych dla każdego użytkownika
 (słowem: wszyscy użytkownicy mają dostęp do tych samych danych).}
 
 \begin{figure}[H]           %requires float package
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/framwork-gigr-pl_architektura_www.jpg}
     \caption{http://framework.gigr.pl/ Architektura Trójwarstwowa}
     \label{fig:architeturatrojwarstwowa}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/multitenant_4.png}
     \caption{Microsoft, Architektura współdzielona baza, rozdzielne schematy}
     \label{fig:multitenant}
@@ -795,8 +822,8 @@ maszynach.}
 
 {Aby uprościć logikę aplikacji i zwiększyć jej wydajność ciężar przetwarzania 
 danych zostanie przerzucony na warstwę bazy danych. Zadanie to przejmą widoki 
-które odpytane przez aplikacje przetwarzają aplikacje w locie w bardzo wydajny 
-sposób.}
+napisane w języku SQL\cite{SQL} które odpytane przez aplikacje przetwarzają 
+aplikacje w locie w bardzo wydajny sposób.}
 
 %Przegląd możliwych metod i narzędzi realizacji
 %Wybrać jedno rozwiązanie i/lub uzasadnić wybór rozwiązania
@@ -831,6 +858,13 @@ wirtualnej, jednak opcjonalnie w ramach dalszego rozwoju przewidziano aby
 środowisko aplikacji powoływać dynamicznie z wykorzystaniem platformy 
 uruchomieniowej Docker \cite{Docker}.}
 
+{Do tworzenia dokumentacji wykorzystany zostanie pakiet narzędzi open source, 
+między innymi będą to: StarUML \cite{StarUML} do tworzenia diagramów, pgAdmin 
+\cite{pgAdmin} do tworzenia dioagramów na podstawie encji bazy danych. 
+Dokumentacja zostanie spisana w języku LaTex \cite{LaTeX} wraz z gamą 
+oficjalnych rozszerzeń dostępnych w sieci - zarówno kod jak i dokumentacja 
+spisana w środowisku VSCode \cite{VSCode}.}
+
 %jak będziemy zapisywać dane trwale
 %model bazy danych i jego szczegóły
 %dla baz relacyjnych - konceptualny, logiczny i fizyczny, jeśli dużo się nie różnią ten najbardziej pełny
@@ -844,14 +878,14 @@ danych aplikacji. Widoki przezentuje rysunek \ref{fig:rightenerdwidoki},
 przetwarzają one dane które prezentowane są użytkownikowi w aplikacji.}
 
 \begin{figure}[H]           %requires float package
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/RightenDB_EntityRelationDiagram.png}
     \caption{Diagram Związków Encji (ERD, Entity-Relationship Diagram)}
     \label{fig:rightenerdtabele}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/Righten_Finances-db_Views.png}
     \caption{Widoki w bazie danych aplikacji}
     \label{fig:rightenerdwidoki}
@@ -872,7 +906,7 @@ funkcji projektu.}
 {Tabele pomocnicze i tymczasowe: są to tabele robocze do zarządzania danymi w 
 trakcie rozwoju, ich ilość, nazwy, struktura oraz przeznaczenie mogą się 
 zmieniać. Kiedy projektowana funkcja zostanie ukończona tabela wchodzi do użytku
- w ramach którejś z wcześniej opisanych  kategorii.}
+ w ramach którejś z wcześniej opisanych kategorii.}
 
 %Organizacja interfejsu użytkownika - rysunki z komentarzem
 %szkice(mockup) i projekty, nie gotowe zrzuty ekranu
@@ -969,7 +1003,14 @@ użytkownikom przy zarządzaniu budżetem.}
 %diagramy projektowe - np.: diagram hierarchii klas, diagramy sekwencji, kolaboracji
 %opisy metod i stosowane algorytmy
 \chapter{\customstylechapter{Dokumentacja techniczna}}
-{}
+{Znaczniki czasu przechywane będą w formacie czasu zgodnym ze standardem 
+ISO 8601 \cite{ISO 8601} - jednolity format ułatwi obsługę i przetwarzanie 
+danych.}
+
+{Dane między warstwami backend i frontend muszą być przesyłane w standardowym 
+formacie aby zapewnić współpracę z dostępnymi na rynku bibliotekami i uprościć 
+implementacje funkcji które będą je obsługiwać. Na potrzeby aplikacji wybrano 
+format JSON \cite{JSON}.}
 
 %zaprezentować: pakiety, moduły, biblioteki, klasy
 %składowe omówić, jej: nazwa, rola w projekcie, przeznaczenie, struktura wewnętrzna, opis
@@ -1005,7 +1046,7 @@ użytkownikom przy zarządzaniu budżetem.}
 %efekty pracy, skoncentrować się na użytkowych aspektach rozwiązania
 %przedstawienie typowego wykorzystania systemu, krok po kroku z czytelnymi grafikami
 %wybrać elementy najciekawsze, nietypowe, ważne
-%zrealizować przypadki użycia Jeśli opisano  w Koncepcji własnego rozwiązania lub opisie wymagań funkcjonalnych
+%zrealizować przypadki użycia Jeśli opisano w Koncepcji własnego rozwiązania lub opisie wymagań funkcjonalnych
 %poglądowo, nie drobiazgowo ani nie samymi grafikami. rysunek/dwa +5-6 zdań
 \chapter{\customstylechapter{Przykładowy scenariusz wykorzystania systemu}}
 {}
@@ -1021,26 +1062,13 @@ użytkownikom przy zarządzaniu budżetem.}
 % -0,3-0,5str Przypomnienie technologii, narzędzi, bibliotek
 % - Negatywne i pozytywne spostrzeżenia z realizacji pracy - ciekawe, zaskakujące, trudności.
 %   Jak rozwiązanie sprawdza się w praktyce (wdrożone - opinie użytkowników, niewdrożone - czy i kiedy)
-%  pochwalić co dobrze wyszło, nie ukrywać wad - wymienić je i opisać jak je poprawić.
+% pochwalić co dobrze wyszło, nie ukrywać wad - wymienić je i opisać jak je poprawić.
 % - Opis kierunkó rozwoju funkcjonalnego i technologicznego
 \chapter{\customstylechapter{Zakończenie}}
 {Celem pracy było zaprojektowanie i realizacja modułu analitycznego aplikacji 
 ułatwiającej jej użytkownikom zarządzanie budżetem domowym dostarczając 
 narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
 kategoryzującej wprowadzone dane.}
-
-
-
-
-%Trimmed content, leaving it here in case 3 examples are not enough 
-%\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
-%Worknotes
-%{mobilna i desktopowa, darmowa (historia rok wstecz) i płatna 
-%(rozszerzona, historia 7 lat wstecz), system kopertowy (dzielenie przychodów na 
-%koszyki) z priorytetyzacją i monitoringiem, dobra do współdzielonego budżetu 
-%(synchronizacja między kontami wielu użytkowników), wskazuje źródła edukacyjne, 
-%dobre wsparcie i często rozszerzana, ręczne dodawanie wydatków, automatyczna i 
-%ręczna kategoryzacja, [ręczny?] import danych,}
 
 % [#TODO]:
 % 3.13.Ewentualne załączniki
@@ -1056,7 +1084,7 @@ kategoryzującej wprowadzone dane.}
 
     %Network resources
     \bibitem{pythonautomate} Al Sweigart, Automate the Boring Stuff with Python \raggedright\url{
-        https://automatetheboringstuff.com/#toc}    
+        https://automatetheboringstuff.com/#toc}
     \bibitem{wiki_ekonomia} Wikipedia, Nauki Ekonomiczne \raggedright\url{
         https://pl.wikipedia.org/wiki/Nauki_ekonomiczne}
     \bibitem{zapaśćekonomiczna} Wikipedia, Economic collapse \raggedright\url{
@@ -1112,17 +1140,29 @@ kategoryzującej wprowadzone dane.}
     \bibitem{tiller} Tiller Inc., Tiller \raggedright\url{
         https://www.tillerhq.com/}
 
-    %Tools and technologies
+    %Metodologies
     \bibitem{MOSCOW} Product Plan, MOSCOW Prioritetization \raggedright\url{
         https://www.productplan.com/glossary/moscow-prioritization/}
     \bibitem{MatrycaEisenhowera}Praca.pl, Matryca Eisenhowera - czym jest, zasada, prioryteryzacja zadań \raggedright\url{
         https://www.praca.pl/poradniki/rynek-pracy/matryca-eisenhowera-czym-jest,zasada,prioryteryzacja-zadan_pr-2012.html}
     \bibitem{MVP} Wikipedia, Minimal Viable Product \raggedright\url{
         https://en.wikipedia.org/wiki/Minimum_viable_product}
+    \bibitem{Kanban} Lean Action Plan, Kanban – układ nerwowy sterowania produkcją w koncepcji Lean Manufacturing \raggedright\url{
+        https://leanactionplan.pl/kanban/}
+    \bibitem{LEAN} Wikipedia, Lean software development \raggedright\url{
+        https://pl.wikipedia.org/wiki/Lean_software_development}
+    \bibitem{Model Przyrostowy} Wikipedia, Model Przyrostowy \raggedright\url{
+        https://pl.wikipedia.org/wiki/Model_przyrostowy}
+    
+    %Standards
     \bibitem{ISO 8601} NASA.gov, A summary of the international standard date and time notation \raggedright\url{
         https://fits.gsfc.nasa.gov/iso-time.html}
     \bibitem{CSV} Y. Shafranovich, SolidMatrix Technologies, Inc., Common Format and MIME Type for Comma-Separated Values (CSV) Files \raggedright\url{
         https://www.rfc-editor.org/rfc/rfc4180}
+    \bibitem{JSON} json.org, Introducing JSON \raggedright\url{
+        https://www.json.org/json-en.html}
+    
+    %Tools and technologies
     \bibitem{SQLite} sqlite.org, SQLite \raggedright\url{
         https://www.sqlite.org/index.html}
     \bibitem{SQL} wikipedia.org, SQL - Structured Query Language \raggedright\url{
@@ -1135,50 +1175,41 @@ kategoryzującej wprowadzone dane.}
         https://www.docker.com/}
     \bibitem{Python} python.org, Python \raggedright\url{
         https://www.python.org/}
-    \bibitem{JSON} json.org, Introducing JSON \raggedright\url{
-        https://www.json.org/json-en.html}
     \bibitem{Trello} Atlassian, Trello.com \raggedright\url{
         https://trello.com/}
     \bibitem{StarUML} MKLabs Co.,Ltd, StarUML \raggedright\url{
         https://staruml.io/}
     \bibitem{LaTeX} The LaTeX Project \raggedright\url{
         https://www.latex-project.org/}
+    %Database visualization tool used for Budgeter - used DBSchema for Righten
+    %\bibitem{DataGrip} JetBrains, DataGrip \raggedright\url{
+    %    https://www.jetbrains.com/datagrip/}
     \bibitem{VSCode} Microsoft, Visual Studio Code \raggedright\url{
         https://code.visualstudio.com/}
-    \bibitem{DataGrid} JetBrains, DataGrid \raggedright\url{
-        https://www.jetbrains.com/datagrip/}
-    \bibitem{Kanban} Lean Action Plan, Kanban – układ nerwowy sterowania produkcją w koncepcji Lean Manufacturing \raggedright\url{
-        https://leanactionplan.pl/kanban/}
-    \bibitem{LEAN} Wikipedia, Lean software development \raggedright\url{
-        https://pl.wikipedia.org/wiki/Lean_software_development}
     \bibitem{GIT} git-scm.com, git \raggedright\url{
         https://git-scm.com/}
     \bibitem{GitHub} https://github.com/ \raggedright\url{
         https://github.com/}
-    \bibitem{Model Przyrostowy} Wikipedia, Model Przyrostowy \raggedright\url{
-        https://pl.wikipedia.org/wiki/Model_przyrostowy}
-    \bibitem{EdittableTable} YouTube The CS Classroom, PySimpleGUI - Excel-style Editable Table \raggedright\url{
-        https://www.youtube.com/watch?v=ETHtvd-_FJg}
     \bibitem{GITBudgeterApp} github.com MarcinNowak94, DatabaseShenanigans \raggedright\url{
         https://github.com/MarcinNowak94/DatabaseShenanigans}
     \bibitem{GITBudgeterDoc} github.com MarcinNowak94, budgeter \raggedright\url{
         https://github.com/MarcinNowak94/budgeter}
     \bibitem{GITRighten} github.com MarcinNowak94, Righten \raggedright\url{
         https://github.com/MarcinNowak94/Righten}
+    \bibitem{JavaScript} Mozilla, JavaScript \raggedright\url{
+        https://developer.mozilla.org/en-US/docs/Web/javascript}
     \bibitem{Bootstrap} getbootstrap.com, Bootstrap \raggedright\url{
         https://getbootstrap.com/}
     \bibitem{Flask} flask.palletsprojects.com, Flask \raggedright\url{
         https://flask.palletsprojects.com/en/3.0.x/}
     \bibitem{Flask-Login} https://pypi.org/project/Flask-Login/, Flask-Login \raggedright\url{
         https://pypi.org/project/Flask-Login/}
-    \bibitem{JavaScript} Mozilla, JavaScript \raggedright\url{
-        https://developer.mozilla.org/en-US/docs/Web/javascript}   
     \bibitem{WTForms} wtforms.readthedocs.io, WTForms \raggedright\url{
         https://wtforms.readthedocs.io/en/3.1.x/}
     \bibitem{jinja} jinja.palletsprojects.com, Jinja \raggedright\url{
         https://jinja.palletsprojects.com/en/3.1.x/}
     \bibitem{chart.js} www.chartjs.org, Chart.js \raggedright\url{
-        https://www.chartjs.org/}      
+        https://www.chartjs.org/}
 \end{thebibliography}
 
 % 3.11.Spis rysunków
@@ -1204,6 +1235,3 @@ kategoryzującej wprowadzone dane.}
 % 3.10.Bibliografia
 % 3.11.Spis rysunków
 % 3.12.Spis tabel
-
-
-%#TODO: rate this feature
