@@ -827,77 +827,101 @@ funkcjonalnych. Nagłówki z powodu objętości zostały skrócone, legenda:}
 %Ogólny opis przeznaczenia i roli poszczególnych elementów i komunikacja między nimi
 \section{\customstylesection{Architektura systemu}}
 {Przedmiotem projektu będzie system klasy internetowej - monolityczna aplikacja 
-internetowa dostępna w przeglądarce w architekturze trójwarstwowej, którą można 
+internetowa dostępna w przeglądarce o architekturze trójwarstwowej, którą można 
 będzie umieścić na dedykowanym serwerze lub jeśli dodatkowy cel konteneryzacji 
 zostanie zrealizowany - na dowolnej maszynie na której udostępniony będzie kod 
 źródłowy oraz zainstalowany Docker. Aplikacja podzielona będzie na interfejs 
 użytkownika (frontend) odpowiadający za interakcję z użytkownikiem i walidację 
 danych, kod na serwerze (backend) zawierający logikę działania aplikacji i 
-komunikację z warstwą dostępu do danych którą będzie baza danych z danymi 
-aplikacji i użytkowników. Warstwy aplikacji będą komunikowały się między sobą 
-zgodnie z przyjętymi standardami - frontend będzie mieć dostęp wyłącznie do 
-backendu, z kolei backend poza odpowiadaniem na żądania frontendu komunikować 
-się będzie z warstwą przechowywania danych którą stanowi baza. Wszystkie 
-komponenty aplikacji docelowo działać będą na pojedynczej maszynie, jednak nic 
-nie stoi na przeszkodzie aby w przyszłości jeżeli zajdzie taka potrzeba 
-wydzielić poszczególne komponenty na osobnych maszynach, natomiast 
-konteneryzacja aplikacji umożliwi zmianę modelu z monolitycznego na 
-mikroserwisy i skalowanie horyzontalne.}
+komunikację z warstwą dostępu do danych którą będzie baza danych aplikacji i 
+użytkowników. Warstwy aplikacji będą komunikowały się między sobą zgodnie z 
+obowiązującym standardem - frontend będzie mieć dostęp wyłącznie do backendu, z 
+kolei backend poza odpowiadaniem na żądania frontendu komunikować się będzie z 
+warstwą przechowywania danych którą stanowi baza. Wszystkie komponenty aplikacji
+ docelowo działać będą na pojedynczej maszynie, jednak nic nie stoi na 
+przeszkodzie aby w przyszłości jeżeli zajdzie taka potrzeba wydzielić 
+dla każdego z nich dedykowane maszyny, natomiast konteneryzacja aplikacji 
+umożliwi zmianę modelu z monolitycznego na mikroserwisy i skalowanie 
+horyzontalne.}
 
-{Aby uprościć logikę aplikacji i zwiększyć jej wydajność ciężar przetwarzania 
+{Aby uprościć logikę aplikacji i poprawić jej wydajność ciężar przetwarzania 
 danych zostanie przerzucony na warstwę bazy danych. Zadanie to przejmą widoki 
-napisane w języku SQL \cite{SQL} które odpytane przez aplikacje przetwarzają 
-aplikacje w locie w bardzo wydajny sposób.}
+napisane w języku SQL \cite{SQL} które odpytane przez aplikacje efektywnie 
+przetwarzają dane w locie.}
 
 %Przegląd możliwych metod i narzędzi realizacji
 %Wybrać jedno rozwiązanie i/lub uzasadnić wybór rozwiązania
 %Krótka charakterystyka narzędzi i określenie wersji
 %krótko i konkretnie, szczegóły tylko jeśli są istotne dla projektu
 \section{\customstylesection{Metody i narzędzia realizacji}}
-{Projekt zostanie zrealizowany w podejściu LEAN \cite{LEAN} i metodologii prac 
-Kanban \cite{Kanban} z wykorzystaniem usługi Trello \cite{Trello} widocznej na 
-rysunku \ref*{fig:trello}. Jako że wybrano model przyrostowy 
-\cite{Model Przyrostowy} priorytet zadań określać będzie klasyfikacja MoSCoW 
-\cite{MOSCOW} poglądowo przedstawiony na rysunku wspierana podejściem opartym 
-o matrycę Eisenhowera \cite{MatrycaEisenhowera} co pozwoli dostarczyć tak zwany 
-Minimalny Wystarczający Produkt (MVP, Minimal Viable Product) \cite{MVP}. 
-Zgodnie z dobrymi praktykami panującymi w inżynierii informatycznej w trakcie 
-rozwoju aplikacji wykorzystany zostanie system kontroli źródła git \cite{GIT}, 
-a kod projektu przechowywany będzie na portalu GitHub \cite{GitHub} (w 
-repozytorium Righten \cite{GITRighten} - z poprzednimi wersjami projektu można 
-się zapoznać w repozytorium DatabaseShenanigans \cite{GITBudgeterApp} a jego 
-dokumentacją w Budgeter \cite{GITBudgeterDoc}). W projektowanym rozwiązaniu 
-preferowane będą technologie i rozwiązania darmowe oraz open source.}
+{Plan projektu zakłada podejście w metodyce LEAN Software Developpment 
+\cite{LEAN} któa umożliwia przyrostowe doskonalenie projektu 
+\cite{Model Przyrostowy}, z wykorzystaniem metody Kanban \cite{Kanban} za pomocą
+ usługi Trello \cite{Trello} widocznej na rysunku \ref*{fig:trello} do 
+rejestracji, planowania realizacji i śledzenia zadań. Zdaniem autora pracy 
+podejście takie umożliwia szybki rozwój ponieważ w miarę rozwoju projektu 
+możliwości aplikacji poszerzają się dzięki małym, ciągłym udoskonaleniom już 
+obecnych funkcji oraz stopniowym dodawaniu nowych.}
+
+{O kolejności realizacji prac zadecyduje priorytet określony w klasyfikacji 
+MoSCoW \cite{MOSCOW} poglądowo przedstawiony na rysunku \ref{fig:moscow}, 
+natomiast wymóg i czas rozpoczęcia prac wyznaczy podejście oparte o matrycę 
+Eisenhowera \cite{MatrycaEisenhowera}. Dzięki temu wszystkie funkcje które 
+pozwolą dostarczyć Minimalny Wystarczający Produkt (MVP, Minimal Viable Product)
+ \cite{MVP} będą na bieżąco widoczne jako zadania najpilniejsze a zatem prace 
+mające na celu ich wdrożenie realizowane niezwłocznie.}
+
+{Zgodnie z dobrymi praktykami inżynierii informatycznej kod  rozwijanej 
+aplikacji będzie przechowywany w systemie kontroli źródła git \cite{GIT}, i 
+opublikowany na portalu GitHub \cite{GitHub} w repozytorium Righten 
+\cite{GITRighten} - z poprzednimi wersjami projektu można się zapoznać w 
+repozytorium DatabaseShenanigans \cite{GITBudgeterApp} a jego dokumentacją w 
+Budgeter \cite{GITBudgeterDoc}. W projektowanym rozwiązaniu preferowane będą 
+technologie i rozwiązania darmowe oraz open source.}
 
 \begin{figure}[H]           %requires float package
     \centering
     \includegraphics[width=12cm]{figures/trello_kanban.png}
-    \caption{Pirorytetyzacja MoSCoW}
+    \caption{Tablica zadań projektu w usłudze Trello}
     \label{fig:trello}
 \end{figure}
 
-{Do implementacji kodu aplikacji użyty zostanie język Python \cite{Python}, 
-głównie przez wzgląd na walory edukacyjne i prostej, ekspresywnej składni co 
-zwiększy czytelność kodu i zmniejszy poziom złożoności aplikacji. Funkcje }
+{Kod aplikacji napisany zostanie w język Python \cite{Python}, głównie przez 
+wzgląd na walory edukacyjne i prostej, ekspresywnej składni co zwiększy 
+czytelność kodu i zmniejszy poziom złożoności aplikacji.}
 
-{Warstwa interfejsu użytkownika (frontend) składać się będzie z szablonów HTML z
- wykorzystaniem silnika szablonów jinja2 \cite{jinja}, wzbogacone o funkcje 
-udostępniane przez framework Bootstrap \cite{Bootstrap} który umożliwi 
-uzupełnianie danych w interfejsie użytkownika funkcjami napisanymi w 
-JavaScript \cite{JavaScript}. Do obsługi formularzy wprowadzania danych posłuży 
-framework WTForms \cite{WTForms}, a wizualizacja danych będzie obsługiwana 
-dzięki bibliotece chart.js \cite{chart.js}.}
+{W warstwie interfejsu użytkownika (frontend) większość wykorzystywanych 
+narzędzi jest ze sobą ściśle połączona ponieważ wybór jednej technologii 
+wpływa na kolejne, które z nią współpracują. W zamierzeniu poszczególne strony 
+generowane będą przez silnik szablonów jinja2 \cite{jinja} który pozwala 
+definiować część elementów strony dynamicznie, wybrano go z uwagi ponieważ jego 
+składnia podobna jest do języka Python. Framework Bootstrap \cite{Bootstrap} 
+umożliwi wzbogacenie interfejsu o funkcje napisane w JavaScript 
+\cite{JavaScript} który posłuży także do wypełniania szablonów stron danymi, a 
+dzięki temu możliwe będzie także generowanie wizualizacji z pomocą biblioteki 
+chart.js \cite{chart.js}. Do obsługi formularzy wprowadzania danych posłuży 
+framework WTForms \cite{WTForms}.}
 
-{Do implementacji funkcji serwera sieciowego (backend) posłuży framework
- Flask \cite{Flask} wraz z dodatkowymi wtyczkami do obsługi poszczególnych 
-funkcji (m.in.: Flask-Login \cite{Flask-Login}) oraz określonymi w trakcie 
-pisania aplikacji wymaganymi bibliotekami.}
+{Ponieważ z projekt zakłada realizację w miarę prostej aplikacji, aby nie 
+serwer sieciowy (backend) obsługiwać będzie framework Flask \cite{Flask} wraz z 
+dodatkowymi wtyczkami do obsługi poszczególnych funkcji (m.in.: Flask-Login 
+\cite{Flask-Login} do zarządzania dostępem do stron w ramach sesji użytkowników) 
+oraz określonymi w trakcie pisania aplikacji wymaganymi bibliotekami. 
+Jako alternatywę rozpatrywano framework Django \cite{Django} który udostępnia 
+wiele dodatkowych mechanizmów zwiększajacych wydajność i bezpieczeństwo kosztem 
+bardziej złożonej konfiguracji. Po rozważeniu opcji stwierdzono jednak że w 
+chwili obecnej jest to projekt na małą skalę w którym liczy się przejrzystość 
+kodu za czym wydają się przemawiać zalety prostszego z rozwiązań, pozostawiając 
+jednocześnie Django jako ewentualność na przyszłość jeżeli projektowana 
+aplikacja zostanie wykorzystana na większą skalę.}
 
-{Wstępna warstwa bazy danych przygotowana na lokalnej instancji 
-SQLite3 \cite{SQLite}, w dalszej części projektu zostanie zmigrowana do 
-docelowej technologii jaką jest PostgreSQL \cite{PostgreSQL} - rozwiązanie takie
- przyjęto ponieważ instancja PostgreSQL do działania wymaga serwera oraz osobnej
- aplikacji pgadmin \cite{pgAdmin} do zarządzania nią.}
+{Dla uproszczenia etapu projektowania wstępnie w warstwa bazy danych będzie 
+projektowana na lokalnej instancji SQLite3 \cite{SQLite}, w dalszej części 
+projektu zostanie zmigrowana do docelowej technologii jaką jest PostgreSQL 
+\cite{PostgreSQL}. Rozwiązanie takie przyjęto ponieważ instancja PostgreSQL do 
+działania wymaga serwera oraz osobnej aplikacji pgadmin \cite{pgAdmin} do 
+zarządzania nią co zwiększa nakłady pracy wymagane do wdrożenia funkcji 
+podstawowych aplikacji.}
 
 {Domyślnie rozwiązanie będzie działało natywnie na serwerze lub maszynie 
 wirtualnej, jednak opcjonalnie w ramach dalszego rozwoju przewidziano aby 
@@ -916,14 +940,15 @@ spisana w środowisku VSCode \cite{VSCode}.}
 %dla baz relacyjnych - konceptualny, logiczny i fizyczny, jeśli dużo się nie różnią ten najbardziej pełny
 %ERD (Entity-Relationship Diagram) i opis przenzaczenia tabel, klucze główne i obce
 \section{\customstylesection{Koncepcja przechowywania danych}}
-{W warstwie przechowywania danych aplikacji do trwałego zapisu posłuży baza 
-danych w technologii PostgreSQL \cite{PostgreSQL}. Podstawowy model schematu 
-bazy danych przedstawia rysunek \ref{fig:rightenerdtabele}, który prezentuje 
-Diagram Związków Encji (ERD, Entity-Relationship Diagram) tabel w szablonowym 
-schemacie bazy danych aplikacji. Widoki prezentuje rysunek 
-\ref{fig:rightenerdwidoki}, przetwarzają one dane które prezentowane są 
-użytkownikowi w aplikacji.}
+{Podstawowy model schematu bazy danych przedstawia rysunek 
+\ref{fig:rightenerdtabele}, który prezentuje Diagram Związków Encji (ERD, 
+Entity-Relationship Diagram) tabel w szablonowym schemacie bazy danych 
+aplikacji. Widoki prezentuje rysunek \ref{fig:rightenerdwidoki}, przetwarzają 
+one dane które prezentowane są użytkownikowi w aplikacji. Z racji na przyjęty 
+model przyrostowy aplikacji liczba i logika widoków może ulec zmianie w toku 
+prac nad projektem.}
 
+%#FIXME: Pictures may be too tiny - may need to divide them
 \begin{figure}[H]           %requires float package
     \centering
     \includegraphics[width=12cm]{figures/RightenDB_EntityRelationDiagram.png}
@@ -961,10 +986,10 @@ zmieniać. Kiedy projektowana funkcja zostanie ukończona tabela wchodzi do uży
 \section{\customstylesection{Projekt interfejsu użytkownika}}
 {Interfejs użytkownika będzie prosty, minimalistyczny aby ułatwić użytkownikowi 
 poruszanie się po aplikacji i zmniejszyć obciążenie poznawcze. Dzięki temu opcje
- powinny być łatwo dostępne, a ryzyko że użytkownik nie znajdzie opcji której 
-poszukuje minimalne.}
+ powinny być łatwo dostępne, a ryzyko że użytkownik się pogubi lub przeoczy 
+opcję której poszukuje minimalne.}
 
-{Pierwszym ekranem który napotka użytkownik jest tak zwany splashscreen którego 
+{Pierwszym ekranem który napotka użytkownik jest tak zwany splash page którego 
 projekt prezentuje rysunek \ref*{fig:uiprojectsplash}, po wejściu w opcję login 
 użytkownik trafi na ekran startowy który prezentuje rysunek 
 \ref*{fig:uiprojectstart}. Rysunek \ref*{fig:uiprojectlogin} prezentuje ekran 
@@ -1255,6 +1280,8 @@ kategoryzującej wprowadzone dane.}
         https://developer.mozilla.org/en-US/docs/Web/javascript}
     \bibitem{Bootstrap} getbootstrap.com, Bootstrap \raggedright\url{
         https://getbootstrap.com/}
+    \bibitem{Django} Django Software Foundation, Django \raggedright\url{
+        https://www.djangoproject.com/}
     \bibitem{Flask} flask.palletsprojects.com, Flask \raggedright\url{
         https://flask.palletsprojects.com/en/3.0.x/}
     \bibitem{Flask-Login} https://pypi.org/project/Flask-Login/, Flask-Login \raggedright\url{
