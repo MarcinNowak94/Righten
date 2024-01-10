@@ -1083,14 +1083,6 @@ użytkownikom przy zarządzaniu budżetem.}
 %diagramy projektowe - np.: diagram hierarchii klas, diagramy sekwencji, kolaboracji
 %opisy metod i stosowane algorytmy
 \chapter{\customstylechapter{Dokumentacja techniczna}}
-{Znaczniki czasu przechowywane będą w formacie czasu zgodnym ze standardem 
-ISO 8601 \cite{ISO 8601} - jednolity format ułatwi obsługę i przetwarzanie 
-danych.}
-
-{Dane między warstwami backend i frontend muszą być przesyłane w standardowym 
-formacie aby zapewnić współpracę z dostępnymi na rynku bibliotekami i uprościć 
-implementacje funkcji które będą je obsługiwać. Na potrzeby aplikacji wybrano 
-format JSON \cite{JSON}.}
 
 %zaprezentować: pakiety, moduły, biblioteki, klasy
 %składowe omówić, jej: nazwa, rola w projekcie, przeznaczenie, struktura wewnętrzna, opis
@@ -1099,7 +1091,105 @@ format JSON \cite{JSON}.}
 %nie zamieszczać długich listingów - kilka linijek, opis, kilka linijek, opis
 
 \section{\customstylesection{Schemat rzeczywistej struktury systemu}}
-{}
+{Struktura projektu w repozytorium Righten \cite{GITRighten} prezentuje rysunek 
+\ref*{fig:projectdirectorytop}. Zgodnie z obowiązującymi dobrymi praktykami dla 
+poprawy czytelności projekt podzielono na katalogi zależenie od ich funkcji. W 
+głównym katalogu znajdują się katalogi Docummentation który zawiera niniejszą 
+dokumentację, Sources zawierający kod źródłowy aplikacji oraz plik licencji 
+LICENSE.md który określa że obecnie oprogramowanie udostępniane jest na licencji
+ GNU GENERAL PUBLIC LICENSE Version 2, June 1991 (możę to jednak ulec zmianie w 
+przyszłości).}
+
+{Zawartość katalogu Sources to katalog Desktop z poprzednią wersją projektu w 
+formie aplikacji Budgeter na komputery osobiste - z jej kodem zapoznać się można w 
+repozytorium DatabaseShenanigans \cite{GITBudgeterApp} - nie jest to część 
+aplikacji a osobny projekt, dlatego zostanie pominięta w dalszej części 
+dokumentacji. Katalog Database zawiera wszystkie pliki bazy danych projektu, 
+Logs przeznaczono na logi aplikacyjne do wykorzystania pod przyszłą funkcję 
+rejestrowania zdarzeń, Web zawiera kod przeglądarkowej wersji aplikacji która 
+jest głównym celem niniejszego projektu. Plik Docker-Compose.yaml zostanie 
+omówiony później.}
+
+{W skład zawartości katalogu Database przedstawionego na rysunku 
+\ref*{fig:projectdirectorydb}  wchodzą wstępna struktura bazy Righten.sqlite, 
+jej wersję Righten\_mock.sqlite3 wypełnioną danymi na potrzeby testów i rozwoju 
+aplikacji, plik Righten\_mock-sqlite\_dump\_PostgreSQL-dialect.sql wykorzystany 
+jako skrypt inicjalizacyjny bazy PostgreSQL zawartej w katalogu RightenDB, 
+którym zmigrowano strukturę między technologiami oraz plik Dockerfile który 
+zostanie omówiony w dalszej części dokumentacji.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_project_directory_top.png}
+    \caption{Struktura katalogu projektu}
+    \label{fig:projectdirectorytop}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_project_directory_sources_Database.png}
+    \caption{Struktura katalogu projektu - katalog Database}
+    \label{fig:projectdirectorydb}
+\end{figure}
+
+{Katalog Web przedstawiony na rysunku \ref*{fig:projectdirectoryweb} zawiera 
+pełny kod aplikacji przeglądarkowej. Komunikacja zabezpieczona jest 
+wygenerowanym na potrzeby projektu certyfikatem OpenSSL - plik cert.pem zawiera 
+klucz publiczny (certyfikat), natomiast key.pem klucz prywatny którym aplikacja 
+szyfruje ruch, dzięki czemu aplikacja do komunikacji wykorzystuje protokół 
+HTTPS. Plik run.py służy do uruchamienia aplikacji, a wszystkie jej zasoby 
+ładowane są z katalogu Resources. Pliki Dockerfile oraz requirements.txt 
+omówione zostaną w dalszej części dokumentacji.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_project_directory_web.png}
+    \caption{Struktura katalogu projektu - katalog Web}
+    \label{fig:projectdirectoryweb}
+\end{figure}
+
+{Katalog Resources także widoczny na rysunku \ref*{fig:projectdirectoryweb} 
+zawiera pliki ważne dla działania aplikacji, przedstawione w kolejności 
+wywoływania. Plik .env zawiera zmienne środowiskowe aplikacji, \_\_init\_\_.py 
+to tak zwana fabryka aplikacji - inicjalizuje wymagane zmienne oraz konfigurację
+ aplikacji, na końcu wczytując plik routes.py który definiuje ścieżki dostępne 
+w przeglądarce i całą logikę któa kryje się pod nimi. Ścieżki aplikacji dla 
+użytkownika rozumiane jako strony w przeglądarce wykorzystują szablony 
+zdefiniowane w katalogu templates, ponadto mogą wykorzystywać modele i formy. 
+Modele danych definiuje plik models.py w którym na podstawie obiektów w bazie 
+danych stworzono klasy które używane są w aplikacji zarówno do odpytywania bazy 
+jak i przechowania w niej informacji. Plik forms.py natomiast przechowuje 
+definicje i logikę form do wprowadzania danych wyświetlanych użytkownikowi na 
+poszczególnych stronach. W katalogu static znajdują się statyczne elementy stron
+ - obecnie jest to jedynie ikona aplikacji w formie pliku favicon.ico.}
+
+
+\medskip
+{Napotkane po drodze pliki Docker-compose.yaml oraz Dockerfile służą do 
+powoływania środowiska aplikacji w formie kontenerów na platformie 
+uruchomieniowej Docker. Infrastruktura aplikacji składa się z trzech 
+komponentów powoływanych i konfigurowanych w pliku Docker-compose.yaml. 
+Pierwszym komponentem jest baza danych PostgreSQL której konfigurację opisuje 
+plik Sources\textbackslash Database\textbackslash Dockerfile, drugim jest system
+ zarządzania bazą danych pgAdmin opisany w samym Docker-compose.yaml, ostatnim i
+ najważniejszym sama aplikacja zdefiniowana w pliku Sources\textbackslash
+Web\textbackslash Dockerfile. Ponieważ katalog w którym kontener bazy 
+przechowuje bazę danych oraz kontener aplikacji przechowuje logi mapowane są w 
+ich definicjach do ścieżek na maszynie gospodarza dane te są przechowywane na 
+stałe i nie są gubione podczas usunięcia, awarii kontenerów.}
+
+%#TODO: Listing docker-compose.yaml
+
+
+%\medskip
+%{Znaczniki czasu przechowywane będą w formacie czasu zgodnym ze standardem 
+%ISO 8601 \cite{ISO 8601} - jednolity format ułatwi obsługę i przetwarzanie 
+%danych.}
+
+%{Dane między warstwami backend i frontend muszą być przesyłane w standardowym 
+%formacie aby zapewnić współpracę z dostępnymi na rynku bibliotekami i uprościć 
+%implementacje funkcji które będą je obsługiwać. Na potrzeby aplikacji wybrano 
+%format JSON \cite{JSON}.}
 
 \section{\customstylesection{Wybrane fragmenty kodu aplikacji}}
 {}
