@@ -1126,7 +1126,7 @@ użytkownikom przy zarządzaniu budżetem.}
 %diagramy projektowe - np.: diagram hierarchii klas, diagramy sekwencji, kolaboracji
 %opisy metod i stosowane algorytmy
 \chapter{\customstylechapter{Dokumentacja techniczna}}
-{Rozdziałten zawiera dokumentację techniczną projektu. Dokumentacja jest 
+{Rozdział ten zawiera dokumentację techniczną projektu. Dokumentacja jest 
 opatrzona stosownymi diagramami, opisuje strukturę projektu wraz z ogólnym 
 opisem przepływu wykonania kodu oraz logiki aplikacji. Znajdują się tu także 
 opisy wybranych fragmentów kodu jak klasy, metody i funkcje oraz algorytmy.}
@@ -1974,13 +1974,283 @@ wyniki z przykładowych danych testowej wersji aplikacji obrazuje rysunek
 %forma: tekst i tabelki przypadków testowych
 \chapter{\customstylechapter{Testy i weryfikacja systemu}}
 %#TODO: opisać środowisko testowe - zmienną debug_version, lokalną bazę i PostgreSQL
-{}
+{Niniejszy rozdział opisuje proces testowania oraz weryfikacji systemu. Aby 
+zapewnić możliwie szybkie postępy prac w kierunku implementacji zaprojektowanych
+ funkcji zastosowano najprostszą metodę testów którą są testy manualne. 
+Testowaniu podlegały zarówno pojedyncze funkcje, moduły jak i aplikacja jako 
+całość, zależnie od etapu rozwoju aplikacji oraz typu implementowanej zmiany. 
+Przykłady wykrytych błędów zaprezentowano w kolejnej sekcji tego rozdziału.}
+
+\medskip
+{Ponieważ ciężar przetwarzania danych aplikacji położono na warstwie bazy 
+danych, to logika zawarta zapytaniach z których złożone są obiekty bazy danych 
+jak widoki podlegała najbardziej rygorystycznym testom. Po utworzeniu zapytania 
+do bazy danych aplikacji wprowadzano zestaw danych testowych, dla których wyniki
+ przetwarzania przygotowano ręcznie oraz z wykorzystaniem narzędzi z pakietu 
+Google Docs \cite{googledocs}. Wyniki uzyskane ręcznie porównywano następnie z 
+danymi wynikowymi przygotowanej funkcji, co pozwalało na bieżąco eliminować 
+błędy w najbardziej istotnej logice aplikacji. Na etapie testów jako bazę danych
+ aplikacji wykorzystano manualnie utworzoną instancję SQLite3 \cite{SQLite}, 
+oraz narzędzie DB Browser for SQLite \cite{DBBrowser} do interakcji z bazą 
+danych. Baza ta na dalszym etapie projektu zmigrowana została do technologii 
+PostgreSQL \cite{PostgreSQL} i narzędzia pgAdmin \cite{pgAdmin}. Finalnie bazę 
+danych wypełniono danymi testowymi które służą jako przykład informacji 
+wprowadzonych przez użytkownika z pomocą specjalnie napisanego w tym celu 
+skryptu. Skrypt ten powielał wybraną losowo część rekordów zmieniając wskazane 
+dane w określonym zakresie - przykładowo cena*liczbaLosowaWZakresie(0.8,1.2).}
+
+\medskip
+{W warstwie backend przeprowadzano głównie manualne testy akceptacyjne dla 
+każdej implementowanej funkcji aby potwierdzić czy działa zgodnie z założeniami 
+i wstępnym projektem. Test każdej wdrożonej funkcji wymagał uruchomienia 
+aplikacj i potwierdzenia jej prawidłowego działania. Część funkcji wymagała 
+zmiany w interfejsie, w takich prypadkach test sprowadzał się do wykonania 
+określonej akcji i potwierdzenia że jej efekt jest zgodny z założonym. 
+Weryfikacja zależała od wdrażanej funkcji, kilka z wybranych przykładów opisano 
+poniżej}
+
+{Sprawdzenie czy dane wprowadzone przez interfejs trafiły do bazy aplikacji.}
+
+{Po dodaniu panelu logowania weryfikacja obejmowała probę wejścia do panelu 
+wizualizacji bez logowania, próby wprowadzenia błędnych poświadczeń (tak nazwy 
+użytkownika jak i hasła) i weryfikację czy zalogowany użytkownik moze prawidłowo
+ poruszać się po aplikacji.}
+{Test po dodaniu zabezpieczenia sesji użytkownika opisano w kolejnej sekcji jako
+ ciekawy przypadek.}
+
+\medskip
+{Warstwa interfejsku użytkownika podlegała głównie manualnych testach 
+integracyjnych, testach nawigacji między elementami aplikacji, wizualnej 
+inspekcji dodanych elementów oraz interakcji poszczególnych kontrolek w 
+przeglądarce. Wykryte błędy sprowadzały się głównie do sytuacji w których 
+ułożenie elementów odbiegało od założeń projektowych, wybrane elementy 
+interfejsu były nieczytelne lub interakcja z nimi nie działała prawidłowo. Testy
+ obejmowały także określenie jak bardzo czytelny, intuicyjny i prosty w obsłudze
+ jest interfejs aplikacji, jednakże ponieważ jest to kwestia subiektywna, 
+zarówno oceny jak i zmian dokonywano arbitralnie. Wśród wykrytych błędów 
+najczęstszym były błędy formatowania tekstu, czy elementy które wstępnie nie 
+mieściły się w wyznaczonym obszarze. Ich naprawa natomiast sprowadzała sie do 
+zmiany odpowiedzialnego atrybutu w szablonie HTML i ponownej weryfikacji.}
+
+\section{\customstylesection{Najciekawsze wykryte błędy}}
+{W miarę rozwoju projektu podczas implementacji poszczególnych funkcji wykryto i
+ wyeliminowano wiele błędów, niektóe jednak wyróżniają się od reszty na kilka 
+ciekawych sposobów a zatem zasługują na szczególną.}
+
+{Pierwszą kategorią tego typu błędów wykrytych w aplikacji były błędy logiki 
+nie widoczne na pierwszy rzut oka. Za przykłąd posłuży obliczanie miesięcznej 
+średniej dziennych wydatków. Ponieważ zapytanie budowane było etapami w których 
+stopniowo rozbudowano je o dodatkowe informacje, jego logika była dość zawiła. 
+Na kolejnych fazach projektu podczas usprawnień warstwy bazy danych zapytanie 
+zostało zoptymalizowane - części wspólne przeniesiono do osobnego podzapytania 
+zbierającego dane dzienne, z któego następnie obliczano dane miesięczne. Efektem
+ prac był kod widoczny na listingu \ref{lst:dbmonthlyspending-errror}, który 
+mimo iż na pierwszy rzut oka wygląda prawidłowo oblicza nie średnie miesieczne a
+ średnie ze średnich dziennych. Błąd logiki wykryto podczas ręcznej weryfikacji 
+danych testowych, a logika po naprawie błędu (i zmianie dialektu SQL) widoczna 
+jest na listingu \ref{lst:dbmonthlyspending-fixed}.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Widok MonthlySpending - średnia średnich dziennych (dialekt SQLite)},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbmonthlyspending-errror}]
+SELECT
+  strftime('%Y-%m',[Day])              AS [Month]
+  ,ROUND(AVG([DailyAmount]))           AS [AverageDaily]
+  ,ROUND(SUM([DailyAmount]))           AS [Total]
+  ,ROUND(AVG([DailyCashPercentage]))   AS [CashPercentage]
+  ,ROUND(AVG([AverageDailyProductPriority]))
+    AS [AverageProductPriority]
+  ,ROUND(AVG([AverageDailyTypePriority]))
+    AS [AverageTypePriority]
+  ,ROUND(SUM([PossibleSavings]),2)     AS [PossibleSavings]
+FROM (
+  SELECT 
+    strftime('%Y-%m-%d',[DateTime])    AS [Day]
+    ,SUM([Amount])                     AS [DailyAmount]
+    ,SUM([Amount]*[ProductPriority])/SUM([Amount])
+      AS [AverageDailyProductPriority]
+    ,SUM([Amount]*[TypePriority])/SUM([Amount])
+      AS [AverageDailyTypePriority]
+    ,SUM((CASE WHEN ([ProductPriority]<(
+            SELECT [Value]
+            FROM [UserSettings]
+            WHERE [Setting]="ProductPriorityTarget"))
+          THEN [Amount] ELSE 0 END))   AS [PossibleSavings]
+    ,AVG((CASE WHEN [Cash]=='YES'
+          THEN 100 ELSE 0 END))    AS [DailyCashPercentage]
+  FROM [ExpendituresEnriched]
+  WHERE [Amount]>0
+  GROUP BY [DateTime]
+)
+GROUP BY [Month]
+ORDER BY [Month] ASC;\end{lstlisting}
+{Zapytanie SQL w dialekcie SQLite sprzed migracji bazy na technologię 
+PostgreSQL. Przykładowo: jeśli w miesiącu zakupiono 50 produktów, jednego dnia 2
+ za gotówkę (DailyCashPercentage 100\%), w drugim dniu 48 kartą 
+(DailyCashPercentage 0\%), widok prezentował informację że 50\% produktów 
+miesięcznie zakupiono za gotówkę (0+100/2=50), podczas gdy faktycznie wartość ta
+ wynosiła 4\% (2/50). }
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Widok MonthlySpending - poprawiona średnia średnich dziennych (dialekt PostgreSQL)},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbmonthlyspending-fixed}]
+--Create intermediary table
+WITH "Daily" AS (
+  --Average daily data by month
+  SELECT
+    TO_CHAR("DateTime", 'YYYY-MM')  AS "Month"
+    ,ROUND(AVG("DailyAmount"),2)    AS "AverageDaily"
+  FROM (
+    --Get daily amounts
+    SELECT 
+      "DateTime", 
+       SUM("Amount") AS "DailyAmount"
+    FROM "ExpendituresEnriched"
+    GROUP BY "DateTime"
+  )
+  GROUP BY "Month"
+)
+
+--Necessary for Alias
+SELECT 
+  "Monthly".*, 
+  "Daily"."AverageDaily"
+FROM (
+  SELECT
+    TO_CHAR("DateTime", 'YYYY-MM')      AS "Month"
+    ,ROUND(SUM("Amount"),2)             AS "Total"
+    ,ROUND(AVG(CASE WHEN "Cash"='YES'
+            THEN 100 ELSE 0 END))       AS "CashPercentage"
+    ,ROUND(AVG("ProductPriority"))
+      AS "AverageProductPriority"
+    ,ROUND(AVG("TypePriority"))
+      AS "AverageTypePriority"
+    ,ROUND(SUM(CASE WHEN ("ProductPriority"<CAST((
+                SELECT "Value"
+                FROM "UserSettings"
+                WHERE "Setting"='ProductPriorityTarget')
+                  AS NUMERIC))
+            THEN "Amount" ELSE 0 END),2)
+      AS "PossibleSavings"
+  FROM "ExpendituresEnriched" 
+  GROUP BY "Month"
+  ORDER BY "Month" ASC
+) AS "Monthly"
+LEFT JOIN "Daily" ON "Monthly"."Month"="Daily"."Month";\end{lstlisting}
+{Zapytanie SQL w dialekcie PostgreSQL po migracji bazy. Zapytanie oblicza osobno
+ średnie miesięczne oraz dodaje średnie dzienne.}
+\end{minipage}
 
 %#TODO: opisać problem z solą przy szyfrowaniu haseł bcrypt
-%#TODO: opisać problem z dostępem do danych po wprowadzeni tokenu CSRF (wymaganie with app.app_context())
-%#TODO: błędy w logice widokó - średnia średnich dziennych zamiast średnia miesięczna ()
-\section{\customstylesection{Najciekawsze wykryte błędy}}
-{}
+{Z ciekawszych problemów które wykryto w warstwie backend na uwagę zasługuje 
+problem z przechowywaniem haseł użytkowników. W trakcie implementacji panelu 
+logowania użytkownika we wstępnej wersji dane wprowadzone przez użytkownika 
+były szyfrowane funkcją bcrypt, a następnie porównywano skrót (hash) hasła 
+wprowadzonego z przechowywanym w bazie danych. Mimo wpisywania prawidłowego 
+hasła uwierzytelnianie za każdym razem kończyło się niepowodzeniem, ponieważ 
+funkcja bcrypt automatycznie generuje także sól - generowany pseudolosowo 
+fragment danych dodawany do hasła przed zaszyfrowaniem aby zwiększyć entropię 
+(losowość danych) - więc w efekcie porównywane hasła zawsze były różne. Po 
+wgłębieniu się w dokumentację biblioteki zmieniono kod aplikacji tak, by 
+wykorzystać funkcję bcrypt.check\_password\_hash która porównuje zapisany skrót 
+hasła z danymi w formie jawnej. Poprawiony fragment kodu prezentuje listing 
+\ref{lst:login-hash}.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Panel logowania - weryfikacja zgodności hasła},
+        language=html,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:login-hash}]
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form=LoginForm()
+    if request.method == "POST" and form.validate_on_submit():
+        username=form.username.data
+        usr=db.session.query(Users).filter_by(Username=username).first()
+        #if user does not exist password is not checked
+        if usr and bcrypt.check_password_hash(usr.Password, form.password.data.encode('utf-8')):
+            user = User()
+            user.id = username
+            flask_login.login_user(user)
+            flash("User logged in", "success")
+            return redirect(redirect_url(url_for("index", next="index")))
+
+        flash("Failed to log in", "danger")
+        return redirect(redirect_url(url_for("login", next="index")))
+    return render_template("login.html", title="Login", form=form)\end{lstlisting}
+{Funkcja ta wykorzystuje sól zapisaną na początku docelowego skrótu, dodając go 
+do testowanego hasła, hashując je i porównując ciągi - w wyniku zwraca jedynie 
+informajcę czy hash jest prawidłowy.}
+\end{minipage}
+
+%gets mushed with listing
+\bigskip
+{W warstwie prezentacji danych natomiast ciekawy problem wystąpił podczas 
+poprawy zabezpieczeń w aplikacji. Po dodaniu tokenu CSRF (Cross-site Request 
+Forgery) aplikacja straciła dostęp do bazy danych. Ponieważ dane wymagane do 
+połączenia aplikacji z bazą danych oraz instancja silnika który utrzymuje 
+połączenie i wykonuje zapytania jest częścią konfiguracji wstępnej aplikacji, 
+zabezpieczenie sesji w ramach aplikacji z wykorzystaniem klucza szyfrowania 
+spowodowało blokowanie wykonywanych poza sesją prób połączenia z bazą funkcji 
+która mapowała model bazy danych na obiekty wykorzystywane w aplikacji 
+działającej w osobnym module models.py. Rozwiązanie problemu wymagało importu we
+ wskazanym module obiektu app reprezentującego aplikację w pamięci i dodanania 
+polecenia with app.context które wykonuje polecenia zawarte w bloku kodu w 
+ramach sesji aplikacji. Problematyczny fragment modułu wraz z opisanymi zmianami
+ zaprezentowano na listingu \ref{lst:models-kontekstapplikacji}.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Fragment modułu models.py - kouminkacja z bazą z wykorzystaniem kontekstu aplikacji},
+        language=html,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:models-kontekstapplikacji}]
+from Resources import db, app
+#(...)
+with app.app_context():
+    Base = automap_base() 
+    Base.prepare(autoload_with=db.engine, reflect=True)
+    #Tables
+    Income=Base.classes.Income
+    Bills=Base.classes.Bills
+    ProductTypes=Base.classes.ProductTypes
+    #(...)\end{lstlisting}
+{Wprowadzenie zabezpieczenia CSRF wymagało zmiany sposobu mapowania obiektów 
+bazy danych na obiekty aplikacji.}
+\end{minipage}
+
 
 %3.8. Przykładowy scenariusz wykorzystania systemu (4-10str)
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/scenariusz/
@@ -2111,6 +2381,8 @@ kategoryzującej wprowadzone dane.}
     %Tools and technologies
     \bibitem{SQLite} sqlite.org, SQLite \raggedright\url{
         https://www.sqlite.org/index.html}
+    \bibitem{DBBrowser} sqlitebrowser.org, DB Browser for SQLite \raggedright\url{
+        https://sqlitebrowser.org}
     \bibitem{SQL} wikipedia.org, SQL - Structured Query Language \raggedright\url{
         https://en.wikipedia.org/wiki/SQL}
     \bibitem{PostgreSQL} postgresql.org, PostgreSQL \raggedright\url{
@@ -2127,6 +2399,9 @@ kategoryzującej wprowadzone dane.}
         https://staruml.io/}
     \bibitem{LaTeX} The LaTeX Project \raggedright\url{
         https://www.latex-project.org/}
+    \bibitem{googledocs} Google Docs \raggedright\url{
+        https://docs.google.com/}
+        
     %Database visualization tool used for Budgeter - used DBSchema for Righten
     %\bibitem{DataGrip} JetBrains, DataGrip \raggedright\url{
     %    https://www.jetbrains.com/datagrip/}
