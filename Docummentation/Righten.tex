@@ -1973,13 +1973,60 @@ wyniki z przykładowych danych testowej wersji aplikacji obrazuje rysunek
 %Tylko wybrane testy, zwłąszcza tam gdzie pojawiły się błędy, ich przyczyna i usunięcie
 %forma: tekst i tabelki przypadków testowych
 \chapter{\customstylechapter{Testy i weryfikacja systemu}}
-%#TODO: opisać środowisko testowe - zmienną debug_version, lokalną bazę i PostgreSQL
 {Niniejszy rozdział opisuje proces testowania oraz weryfikacji systemu. Aby 
-zapewnić możliwie szybkie postępy prac w kierunku implementacji zaprojektowanych
- funkcji zastosowano najprostszą metodę testów którą są testy manualne. 
-Testowaniu podlegały zarówno pojedyncze funkcje, moduły jak i aplikacja jako 
+zapewnić możliwie szybką implementację zaprojektowanych funkcji zastosowano 
+najprostszą metodę testów którą są testy manualne. Testowaniu podlegały zarówno pojedyncze funkcje, moduły jak i aplikacja jako 
 całość, zależnie od etapu rozwoju aplikacji oraz typu implementowanej zmiany. 
 Przykłady wykrytych błędów zaprezentowano w kolejnej sekcji tego rozdziału.}
+
+{Po migracji aplikacji na środowisko uruchomieniowe Docker oraz zmianie 
+technologii bazy danych z SQLite na PostgreSQL testowanie a zarazem i rozwój 
+aplikacji stały się bardziej skomplikowane. Ponieważ kod uruchamiany na 
+platformie Docker jest niejako gotowym środowiskiem wdrożonej aplikacji, 
+standardowe funkcje środowiska programistycznego jak możliwość zatrzymania 
+wykonywanego kodu czy inspekcji wartości zmiennych są niedostępne. Z tego powodu
+ w konfiguracji zaszyto przełącznik w formie zmiennej debug\_version, cały kod 
+z nim związany rozsiany jest po kilku plikach - ich wycinki prezentuje listing 
+\ref{lst:debugversion}.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Fragmenty kodu prezentujące mechanizm debug\_version},
+        language=html,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:debugversion}]
+#Zawartosc .env
+FLASK_SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres:postgres@rightendb:5432/RightenDB
+
+
+#zawartosc __init__.py
+import os
+from dotenv import load_dotenv
+basepath = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basepath, '.env'))
+
+app=Flask(__name__)
+app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
+
+version="debug_local"   #Decyduje o technologiach
+
+#Nadpisanie polaczenia do bazy danych aplikacji w trakcie rozwoju 
+if version=="debug_local":
+    app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3' #Local SQLite3
+
+db=SQLAlchemy(app)\end{lstlisting}
+{Mechanizm ten decyduje o wartości zmiennych środowiskowych wskazujących ważne 
+pliki wymagane do uruchomienia aplikacji. W efekcie zmieniając wartość w jednym 
+miejscu można przełączyć aplikację w tryb testowania lub wdrożenia 
+wykorzystujące rozbieżne technologie.}
+\end{minipage}
+
 
 \medskip
 {Ponieważ ciężar przetwarzania danych aplikacji położono na warstwie bazy 
@@ -2001,54 +2048,54 @@ dane w określonym zakresie - przykładowo cena*liczbaLosowaWZakresie(0.8,1.2).}
 
 \medskip
 {W warstwie backend przeprowadzano głównie manualne testy akceptacyjne dla 
-każdej implementowanej funkcji aby potwierdzić czy działa zgodnie z założeniami 
-i wstępnym projektem. Test każdej wdrożonej funkcji wymagał uruchomienia 
+każdej implementowanej funkcji aby określić czy działa zgodnie z założeniami 
+wstępnymi projektu. Test każdej wdrożonej funkcji wymagał uruchomienia 
 aplikacj i potwierdzenia jej prawidłowego działania. Część funkcji wymagała 
 zmiany w interfejsie, w takich prypadkach test sprowadzał się do wykonania 
 określonej akcji i potwierdzenia że jej efekt jest zgodny z założonym. 
 Weryfikacja zależała od wdrażanej funkcji, kilka z wybranych przykładów opisano 
-poniżej}
+poniżej.}
 
 {Sprawdzenie czy dane wprowadzone przez interfejs trafiły do bazy aplikacji.}
 
-{Po dodaniu panelu logowania weryfikacja obejmowała probę wejścia do panelu 
+{Po dodaniu panelu logowania weryfikacja obejmowała próbę wejścia do panelu 
 wizualizacji bez logowania, próby wprowadzenia błędnych poświadczeń (tak nazwy 
-użytkownika jak i hasła) i weryfikację czy zalogowany użytkownik moze prawidłowo
+użytkownika jak i hasła) i weryfikację czy zalogowany użytkownik może prawidłowo
  poruszać się po aplikacji.}
 {Test po dodaniu zabezpieczenia sesji użytkownika opisano w kolejnej sekcji jako
  ciekawy przypadek.}
 
 \medskip
-{Warstwa interfejsku użytkownika podlegała głównie manualnych testach 
+{Warstwa interfejsu użytkownika podlegała głównie manualnych testach 
 integracyjnych, testach nawigacji między elementami aplikacji, wizualnej 
 inspekcji dodanych elementów oraz interakcji poszczególnych kontrolek w 
 przeglądarce. Wykryte błędy sprowadzały się głównie do sytuacji w których 
-ułożenie elementów odbiegało od założeń projektowych, wybrane elementy 
+ułożenie elementów odbiega od założeń projektowych, wybrane elementy 
 interfejsu były nieczytelne lub interakcja z nimi nie działała prawidłowo. Testy
  obejmowały także określenie jak bardzo czytelny, intuicyjny i prosty w obsłudze
  jest interfejs aplikacji, jednakże ponieważ jest to kwestia subiektywna, 
 zarówno oceny jak i zmian dokonywano arbitralnie. Wśród wykrytych błędów 
 najczęstszym były błędy formatowania tekstu, czy elementy które wstępnie nie 
-mieściły się w wyznaczonym obszarze. Ich naprawa natomiast sprowadzała sie do 
+mieściły się w wyznaczonym obszarze. Ich naprawa natomiast sprowadzała się do 
 zmiany odpowiedzialnego atrybutu w szablonie HTML i ponownej weryfikacji.}
 
 \section{\customstylesection{Najciekawsze wykryte błędy}}
 {W miarę rozwoju projektu podczas implementacji poszczególnych funkcji wykryto i
- wyeliminowano wiele błędów, niektóe jednak wyróżniają się od reszty na kilka 
+ wyeliminowano wiele błędów, niektóre jednak wyróżniają się od reszty na kilka 
 ciekawych sposobów a zatem zasługują na szczególną.}
 
 {Pierwszą kategorią tego typu błędów wykrytych w aplikacji były błędy logiki 
-nie widoczne na pierwszy rzut oka. Za przykłąd posłuży obliczanie miesięcznej 
+nie widoczne na pierwszy rzut oka. Za przykład posłuży obliczanie miesięcznej 
 średniej dziennych wydatków. Ponieważ zapytanie budowane było etapami w których 
 stopniowo rozbudowano je o dodatkowe informacje, jego logika była dość zawiła. 
 Na kolejnych fazach projektu podczas usprawnień warstwy bazy danych zapytanie 
 zostało zoptymalizowane - części wspólne przeniesiono do osobnego podzapytania 
-zbierającego dane dzienne, z któego następnie obliczano dane miesięczne. Efektem
- prac był kod widoczny na listingu \ref{lst:dbmonthlyspending-errror}, który 
-mimo iż na pierwszy rzut oka wygląda prawidłowo oblicza nie średnie miesieczne a
- średnie ze średnich dziennych. Błąd logiki wykryto podczas ręcznej weryfikacji 
-danych testowych, a logika po naprawie błędu (i zmianie dialektu SQL) widoczna 
-jest na listingu \ref{lst:dbmonthlyspending-fixed}.}
+zbierającego dane dzienne, z którego następnie obliczano dane miesięczne. 
+Efektem prac był kod widoczny na listingu \ref{lst:dbmonthlyspending-errror}, 
+który mimo iż na pierwszy rzut oka wygląda prawidłowo oblicza nie średnie 
+miesięczne a średnie ze średnich dziennych. Błąd logiki wykryto podczas ręcznej 
+weryfikacji danych testowych, a logika po naprawie błędu (i zmianie dialektu 
+SQL) widoczna jest na listingu \ref{lst:dbmonthlyspending-fixed}.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Widok MonthlySpending - średnia średnich dziennych (dialekt SQLite)},
@@ -2220,7 +2267,7 @@ zabezpieczenie sesji w ramach aplikacji z wykorzystaniem klucza szyfrowania
 spowodowało blokowanie wykonywanych poza sesją prób połączenia z bazą funkcji 
 która mapowała model bazy danych na obiekty wykorzystywane w aplikacji 
 działającej w osobnym module models.py. Rozwiązanie problemu wymagało importu we
- wskazanym module obiektu app reprezentującego aplikację w pamięci i dodanania 
+ wskazanym module obiektu app reprezentującego aplikację w pamięci i dodania 
 polecenia with app.context które wykonuje polecenia zawarte w bloku kodu w 
 ramach sesji aplikacji. Problematyczny fragment modułu wraz z opisanymi zmianami
  zaprezentowano na listingu \ref{lst:models-kontekstapplikacji}.}

@@ -37,7 +37,7 @@ services:
     container_name:       pgadmin4_container
     restart:              always
     environment:
-      #Cardinal sin #1: Thou shall not devulge your password
+      #Cardinal sin #1: Thou shall not devulge your password. Done for sake of clarity
       PGADMIN_DEFAULT_EMAIL: admin@righten.com
       PGADMIN_DEFAULT_PASSWORD: testpass
     ports:

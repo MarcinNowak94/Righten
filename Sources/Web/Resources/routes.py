@@ -193,6 +193,7 @@ def register():
 
 #Summaries and visualizations --------------------------------------------------
 
+#TODO: Add percentages in piechart as in finances
 @app.route("/incomesummary")
 @flask_login.login_required
 def incomesummary():
@@ -221,6 +222,7 @@ def incomesummary():
                            Summary=Summary
                            )
 
+#TODO: Add percentages in piechart as in finances
 @app.route("/billssummary")
 @flask_login.login_required
 def billssummary():
@@ -250,10 +252,7 @@ def billssummary():
                            Summary=Summary
                            )
 
-#TODO: Add product picker and corresponding graph
-#TODO: Add type picker and corresponding graph
-#TODO: Add pie chart by 'Necessary'
-#TODO: Organize displays by Amount descending
+#TODO: Add percentages in piechart as in finances
 @app.route("/expendituressummary")
 @flask_login.login_required
 def expendituressummary():
@@ -319,6 +318,7 @@ def spending():
 @app.route("/finances")
 @flask_login.login_required
 def finances():
+    StatisticData=db.session.query(Statistics).all()
     BilanceData=db.session.query(MonthlyBilanceSingle).all();
     Bilance=[]
     Breakeven=[]
@@ -348,8 +348,6 @@ def finances():
         BilanceTotalLabels.append(Source+' '+str(round((abs(Amount)/Total)*100,2))+'%')
         BilanceTotalValues.append(Amount)
 
-    StatisticData=db.session.query(Statistics).all()
-
     return render_template("financialposture.html",
                            title="Finances",
                            BilanceTotalLabels=json.dumps(BilanceTotalLabels, cls=DecimalEncoder),
@@ -363,6 +361,7 @@ def finances():
 # - Product priority over time
 # - spending by Product (move from expenditures?)
 # - Top 10 low priority product spending Calculate (Amount*(100-priority))
+#TODO: Add product picker and corresponding graph
 @app.route("/productssummary")
 @flask_login.login_required
 def productssummary():
@@ -371,6 +370,7 @@ def productssummary():
                         )
 
 #TODO: producttypessummary
+#TODO: Add type picker and corresponding graph
 @app.route("/producttypessummary")
 @flask_login.login_required
 def producttypessummary():
@@ -381,8 +381,7 @@ def producttypessummary():
 
 
 #Basic data display ------------------------------------------------------------
-
-#TODO: add average income year to date
+#FIXME: As for now user cannot add new Income type or source
 #TODO: Paginate
 #NICE-TO-HAVE: Add data import option
 @app.route("/income", methods=["GET", "POST"])

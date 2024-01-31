@@ -14046,32 +14046,47 @@ CREATE VIEW "Statistics" AS
 	UNION SELECT 
 		'Net Worth' as "Statistic",
 		SUM(Amount) as "Value"
-	FROM MonthlyBilance;
+	FROM "MonthlyBilance";
 CREATE VIEW "MonthlySpending" AS
-SELECT
-    TO_CHAR("Day", 'YYYY-MM') 				AS "Month"
-    ,ROUND(AVG("DailyAount"))					AS "AverageDaily"
-    ,ROUND(SUM("DailyAount"))					AS "Total"
-	,ROUND(AVG("AverageDailyProductPriority"))	AS "AverageProductPriority"
-    ,ROUND(AVG("AverageDailyTypePriority"))		AS "AverageTypePriority"
-	,ROUND(SUM("PossibleSavings"),2)			AS "PossibleSavings"
-FROM (
-	SELECT 
-		"DateTime"						 				AS "Day"
-		,SUM("Amount") 				    				AS "DailyAount"
-		,SUM("Amount"*"ProductPriority")/SUM("Amount")	AS "AverageDailyProductPriority"
-		,SUM("Amount"*"TypePriority")/SUM("Amount")		AS "AverageDailyTypePriority"
-		,SUM((CASE WHEN ("ProductPriority"<CAST((
-				SELECT "Value"
-				FROM "UserSettings"
-				WHERE "Setting"='ProductPriorityTarget') AS NUMERIC))
-		  THEN "Amount" ELSE 0 END)) 	AS "PossibleSavings"
-	FROM "ExpendituresEnriched"
-	GROUP BY "DateTime"
+--Create intermediary table
+WITH "Daily" AS (
+	--Average daily data by month
+	SELECT
+		TO_CHAR("DateTime", 'YYYY-MM') 				AS "Month"
+		,ROUND(AVG("DailyAmount"),2)				AS "AverageDaily"
+	FROM (
+		--Get daily amounts
+		SELECT 
+			"DateTime", 
+			SUM("Amount") AS "DailyAmount"
+		FROM "ExpendituresEnriched"
+		GROUP BY "DateTime"
+	)
+	GROUP BY "Month"
 )
-GROUP BY "Month"
-ORDER BY "Month" ASC;
 
+--Necessary for Alias
+SELECT 
+	"Monthly".*, 
+	"Daily"."AverageDaily"
+FROM (
+	SELECT
+		TO_CHAR("DateTime", 'YYYY-MM')				AS "Month"
+		,ROUND(SUM("Amount"),2)						AS "Total"
+		,ROUND(AVG(CASE WHEN "Cash"='YES'
+			  THEN 100 ELSE 0 END))					AS "CashPercentage"
+		,ROUND(AVG("ProductPriority"))				AS "AverageProductPriority"
+		,ROUND(AVG("TypePriority"))					AS "AverageTypePriority"
+		,ROUND(SUM(CASE WHEN ("ProductPriority"<CAST((
+					SELECT "Value"
+					FROM "UserSettings"
+					WHERE "Setting"='ProductPriorityTarget') AS NUMERIC))
+			  THEN "Amount" ELSE 0 END),2)				AS "PossibleSavings"
+	FROM "ExpendituresEnriched" 
+	GROUP BY "Month"
+	ORDER BY "Month" ASC
+) AS "Monthly"
+LEFT JOIN "Daily" ON "Monthly"."Month"="Daily"."Month";
 CREATE VIEW "BillsSummary" AS
 SELECT
 	DISTINCT("Bills"."Medium")				AS "Medium"

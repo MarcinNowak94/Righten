@@ -16,6 +16,8 @@ class CommonForm(FlaskForm):
     comment = StringField("Comment", validators=[])
     submit = SubmitField("SubmitField")
 
+#Keyword: autocomplete
+#TODO: Allow new input as per https://stackoverflow.com/questions/58354678/wtforms-textfield-searchfield-with-autocompletion-for-flask-app-similar-to-a-go
 class IncomeInputForm(CommonForm):
     with app.app_context():
       types=[]
@@ -29,10 +31,13 @@ class IncomeInputForm(CommonForm):
                           choices=types,
                         )
     #NICE-TO-HAVE: display only sources viable for specified type
+    #moderj: try htmx library - based on chang in form ask backend to get new form - as per https://www.youtube.com/watch?v=L76zDuDmsuY
     source = SelectField("Source", validators=[DataRequired()],
                           choices=sources
                         )
 
+#Keyword: autocomplete
+#TODO: Allow new input as per https://stackoverflow.com/questions/58354678/wtforms-textfield-searchfield-with-autocompletion-for-flask-app-similar-to-a-go
 class BillsInputForm(CommonForm):
     with app.app_context():
       medias=[]

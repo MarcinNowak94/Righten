@@ -11,9 +11,7 @@ load_dotenv(os.path.join(basepath, '.env'))
 
 app=Flask(__name__)
 app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
-version="debug_local"
-if version=="debug_local":
-    app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3' #Local SQLite3
+
 
 db=SQLAlchemy(app)
 bcrypt=Bcrypt(app)
