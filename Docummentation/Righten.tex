@@ -1126,10 +1126,10 @@ użytkownikom przy zarządzaniu budżetem.}
 %diagramy projektowe - np.: diagram hierarchii klas, diagramy sekwencji, kolaboracji
 %opisy metod i stosowane algorytmy
 \chapter{\customstylechapter{Dokumentacja techniczna}}
-{Rozdział ten zawiera dokumentację techniczną projektu. Dokumentacja jest 
-opatrzona stosownymi diagramami, opisuje strukturę projektu wraz z ogólnym 
-opisem przepływu wykonania kodu oraz logiki aplikacji. Znajdują się tu także 
-opisy wybranych fragmentów kodu jak klasy, metody i funkcje oraz algorytmy.}
+{Rozdział ten zawiera dokumentację techniczną projektu. Dokumentacja zawiera 
+diagramy projektowe, nakreśla strukturę projektu wraz z ogólnym opisem przepływu
+ wykonania kodu oraz logiki aplikacji. Znajdują się tu także opisy wybranych 
+fragmentów kodu jak klasy, metody i funkcje oraz algorytmy.}
 
 
 %zaprezentować: pakiety, moduły, biblioteki, klasy
@@ -2030,7 +2030,7 @@ wykorzystujące rozbieżne technologie.}
 
 \medskip
 {Ponieważ ciężar przetwarzania danych aplikacji położono na warstwie bazy 
-danych, to logika zawarta zapytaniach z których złożone są obiekty bazy danych 
+danych, to logika zawarta zapytaniach, z których złożone są obiekty bazy danych 
 jak widoki podlegała najbardziej rygorystycznym testom. Po utworzeniu zapytania 
 do bazy danych aplikacji wprowadzano zestaw danych testowych, dla których wyniki
  przetwarzania przygotowano ręcznie oraz z wykorzystaniem narzędzi z pakietu 
@@ -2047,7 +2047,7 @@ skryptu. Skrypt ten powielał wybraną losowo część rekordów zmieniając wsk
 dane w określonym zakresie - przykładowo cena*liczbaLosowaWZakresie(0.8,1.2).}
 
 \medskip
-{W warstwie backend przeprowadzano głównie manualne testy akceptacyjne dla 
+{W warstwie serwerowej przeprowadzano głównie manualne testy akceptacyjne dla 
 każdej implementowanej funkcji aby określić czy działa zgodnie z założeniami 
 wstępnymi projektu. Test każdej wdrożonej funkcji wymagał uruchomienia 
 aplikacj i potwierdzenia jej prawidłowego działania. Część funkcji wymagała 
@@ -2085,17 +2085,18 @@ zmiany odpowiedzialnego atrybutu w szablonie HTML i ponownej weryfikacji.}
 ciekawych sposobów a zatem zasługują na szczególną.}
 
 {Pierwszą kategorią tego typu błędów wykrytych w aplikacji były błędy logiki 
-nie widoczne na pierwszy rzut oka. Za przykład posłuży obliczanie miesięcznej 
-średniej dziennych wydatków. Ponieważ zapytanie budowane było etapami w których 
-stopniowo rozbudowano je o dodatkowe informacje, jego logika była dość zawiła. 
-Na kolejnych fazach projektu podczas usprawnień warstwy bazy danych zapytanie 
-zostało zoptymalizowane - części wspólne przeniesiono do osobnego podzapytania 
-zbierającego dane dzienne, z którego następnie obliczano dane miesięczne. 
-Efektem prac był kod widoczny na listingu \ref{lst:dbmonthlyspending-errror}, 
-który mimo iż na pierwszy rzut oka wygląda prawidłowo oblicza nie średnie 
-miesięczne a średnie ze średnich dziennych. Błąd logiki wykryto podczas ręcznej 
-weryfikacji danych testowych, a logika po naprawie błędu (i zmianie dialektu 
-SQL) widoczna jest na listingu \ref{lst:dbmonthlyspending-fixed}.}
+widoczne dopiero po dokładnej analizie wyniku algorytmu. Za przykład posłuży 
+obliczanie miesięcznej średniej dziennych wydatków. Ponieważ zapytanie budowane 
+było etapami w których stopniowo rozbudowano je o dodatkowe informacje, jego 
+logika była dość zawiła. Na kolejnych fazach projektu podczas usprawnień warstwy
+ bazy danych zapytanie zostało zoptymalizowane - części wspólne przeniesiono do 
+osobnego podzapytania zbierającego dane dzienne, z którego następnie obliczano 
+dane miesięczne. Efektem prac był kod widoczny na listingu 
+\ref{lst:dbmonthlyspending-errror}, który mimo iż na pierwszy rzut oka wygląda 
+prawidłowo oblicza nie średnie miesięczne a średnie ze średnich dziennych. Błąd 
+logiki wykryto podczas ręcznej weryfikacji danych testowych, a logika po 
+naprawie błędu (i zmianie dialektu SQL) widoczna jest na listingu 
+\ref{lst:dbmonthlyspending-fixed}.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Widok MonthlySpending - średnia średnich dziennych (dialekt SQLite)},
@@ -2207,8 +2208,7 @@ LEFT JOIN "Daily" ON "Monthly"."Month"="Daily"."Month";\end{lstlisting}
  średnie miesięczne oraz dodaje średnie dzienne.}
 \end{minipage}
 
-%#TODO: opisać problem z solą przy szyfrowaniu haseł bcrypt
-{Z ciekawszych problemów które wykryto w warstwie backend na uwagę zasługuje 
+{Z ciekawszych problemów które wykryto w warstwie serwerowej na uwagę zasługuje 
 problem z przechowywaniem haseł użytkowników. W trakcie implementacji panelu 
 logowania użytkownika we wstępnej wersji dane wprowadzone przez użytkownika 
 były szyfrowane funkcją bcrypt, a następnie porównywano skrót (hash) hasła 
@@ -2259,18 +2259,21 @@ informajcę czy hash jest prawidłowy.}
 %gets mushed with listing
 \bigskip
 {W warstwie prezentacji danych natomiast ciekawy problem wystąpił podczas 
-poprawy zabezpieczeń w aplikacji. Po dodaniu tokenu CSRF (Cross-site Request 
-Forgery) aplikacja straciła dostęp do bazy danych. Ponieważ dane wymagane do 
-połączenia aplikacji z bazą danych oraz instancja silnika który utrzymuje 
-połączenie i wykonuje zapytania jest częścią konfiguracji wstępnej aplikacji, 
-zabezpieczenie sesji w ramach aplikacji z wykorzystaniem klucza szyfrowania 
-spowodowało blokowanie wykonywanych poza sesją prób połączenia z bazą funkcji 
-która mapowała model bazy danych na obiekty wykorzystywane w aplikacji 
-działającej w osobnym module models.py. Rozwiązanie problemu wymagało importu we
- wskazanym module obiektu app reprezentującego aplikację w pamięci i dodania 
-polecenia with app.context które wykonuje polecenia zawarte w bloku kodu w 
-ramach sesji aplikacji. Problematyczny fragment modułu wraz z opisanymi zmianami
- zaprezentowano na listingu \ref{lst:models-kontekstapplikacji}.}
+poprawy zabezpieczeń. Dodanie tokenu CSRF (Cross-site Request Forgery) pozbawiło
+ aplikację dostępu do bazy danych - sytuacja była o tyle ciekawa, że rozwiązanie 
+ problemu wymagało modyfikacji kodu w zupełnie innym miejscu niż zmiana, która go 
+spowodowała. Wstępna konfiguracja aplikacji zawiera instancję silnika, który 
+utrzymuje połączenie z bazą danych i obsługuje wszelkie zapytania, oraz dane 
+niezbędne do połączenia. Spójność modelu danych aplikacji zapewnia funkcja 
+zawarta w osobnym module models.py mapująca model bazy danych na obiekty 
+wykorzystywane dalej w logice. Po zabezpieczeniu sesji w ramach aplikacji 
+kluczem szyfrowania (token CSRF), funkcja ta utraciła dostęp do bazy ponieważ 
+nawiązywała połaczenia niezależnie więc były odrzucane. Rozwiązaniem okazał się 
+import obiektu app reprezentującego aplikację w pamięci we wskazanym module i 
+dodanie polecenia with app.context, które wykorzystuje już zestawioną sesję 
+aplikacji do wykonania kodu, co nie narusza dodanych reguł zabezpieczeń 
+połączenia. Problematyczny fragment modułu wraz z opisanymi zmianami 
+zaprezentowano na listingu \ref{lst:models-kontekstapplikacji}.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Fragment modułu models.py - kouminkacja z bazą z wykorzystaniem kontekstu aplikacji},
