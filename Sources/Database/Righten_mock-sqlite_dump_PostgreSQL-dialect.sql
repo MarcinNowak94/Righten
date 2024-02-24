@@ -13605,7 +13605,10 @@ INSERT INTO "AccountData" ("Data księgowania","Data operacji","Tytuł operacji"
  ('2023-12-01','2023-12-01','literally nothing','','',-0.9,NULL,4355),
  ('2023-12-02','2023-12-02','literally nothing','','',-3712.5,NULL,4356),
  ('2023-12-03','2023-12-01','literally nothing','','',-11.4,NULL,4357);
-INSERT INTO "UserSettings" ("Setting","Value") VALUES ('ProductPriorityTarget','33');
+INSERT INTO "UserSettings" ("Setting","Value") VALUES 
+ ('ProductPriorityTarget','33'),
+ ('SpendingTarget', '1500'),
+ ('SavingsTarget', '200');
 CREATE VIEW "MonthlyBills" AS
 SELECT 
 	SUBSTRING(TO_CHAR("DateTime", 'YYYY-MM-DD'), 1, 7)				as "Month"

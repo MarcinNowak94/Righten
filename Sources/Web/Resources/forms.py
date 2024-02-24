@@ -31,7 +31,7 @@ class IncomeInputForm(CommonForm):
                           choices=types,
                         )
     #NICE-TO-HAVE: display only sources viable for specified type
-    #moderj: try htmx library - based on chang in form ask backend to get new form - as per https://www.youtube.com/watch?v=L76zDuDmsuY
+    #modrej: try htmx library - based on chang in form ask backend to get new form - as per https://www.youtube.com/watch?v=L76zDuDmsuY
     source = SelectField("Source", validators=[DataRequired()],
                           choices=sources
                         )
@@ -101,6 +101,13 @@ class LoginForm(FlaskForm):
 
 class SettingsForm(FlaskForm):
     productprioritytarget=IntegerField(validators=[InputRequired(), NumberRange(min=1,max=100)],  default=33)
-    password=PasswordField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "Password"})
-    passwordrepeated=PasswordField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "Repeat password"})
+    spendingtarget=DecimalField(validators=[InputRequired()],  default=1000)
+    savingstarget=DecimalField(validators=[InputRequired()],  default=1000)
+    
+    #Validators omitted during testing
+    #password=PasswordField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "Password"})
+    #passwordrepeated=PasswordField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "Repeat password"})
+    password=PasswordField(render_kw={"placeholder": "Password"})
+    passwordrepeated=PasswordField(render_kw={"placeholder": "Repeat password"})
+    accountactive=BooleanField(default=False)
     submit=SubmitField("Submit")

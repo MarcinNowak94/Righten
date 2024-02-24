@@ -1,5 +1,3 @@
-from Resources import app, version
-from Resources import db
 import flask
 from flask import render_template, flash, redirect, url_for, request
 import flask_login
@@ -8,6 +6,7 @@ from sqlalchemy import delete, union_all, func
 from datetime import date
 import json
 import uuid
+from Resources import db, app, version
 from Resources.models import *
 from Resources.forms import *
 from Resources.__init__ import bcrypt
@@ -105,6 +104,7 @@ def request_loader(request):
     currentuser.id = user
     return currentuser
 
+#TODO: add 'Forgot password?' and coresponding panel
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form=LoginForm()
@@ -112,7 +112,9 @@ def login():
         username=form.username.data
         usr=db.session.query(Users).filter_by(Username=username).first()
         #if user does not exist password is not checked
-        if usr and bcrypt.check_password_hash(usr.Password, form.password.data.encode('utf-8')):
+        if (usr 
+            and bcrypt.check_password_hash(usr.Password, form.password.data.encode('utf-8'))
+            and usr.isActive):
             user = User()
             user.id = username
             flask_login.login_user(user)
@@ -136,40 +138,83 @@ def unauthorized_handler():
     flash("Access denied - requires logon", "danger")
     return redirect(url_for('index'))
 
-#TODO
-@app.route('/settings')
+#TODO: Move Change Password to separate site
+@app.route('/settings', methods=['GET', 'POST'])
 @flask_login.login_required
 def settings():
-    #FIXME: Does not work - KeyError
-    #usrentry = db.session.get(entity=tables[Users], ident=current_user.id)
-    #settingsentry = db.get_or_404(entity=tables[UserSettings], ident="ProductPriorityTarget")
-    
+    userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
+    #Settings must be separate to update them separately
+    priority = db.session.query(UserSettings).filter_by(Setting="ProductPriorityTarget").first()
+    spending = db.session.query(UserSettings).filter_by(Setting="SpendingTarget").first()
+    savings = db.session.query(UserSettings).filter_by(Setting="SavingsTarget").first()
+
     form=SettingsForm(
-    #    productprioritytarget=int(settingsentry.Value)
+        productprioritytarget=Decimal(priority.Value),
+        spendingtarget=Decimal(spending.Value),
+        savingstarget=Decimal(savings.Value),
+        accountactive=bool(userentry.isActive)
     )
 
     if request.method == "POST" and form.validate_on_submit():
         #Passwords are stored in Users
         if form.password.data and (form.password.data==form.passwordrepeated.data):
-            #usrentry.Password=bcrypt.generate_password_hash(form.password.data)
-            #try:
-            #    db.session.commit()
-            #    flash("Data updated", "success")
-            #except Exception as error:
-            #    print(error)
-            #    db.session.flush()
-            #    flash("Data not updated", "danger")
+            userentry.Password=bcrypt.generate_password_hash(form.password.data)
+            try:
+                flash("Password would be updated to"+form.password.data, "success")
+                #db.session.commit()
+                #flash("Password updated", "success")
+            except Exception as error:
+                #print(error)
+                #db.session.flush()
+                #flash("Password not updated", "danger")
+                pass
             pass
-        #Settings are stored in UserSettings
-        if form.productprioritytarget.data:
-            #settingsentry.Value=int(form.productprioritytarget.data)
-            #try:
-            #    db.session.commit()
-            #    flash("Data updated", "success")
-            #except Exception as error:
-            #    print(error)
-            #    db.session.flush()
-            #    flash("Data not updated", "danger")
+        #TODO: redirect to confirmation screen with password confirmation
+        #Only active user can get here
+        if form.accountactive.data==False:
+            userentry.isActive=form.accountactive.data
+            try:
+                db.session.commit()
+                flash("Account activity state changed to "+str(userentry.isActive), "success")
+                flask_login.logout_user()
+            except Exception as error:
+                print(error)
+                db.session.flush()
+                flash("Account activity state NOT changed", "danger")
+                pass
+        
+        #Store only changed values
+        if form.productprioritytarget.data and form.productprioritytarget.data!=Decimal(priority.Value):
+            priority.Value=form.productprioritytarget.data
+            try:
+                db.session.commit()
+                flash("Product priority target updated", "success")
+            except Exception as error:
+                print(error)
+                db.session.flush()
+                flash("Product priority target not updated", "danger")
+            pass
+
+        if form.spendingtarget.data and form.spendingtarget.data!=Decimal(spending.Value):
+            spending.Value=str(form.spendingtarget.data)
+            try:
+                db.session.commit()
+                flash("Spending target updated", "success")
+            except Exception as error:
+                print(error)
+                db.session.flush()
+                flash("Spending target not updated", "danger")
+            pass
+
+        if form.savingstarget.data and form.savingstarget.data!=Decimal(savings.Value):
+            savings.Value=str(form.savingstarget.data)
+            try:
+                db.session.commit()
+                flash("Savings target updated", "success")
+            except Exception as error:
+                print(error)
+                db.session.flush()
+                flash("Savings target not updated", "danger")
             pass
         return redirect(redirect_url())
     return render_template("settings.html", form=form)
@@ -291,12 +336,14 @@ def spending():
     Spending=db.session.query(MonthlySpending).all()
     PriorityTarget=db.session.query(UserSettings).filter_by(Setting="ProductPriorityTarget").first()
     MonthlySpendingData=[]
+    CashPercentageData=[]
     MonthlyPossibleSavingsData=[]
     ProductPriorityData=[]
     TypePriorityData=[]
     PriorityTargetData=[]
-    for Month, AverageDaily, Total, AverageProductPriority, AverageTypePriority, PossibleSavings in Spending:
+    for Month, Total, CashPercentage, AverageProductPriority, AverageTypePriority, PossibleSavings, AverageDaily in Spending:
         MonthlySpendingData.append({"x":Month,"y":Total})
+        CashPercentageData.append({"x":Month,"y":CashPercentage})        
         MonthlyPossibleSavingsData.append({"x":Month,"y":PossibleSavings})
         ProductPriorityData.append({"x":Month,"y":AverageProductPriority})
         TypePriorityData.append({"x":Month,"y":AverageTypePriority})
@@ -307,6 +354,7 @@ def spending():
     return render_template("spendingsummary.html",
                            title="Spending",
                            MonthlySpendingData=json.dumps(MonthlySpendingData, cls=DecimalEncoder),
+                           CashPercentageData=json.dumps(CashPercentageData, cls=DecimalEncoder),
                            MonthlyPossibleSavingsData=json.dumps(MonthlyPossibleSavingsData, cls=DecimalEncoder),
                            ProductPriorityData=json.dumps(ProductPriorityData, cls=DecimalEncoder),
                            TypePriorityData=json.dumps(TypePriorityData, cls=DecimalEncoder),
