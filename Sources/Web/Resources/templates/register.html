@@ -18,6 +18,11 @@
                 {{ form.password(class = "form-control form-control-sm") }}
             </div>
 
+            <div class="col form-group">
+                {{ form.passwordrepeated.label(class = "form-control-label") }}
+                {{ form.passwordrepeated(class = "form-control form-control-sm") }}
+            </div>
+
             <div class="col">
                 {{ form.submit(class="btn btn-success", value="Create")}}
             </div>

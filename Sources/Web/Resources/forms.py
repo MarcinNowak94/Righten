@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, IntegerField, DecimalField, SubmitField, BooleanField, PasswordField
-from wtforms.validators import DataRequired, Regexp, NumberRange, InputRequired, Length, ValidationError
+from wtforms.validators import DataRequired, Regexp, NumberRange, InputRequired, Length, ValidationError, EqualTo
 from datetime import date
 from Resources.models import *
 
@@ -14,7 +14,7 @@ class CommonForm(FlaskForm):
                            default=date.today().isoformat())
     amount = DecimalField("Amount", validators=[DataRequired()])
     comment = StringField("Comment", validators=[])
-    submit = SubmitField("SubmitField")
+    submit = SubmitField("Submit")
 
 #Keyword: autocomplete
 #TODO: Allow new input as per https://stackoverflow.com/questions/58354678/wtforms-textfield-searchfield-with-autocompletion-for-flask-app-similar-to-a-go
@@ -91,6 +91,7 @@ class RegisterForm(FlaskForm):
     username=StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
     #NICE-TO-HAVE: enforce better passowrd policy
     password=PasswordField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Password"})
+    passwordrepeated=PasswordField(validators=[InputRequired(), Length(min=4, max=20), EqualTo('password')], render_kw={"placeholder": "Repeat password"})
     submit=SubmitField("Submit")
 
 class LoginForm(FlaskForm):
@@ -103,11 +104,11 @@ class SettingsForm(FlaskForm):
     productprioritytarget=IntegerField(validators=[InputRequired(), NumberRange(min=1,max=100)],  default=33)
     spendingtarget=DecimalField(validators=[InputRequired()],  default=1000)
     savingstarget=DecimalField(validators=[InputRequired()],  default=1000)
-    
-    #Validators omitted during testing
-    #password=PasswordField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "Password"})
-    #passwordrepeated=PasswordField(validators=[Length(min=4, max=20)], render_kw={"placeholder": "Repeat password"})
-    password=PasswordField(render_kw={"placeholder": "Password"})
-    passwordrepeated=PasswordField(render_kw={"placeholder": "Repeat password"})
     accountactive=BooleanField(default=False)
+    submit=SubmitField("Submit")
+
+class PasswordChangeForm(FlaskForm):
+    password=PasswordField(validators=[InputRequired(),Length(min=4, max=20)], render_kw={"placeholder": "Current password"})
+    newpassword=PasswordField(validators=[InputRequired(),Length(min=4, max=20)], render_kw={"placeholder": "New password"})
+    passwordrepeated=PasswordField(validators=[InputRequired(),Length(min=4, max=20), EqualTo(fieldname='newpassword', message="New password and repeated new password do not match!")], render_kw={"placeholder": "Repeat password"})
     submit=SubmitField("Submit")

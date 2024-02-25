@@ -24,22 +24,13 @@
             </div>
 
             <div class="col form-group">
-                {{ form.password.label(class = "form-control-label") }}
-                {{ form.password(class = "form-control form-control-sm") }}
-            </div>
-            
-            <div class="col form-group">
-                {{ form.passwordrepeated.label(class = "form-control-label") }}
-                {{ form.passwordrepeated(class = "form-control form-control-sm") }}
-            </div>
-
-            <div class="col form-group">
                 {{ form.accountactive.label(class = "form-control-label") }}
                 {{ form.accountactive }}
             </div>
 
             <div class="col">
                 {{ form.submit(class="btn btn-success", value="Submit")}}
+                <a href="{{ url_for('passwordchange') }}" class="btn btn-outline-danger btn-sm">Change Password</a>
             </div>
         </fieldset>
     </form>

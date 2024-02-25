@@ -86,7 +86,10 @@ class User(flask_login.UserMixin):
 def user_loader(checkeduser):
     users=db.session.query(Users).all()
     for user in users:
-        if checkeduser ==user.Username:
+        if checkeduser==user.Username:
+            #TODO: Check if whole userentry can be moved here
+            #possible issue: it can be na active session maintained for the duration of user interaction
+            #possible issue: user object containing password stored in memory  
             currentuser = User()
             currentuser.id = checkeduser
             currentuser.uuid = user.ID
@@ -156,19 +159,6 @@ def settings():
     )
 
     if request.method == "POST" and form.validate_on_submit():
-        #Passwords are stored in Users
-        if form.password.data and (form.password.data==form.passwordrepeated.data):
-            userentry.Password=bcrypt.generate_password_hash(form.password.data)
-            try:
-                flash("Password would be updated to"+form.password.data, "success")
-                #db.session.commit()
-                #flash("Password updated", "success")
-            except Exception as error:
-                #print(error)
-                #db.session.flush()
-                #flash("Password not updated", "danger")
-                pass
-            pass
         #TODO: redirect to confirmation screen with password confirmation
         #Only active user can get here
         if form.accountactive.data==False:
@@ -235,6 +225,37 @@ def register():
             print("TODO: create schema in postgreSQL")
         return redirect(redirect_url(url_for("login", next="login")))
     return render_template('register.html', title="Register", form=form)
+
+#TODO
+@app.route('/paswordreset', methods=['GET', 'POST'])
+@flask_login.login_required
+def passwordreset():
+    #form=PasswordResetForm()
+    #return render_template('passwordreset.html', title="Password reset", form=form)
+    return render_template('underconstruction.html')
+
+@app.route('/passwordchange', methods=['GET', 'POST'])
+@flask_login.login_required
+def passwordchange():
+    userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
+    form=PasswordChangeForm()
+    
+    if request.method == "POST" and form.validate_on_submit():
+        if (form.password.data
+            and userentry.isActive
+            and bcrypt.check_password_hash(userentry.Password, form.password.data.encode('utf-8'))):
+            userentry.Password=bcrypt.generate_password_hash(form.password.data)
+            try:
+                db.session.commit()
+                flash("Password updated", "success")
+            except Exception as error:
+                print(error)
+                db.session.flush()
+                flash("Password not updated", "danger")
+                pass
+            pass
+        return redirect(redirect_url())
+    return render_template('passwordchange.html', title="Password reset", form=form)
 
 #Summaries and visualizations --------------------------------------------------
 
