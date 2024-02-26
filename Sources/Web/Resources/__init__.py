@@ -1,11 +1,14 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-#from logging.handlers import SysLogHandler
+from Resources.logging_definition import logger, setup_logging
+from Resources.rightenlogger import RightenJSONFormatter
 #Secure config as per https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
 #https://www.youtube.com/watch?v=L1h5gRxh8w8
 import os
 from dotenv import load_dotenv
+setup_logging()
+logger.info("Logging started")
 basepath = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basepath, '.env'))
 
@@ -20,6 +23,7 @@ bcrypt=Bcrypt(app)
 
 if not app.config['SECRET_KEY']:
     raise ValueError("No SECRET_KEY set for Flask application")
+logger.info("Application setup finished")
 
 #Print all variables if in debug mode
 if (app.config['DEBUG']):

@@ -10,7 +10,7 @@ from sqlalchemy.ext.automap import automap_base
 #Currently 'public' schema, need to figure out how to make and access separate schemas for each user
 #https://stackoverflow.com/questions/2342999/postgres-is-there-a-way-to-tie-a-user-to-a-schema
 with app.app_context():
-    Base = automap_base() 
+    Base = automap_base()
     Base.prepare(autoload_with=db.engine, reflect=True)
     #Tables
     Income=Base.classes.Income
@@ -80,3 +80,11 @@ tables={
     "MonthlySpending" : MonthlySpending,
     "Statistics" : Statistics
 }
+
+def create_schema_for_user(userUUID):
+    with app.app_context():
+        #Schema must begin with letter - UUIDs are alphanumeric 
+        query = "CREATE SCHEMA u"+userUUID+" TEMPLATE pulic;" #TODO: Fix, chat hallucinating
+        connection = db.engine.connect()
+        connection.execute(query)
+        connection.close()

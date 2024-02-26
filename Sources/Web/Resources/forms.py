@@ -3,6 +3,7 @@ from wtforms import StringField, SelectField, IntegerField, DecimalField, Submit
 from wtforms.validators import DataRequired, Regexp, NumberRange, InputRequired, Length, ValidationError, EqualTo
 from datetime import date
 from Resources.models import *
+from Sources.Web.Resources.logging_definition import logger
 
 #Base class with common elements
 class CommonForm(FlaskForm):
