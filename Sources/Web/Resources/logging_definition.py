@@ -1,9 +1,9 @@
 #Based monstly on https://www.youtube.com/watch?v=9L77QExPmI0
 import atexit
 import json
+import logging          #FileHandler lives here
 import logging.config
 import logging.handlers
-from logging import FileHandler
 import pathlib
 from Resources.rightenlogger import RightenJSONFormatter
 
@@ -16,18 +16,31 @@ logging_config={
     "disable_existing_loggers": False,
     "formatters": {
         "simple": {
-            "format": "%(actime)s, %(levelname)s, %(message)s",
+            "format": "%(asctime)s, %(levelname)s, %(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S%z"
         },
         "detailed": {
             "format": "%(asctime)s, %(levelname)s, %(module)s, L%(lineno)d: %(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S%z"
+        },
+        "json": {
+            "()": RightenJSONFormatter,
+            "fmt_keys": {
+                "level": "levelname",
+                "message": "message",
+                "timestamp": "timestamp",
+                "logger": "name",
+                "module": "module",
+                "function": "funcName",
+                "line": "lineno",
+                "thread_name": "threadName"
+            }
         }
     },
     "handlers": {
         "stdout": {
             "class": "logging.StreamHandler",
-            "formatter": "detailed",
+            "formatter": "simple",
             "stream": "ext://sys.stdout"
         },
         "stderr": {
@@ -36,9 +49,18 @@ logging_config={
             "formatter": "detailed",
             "stream": "ext://sys.stderr"
         },
+        "file": {
+            "class": "logging.FileHandler",
+            "level": "DEBUG",
+            "formatter": "json",            
+            "filename": "E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl",
+            "mode": "a",
+            "encoding": "utf_8"
+        },
         "queue_handler": {
             "class": "logging.handlers.QueueHandler",
             "handlers": [
+                "file",
                 "stdout"
             ],
             "respect_handler_level": True

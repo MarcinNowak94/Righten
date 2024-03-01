@@ -94,7 +94,9 @@ def user_loader(checkeduser):
             currentuser = User()
             currentuser.id = checkeduser
             currentuser.uuid = user.ID
+            logger.info("User " + checkeduser + " logged in.", extra={"action": "Login success"})
             return currentuser
+    logger.info("User " + checkeduser + " not found.", extra={"action": "Login failure"})
     return
 
 @login_manager.request_loader
@@ -280,6 +282,7 @@ def incomesummary():
     IncomeTypesByTime=db.session.query(MonthlyIncomeByType).all()
     IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
 
+    logger.info("User: "+current_user.uuid+" opened site: incomesummary", extra={"action": "Site opened"})
     return render_template("incomesummary.html",
                            title="Income",
                            IncomeSummarydata=json.dumps(incometypesummary, cls=DecimalEncoder),
@@ -310,6 +313,7 @@ def billssummary():
     BillsTypespermonth=db.session.query(MonthlyBillsByMedium).all();
     BillsTypesData=createchartdataset(BillsTypespermonth)
 
+    logger.info("User: "+current_user.uuid+" opened site: billsummary", extra={"action": "Site opened"})
     return render_template("billssummary.html",
                            title="Bills",
                            BillsTypeAmounts=json.dumps(BillsTypeAmounts, cls=DecimalEncoder),
