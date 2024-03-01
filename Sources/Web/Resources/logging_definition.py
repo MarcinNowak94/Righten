@@ -8,7 +8,8 @@ import pathlib
 from Resources.rightenlogger import RightenJSONFormatter
 
 #logfile="/logs/righten/rightenlog.jsonl"
-
+logfile="E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl"
+            
 logger = logging.getLogger("righten") #Create non-rootlogger if not exists, 
 
 logging_config={
@@ -53,7 +54,7 @@ logging_config={
             "class": "logging.FileHandler",
             "level": "DEBUG",
             "formatter": "json",            
-            "filename": "E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl",
+            "filename": logfile,
             "mode": "a",
             "encoding": "utf_8"
         },

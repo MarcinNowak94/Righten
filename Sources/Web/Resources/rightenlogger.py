@@ -46,10 +46,10 @@ class RightenJSONFormatter(logging.Formatter):
     
     def _prepare_log_dict(self, record: logging.LogRecord):
         basic_fields={
-            "message": record.getMessage(),
             "timestamp": dt.datetime.fromtimestamp(
                 record.created, tz=dt.timezone.utc
-            ).isoformat()
+            ).isoformat(),
+            "message": record.getMessage()
         }
         
         if record.exc_info is not None:

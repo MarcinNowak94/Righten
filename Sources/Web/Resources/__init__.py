@@ -29,13 +29,10 @@ db=SQLAlchemy(app)
 bcrypt=Bcrypt(app)
 
 if not app.config['SECRET_KEY']:
+    logger.ERROR("No SECRET_KEY set for Flask application!", extra={"action": "Application configuration error", "config": app.config.items()})
     raise ValueError("No SECRET_KEY set for Flask application")
-logger.info("Application setup finished")
 
 #Print all variables if in debug mode
-if (app.config['DEBUG']):
-    for key, variable in app.config.items():
-        value=str(variable)
-        print("{:<35} {:<10}".format(key, value))
+logger.debug("Righten Application started", extra={"action": "Application started", "config": app.config.items()})
 
 from Resources import routes

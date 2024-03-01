@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 import flask
 from flask import render_template, flash, redirect, url_for, request
 import flask_login
@@ -12,27 +13,51 @@ from Resources.models import *
 from Resources.forms import *
 from Resources.__init__ import bcrypt
 
+def log_site_opened(sitename, userid) -> None:
+    logger.info(
+        "User visited site",
+        extra={
+            "action": "Site visited",
+            "result": "Success",
+            "function": sitename,
+            "user": userid
+            }
+        )
 
 #https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
 #Dumping decimal data
-from decimal import Decimal
 class DecimalEncoder(json.JSONEncoder):
   def default(self, obj):
     if isinstance(obj, Decimal):
       return str(obj)
     return json.JSONEncoder.default(self, obj)
 
-def addtodb(entry):
+def addtodb(entry, table):
+    result=False
+    errors=""
     try:
         db.session.add(entry)
         db.session.commit()
         flash("Data added", "success")
-        return True
+        result=True
     except Exception as error:
-        print(error)
         db.session.flush()
         flash("Data not added", "danger")
-        return False
+        result=False
+        errors=error
+    
+    logger.info(
+            "Database insert attempt",
+            extra={
+                "action": "Database insert",
+                "result": "Success" if result else "Failure",
+                "function": addtodb.__name__,
+                "user": current_user.uuid,
+                "error": errors,
+                "table": table
+                }
+            )
+    return result
 
 def createchartdataset(dbdata, fill="false"):
     months=[]
@@ -55,6 +80,15 @@ def createchartdataset(dbdata, fill="false"):
     for set in sets:
         dataset.append({"label": set, "data": sets[set], "fill": fill})
 
+    logger.debug(
+            "Created chart data set",
+            extra={
+                "action": "Chart dataset creation", 
+                "result": "Success",
+                "function": createchartdataset.__name__,
+                "user": current_user.uuid
+                }
+            )
     return dataset
 
 #As per https://stackoverflow.com/questions/14277067/redirect-back-in-flask
@@ -65,10 +99,12 @@ def redirect_url(default='index'):
 
 @app.route("/")
 def index():
+    log_site_opened(index.__name__, "none")
     return render_template('index.html', title="Main apage");
 
 @app.route("/layout")
 def layout():
+    log_site_opened(layout.__name__, "none")
     return render_template("layout.html")
 
 #User authentication -----------------------------------------------------------
@@ -94,9 +130,7 @@ def user_loader(checkeduser):
             currentuser = User()
             currentuser.id = checkeduser
             currentuser.uuid = user.ID
-            logger.info("User " + checkeduser + " logged in.", extra={"action": "Login success"})
             return currentuser
-    logger.info("User " + checkeduser + " not found.", extra={"action": "Login failure"})
     return
 
 @login_manager.request_loader
@@ -125,9 +159,28 @@ def login():
             user.id = username
             flask_login.login_user(user)
             flash("User logged in", "success")
+            logger.info(
+                "User logged in",
+                extra={
+                    "action": "Login",
+                    "result": "Success",
+                    "user": usr.ID
+                    }
+                )
             return redirect(redirect_url(url_for("index", next="index")))
 
         flash("Failed to log in", "danger")
+        logger.info(
+                "User failed to logged in", 
+                extra={
+                    "action": "Login",
+                    "result": "Failure",
+                    "user": "none",
+                    "params": {
+                        "givenusername": username
+                        }
+                    }
+                )
         return redirect(redirect_url(url_for("login", next="index")))
     return render_template("login.html", title="Login", form=form)
 
@@ -135,19 +188,41 @@ def login():
 @app.route('/logout')
 @flask_login.login_required
 def logout():
-    flask_login.logout_user()
     flash("User logged out", "success")
+    logger.debug(
+        "User logged out",
+        extra={
+            "action": "Logout", 
+            "result": "Success",
+            "function": logout.__name__,
+            "user": current_user.uuid
+            }
+        )
+    flask_login.logout_user()
     return redirect(redirect_url("index"))
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
     flash("Access denied - requires logon", "danger")
+    logger.warning(
+        "Access denied - requires logon",
+        extra={
+            "action": "Access attempt",
+            "result": "Failure",
+            "function": unauthorized_handler.__name__,
+            "reason": "Login required"
+            }
+        )
     return redirect(url_for('index'))
 
 #TODO: Move Change Password to separate site
 @app.route('/settings', methods=['GET', 'POST'])
 @flask_login.login_required
 def settings():
+    result="Success"
+    changeerror="none"
+    settingschanged=[]
+
     userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
     #Settings must be separate to update them separately
     priority = db.session.query(UserSettings).filter_by(Setting="ProductPriorityTarget").first()
@@ -160,56 +235,108 @@ def settings():
         savingstarget=Decimal(savings.Value),
         accountactive=bool(userentry.isActive)
     )
-
+    
     if request.method == "POST" and form.validate_on_submit():
         #TODO: redirect to confirmation screen with password confirmation
         #Only active user can get here
         if form.accountactive.data==False:
-            userentry.isActive=form.accountactive.data
+            change = {}
+            change["setting"] = "Account activity"
+            change["oldvalue"] = userentry.isActive
+            change["newvalue"] = form.accountactive.data
+
+            userentry.isActive=form.accountactive.data   
             try:
                 db.session.commit()
                 flash("Account activity state changed to "+str(userentry.isActive), "success")
+                result="Success"
                 flask_login.logout_user()
             except Exception as error:
-                print(error)
                 db.session.flush()
                 flash("Account activity state NOT changed", "danger")
-                pass
+                result="Failure"
+                changeerror=error
+            
+            change["result"] = result
+            change["error"] = changeerror
+            settingschanged.append(change)
         
         #Store only changed values
         if form.productprioritytarget.data and form.productprioritytarget.data!=Decimal(priority.Value):
+            change = {}
+            change["setting"] = "Priority target"
+            change["oldvalue"] = priority.Value
+            change["newvalue"] = form.productprioritytarget.data
+
             priority.Value=form.productprioritytarget.data
             try:
                 db.session.commit()
                 flash("Product priority target updated", "success")
+                result="Success"
             except Exception as error:
-                print(error)
                 db.session.flush()
                 flash("Product priority target not updated", "danger")
-            pass
+                result="Failure"
+                changeerror=error
+            
+            change["result"] = result
+            change["error"] = changeerror
+            settingschanged.append(change)
 
         if form.spendingtarget.data and form.spendingtarget.data!=Decimal(spending.Value):
+            change = {}
+            change["setting"] = "Spending target"
+            change["oldvalue"] = spending.Value
+            change["newvalue"] = form.spendingtarget.data
+
             spending.Value=str(form.spendingtarget.data)
             try:
                 db.session.commit()
                 flash("Spending target updated", "success")
+                result="Success"
             except Exception as error:
-                print(error)
                 db.session.flush()
                 flash("Spending target not updated", "danger")
-            pass
+                result="Failure"
+                changeerror=error
+            
+            change["result"] = result
+            change["error"] = changeerror
+            settingschanged.append(change)
 
         if form.savingstarget.data and form.savingstarget.data!=Decimal(savings.Value):
+            change = {}
+            change["setting"] = "Savings target"
+            change["oldvalue"] = savings.Value
+            change["newvalue"] = form.savingstarget.data
+            
             savings.Value=str(form.savingstarget.data)
             try:
                 db.session.commit()
                 flash("Savings target updated", "success")
+                result="Success"
             except Exception as error:
-                print(error)
                 db.session.flush()
                 flash("Savings target not updated", "danger")
+                result="Failure"
+                changeerror=error
             pass
+            
+            change["result"] = result
+            change["error"] = changeerror
+            settingschanged.append(change)
+
+        logger.warn(
+            "User settings change",
+            extra={
+                "action": "User settings change",
+                "function": settings.__name__,
+                "user": current_user.uuid,
+                "changes": settingschanged
+                }
+            )
         return redirect(redirect_url())
+    log_site_opened(register.__name__, current_user.uuid)
     return render_template("settings.html", form=form)
 
 #User registration https://www.youtube.com/watch?v=71EU8gnZqZQ&t=45s
@@ -226,7 +353,17 @@ def register():
         if useradded and version!="debug_local":
             #TODO: create schema in postgreSQL
             print("TODO: create schema in postgreSQL")
+        logger.info(
+            "New user registered",
+            extra={
+                "action": "User add",
+                "result": "Success",
+                "function": register.__name__,
+                "user": user.ID
+                }
+            )
         return redirect(redirect_url(url_for("login", next="login")))
+    log_site_opened(register.__name__, "none")
     return render_template('register.html', title="Register", form=form)
 
 #TODO
@@ -235,11 +372,23 @@ def register():
 def passwordreset():
     #form=PasswordResetForm()
     #return render_template('passwordreset.html', title="Password reset", form=form)
+    logger.info(
+        "Password reset",
+        extra={
+            "action": "User password change",
+            "result": "Success",
+            "function": passwordreset.__name__,
+            "user": current_user.uuid
+            }
+        )
+    log_site_opened(spending.__name__, "none") #TODO: log username once provided
     return render_template('underconstruction.html')
 
 @app.route('/passwordchange', methods=['GET', 'POST'])
 @flask_login.login_required
 def passwordchange():
+    result=""
+    encounterederrors=[]
     userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
     form=PasswordChangeForm()
     
@@ -251,13 +400,25 @@ def passwordchange():
             try:
                 db.session.commit()
                 flash("Password updated", "success")
+                result="Success"
             except Exception as error:
-                print(error)
                 db.session.flush()
                 flash("Password not updated", "danger")
-                pass
+                result="Failed"
+                encounterederrors=error
             pass
+        logger.info(
+            "Password change",
+            extra={
+                "action": "User password change",
+                "result": result,
+                "function": passwordchange.__name__,
+                "user": current_user.uuid,
+                "error": encounterederrors
+                }
+            )
         return redirect(redirect_url())
+    log_site_opened(passwordchange.__name__, current_user.uuid)
     return render_template('passwordchange.html', title="Password reset", form=form)
 
 #Summaries and visualizations --------------------------------------------------
@@ -282,7 +443,7 @@ def incomesummary():
     IncomeTypesByTime=db.session.query(MonthlyIncomeByType).all()
     IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
 
-    logger.info("User: "+current_user.uuid+" opened site: incomesummary", extra={"action": "Site opened"})
+    log_site_opened(incomesummary.__name__, current_user.uuid)
     return render_template("incomesummary.html",
                            title="Income",
                            IncomeSummarydata=json.dumps(incometypesummary, cls=DecimalEncoder),
@@ -313,7 +474,7 @@ def billssummary():
     BillsTypespermonth=db.session.query(MonthlyBillsByMedium).all();
     BillsTypesData=createchartdataset(BillsTypespermonth)
 
-    logger.info("User: "+current_user.uuid+" opened site: billsummary", extra={"action": "Site opened"})
+    log_site_opened(billssummary.__name__, current_user.uuid)
     return render_template("billssummary.html",
                            title="Bills",
                            BillsTypeAmounts=json.dumps(BillsTypeAmounts, cls=DecimalEncoder),
@@ -347,6 +508,7 @@ def expendituressummary():
     TopProductsChartData=db.session.query(Top10ProductsMonthly).all();
     TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
 
+    log_site_opened(expendituressummary.__name__, current_user.uuid)
     return render_template("expendituressummary.html",
                            title="Expenditures",
                            ExpendituresSummaryData=json.dumps(ExpendituresSummaryData, cls=DecimalEncoder),
@@ -377,6 +539,7 @@ def spending():
         #Priority data is average of month priorities, thus target priority is 100-target  
         PriorityTargetData.append({"x":Month,"y":100-int(PriorityTarget.Value)})
     
+    log_site_opened(spending.__name__, current_user.uuid)
     return render_template("spendingsummary.html",
                            title="Spending",
                            MonthlySpendingData=json.dumps(MonthlySpendingData, cls=DecimalEncoder),
@@ -422,6 +585,7 @@ def finances():
         BilanceTotalLabels.append(Source+' '+str(round((abs(Amount)/Total)*100,2))+'%')
         BilanceTotalValues.append(Amount)
 
+    log_site_opened(finances.__name__, current_user.uuid)
     return render_template("financialposture.html",
                            title="Finances",
                            BilanceTotalLabels=json.dumps(BilanceTotalLabels, cls=DecimalEncoder),
@@ -439,6 +603,7 @@ def finances():
 @app.route("/productssummary")
 @flask_login.login_required
 def productssummary():
+    log_site_opened(productssummary.__name__, current_user.uuid)
     return render_template("underconstruction.html",
                         title="Products"
                         )
@@ -448,9 +613,10 @@ def productssummary():
 @app.route("/producttypessummary")
 @flask_login.login_required
 def producttypessummary():
-        return render_template("underconstruction.html",
-                           title="Product types"
-                           )
+    log_site_opened(producttypessummary.__name__, current_user.uuid)
+    return render_template("underconstruction.html",
+                        title="Product types"
+                        )
 
 
 
@@ -470,8 +636,9 @@ def income():
                 Source=form.source.data,
                 Comment=form.comment.data
         )
-        addtodb(entry)
+        addtodb(entry, "Income")
         return redirect(redirect_url(url_for("income", next="income")))
+    log_site_opened(income.__name__, current_user.uuid)
     return render_template("incometable.html", title="Income", entries=entries, form=form)
 
 #TODO: add average bills year to date
@@ -488,9 +655,11 @@ def bills():
                 Medium=form.medium.data,
                 Comment=form.comment.data
         )
-        addtodb(entry)
+        addtodb(entry, "Bills")
+        #TODO: Log data addition
         return redirect(redirect_url(url_for("bills", next="bills")))
     
+    log_site_opened(bills.__name__, current_user.uuid)
     return render_template("billstable.html", title="Bills", entries=entries, form=form)
 
 #TODO: add average expenditures year to date
@@ -509,9 +678,10 @@ def expenditures():
                 isCash=form.isCash.data,
                 Comment=form.comment.data
         )
-        addtodb(entry)
+        addtodb(entry, "Expenditures")
         return redirect(redirect_url())
     
+    log_site_opened(expenditures.__name__, current_user.uuid)
     return render_template("expenditurestable.html", title="Expenditures", entries=entries, form=form)
 
 @app.route("/products", methods=["GET", "POST"])
@@ -526,9 +696,11 @@ def products():
                 Comment=form.comment.data,
                 Priority=form.priority.data
         )
-        addtodb(entry)
+        addtodb(entry, "Products")
+        #TODO: Log data addition
         return redirect(redirect_url())
     
+    log_site_opened(products.__name__, current_user.uuid)
     return render_template("productstable.html", title="Products", entries=entries, form=form)
 
 @app.route("/producttypes", methods=["GET", "POST"])
@@ -542,9 +714,11 @@ def producttypes():
                 Comment=form.comment.data,
                 Priority=form.priority.data
         )
-        addtodb(entry)
+        addtodb(entry, "Producttypes")
+        #TODO: Log data addition
         return redirect(redirect_url())
     
+    log_site_opened(producttypes.__name__, current_user.uuid)
     return render_template("producttypestable.html", title="Product Types", entries=entries, form=form)
 
 
@@ -556,15 +730,31 @@ def producttypes():
 @app.route("/delete/<string:table>/<int:entry_id>")
 @flask_login.login_required
 def delete(table, entry_id):
+    result=False
+    errors=""
     try:
         db.session.query(tables[table]).filter_by(ID=entry_id).delete()
         db.session.commit()
         flash("Data removed", "success")
+        result=True
     except Exception as error:
-        print(error)
         db.session.flush()
         flash("Data not removed", "danger")
-    
+        result=False
+        errors=error
+
+    logger.debug(
+            "Database delete attempt",
+            extra={
+                "action": "Database delete",
+                "result": "Success" if result else "Failure",
+                "function": addtodb.__name__,
+                "user": current_user.uuid,
+                "error": errors,
+                "table": table,
+                "entryID": entry_id
+                }
+            )
     return redirect(redirect_url())
 
 #TODO: Generalize - use table variable
@@ -587,6 +777,8 @@ def incomeedit(table, entry_id):
         source=entry.Source,
     )
     if request.method == "POST" and form.validate_on_submit():
+        result="Success"
+        errors=""
         entry.DateTime=date.fromisoformat(form.datetime.data)
         entry.Amount=form.amount.data.real
         entry.Type=form.type.data
@@ -596,12 +788,28 @@ def incomeedit(table, entry_id):
         try:
             db.session.commit()
             flash("Data updated", "success")
+            result="Success"
         except Exception as error:
-            print(error)
             db.session.flush()
             flash("Data not updated", "danger")
+            result="Failure"
+            errors=error
+        logger.warn(
+            "Income data edit",
+            extra={
+                "action": "Database update",
+                "result": result,
+                "function": incomeedit.__name__,
+                "user": current_user.uuid,
+                "error": errors,
+                "table": "Income",
+                "entryID": entry_id
+                }
+            )
         return redirect(redirect_url())
+    log_site_opened(incomeedit.__name__, current_user.uuid)
     return render_template("incomeedit.html", title="Income Edit", form=form)
+
 
 @app.route("/billsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
 @flask_login.login_required
@@ -616,6 +824,8 @@ def billsedit(table, entry_id):
         medium=entry.Medium
     )
     if request.method == "POST" and form.validate_on_submit():
+        result="Success"
+        errors=""
         entry.DateTime=date.fromisoformat(form.datetime.data)
         entry.Amount=form.amount.data.real
         entry.Medium=form.medium.data
@@ -623,11 +833,26 @@ def billsedit(table, entry_id):
         try:
             db.session.commit()
             flash("Data updated", "success")
+            result="Success"
         except Exception as error:
-            print(error)
             db.session.flush()
             flash("Data not updated", "danger")
+            result="Failure"
+            errors=error
+        logger.warn(
+            "Bills data edit",
+            extra={
+                "action": "Database update",
+                "result": result,
+                "function": billsedit.__name__,
+                "user": current_user.uuid,
+                "error": errors,
+                "table": "Bills",
+                "entryID": entry_id
+                }
+            )
         return redirect(redirect_url())
+    log_site_opened(billsedit.__name__, current_user.uuid)
     return render_template("billsedit.html", title="Bills Edit", form=form)
 
 @app.route("/expendituresedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -644,6 +869,8 @@ def expendituresedit(table, entry_id):
         isCash=entry.isCash
     )
     if request.method == "POST" and form.validate_on_submit():
+        result="Success"
+        errors=""
         entry.DateTime=date.fromisoformat(form.datetime.data)
         entry.Amount=form.amount.data.real
         entry.ProductID=form.productID.data
@@ -652,13 +879,27 @@ def expendituresedit(table, entry_id):
         try:
             db.session.commit()
             flash("Data updated", "success")
+            result="Success"
         except Exception as error:
-            print(error)
             db.session.flush()
             flash("Data not updated", "danger")
-            #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
-            #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
+            result="Failure"
+            errors=error
+        logger.warn(
+            "Expenditures data edit",
+            extra={
+                "action": "Database update",
+                "result": result,
+                "function": expendituresedit.__name__,
+                "user": current_user.uuid,
+                "error": errors,
+                "table": "Expenditures",
+                "entryID": entry_id
+                }
+            )
+            
         return redirect(redirect_url())
+    log_site_opened(expendituresedit.__name__, current_user.uuid)
     return render_template("expendituresedit.html", title="Expenditures Edit", form=form)
 
 @app.route("/producttypesedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -673,19 +914,34 @@ def producttypesedit(table, entry_id):
         comment=entry.Comment
     )
     if request.method == "POST" and form.validate_on_submit():
+        result="Success"
+        errors=""
         entry.Type=form.type.data
         entry.Priority=form.priority.data
         entry.Comment=form.comment.data
         try:
             db.session.commit()
             flash("Data updated", "success")
+            result="Success"
         except Exception as error:
-            print(error)
             db.session.flush()
             flash("Data not updated", "danger")
-            #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
-            #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
+            result="Failure"
+            errors=error
+        logger.warn(
+            "Product Types data edit",
+            extra={
+                "action": "Database update",
+                "result": result,
+                "function": producttypes.__name__,
+                "user": current_user.uuid,
+                "error": errors,
+                "table": "ProductTypes",
+                "entryID": entry_id
+                }
+            )
         return redirect(redirect_url())
+    log_site_opened(producttypesedit.__name__, current_user.uuid)
     return render_template("producttypesedit.html", title="Product Types edit", form=form)
 
 @app.route("/productsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -701,6 +957,8 @@ def productsedit(table, entry_id):
         comment=entry.Comment
     )
     if request.method == "POST" and form.validate_on_submit():
+        result="Success"
+        errors=""
         entry.Product=form.product.data
         entry.TypeID=form.typeID.data
         entry.Priority=form.priority.data
@@ -708,37 +966,56 @@ def productsedit(table, entry_id):
         try:
             db.session.commit()
             flash("Data updated", "success")
+            result="Success"
         except Exception as error:
-            print(error)
             db.session.flush()
             flash("Data not updated", "danger")
-            #https://stackoverflow.com/questions/7075200/converting-exception-to-a-string-in-python-3
-            #print("Error {0}".format(str(error.args[0])).encode("utf-8"))
+            result="Failure"
+            errors=error
+        logger.warn(
+            "Products data edit",
+            extra={
+                "action": "Database update",
+                "result": result,
+                "function": productsedit.__name__,
+                "user": current_user.uuid,
+                "error": errors,
+                "table": "Products",
+                "entryID": entry_id
+                }
+            )
         return redirect(redirect_url())
+    log_site_opened(productsedit.__name__, current_user.uuid)
     return render_template("productsedit.html", title="Products Edit", form=form)
 
 #Manual pages ------------------------------------------------------------------
 
 @app.route("/manbasic", methods=["GET"])
 def manbasic():
+    log_site_opened(manbasic.__name__, "none")
     return render_template("manbasic.html", title="Basics")
 
 @app.route("/mandata", methods=["GET"])
 def mandata():
+    log_site_opened(mandata.__name__, "none")
     return render_template("underconstruction.html", title="Basics")
 
 @app.route("/manvisual", methods=["GET"])
 def manvisual():
+    log_site_opened(manvisual.__name__, "none")
     return render_template("underconstruction.html", title="Basics")
 
 @app.route("/manaction", methods=["GET"])
 def manaction():
+    log_site_opened(manaction.__name__, "none")
     return render_template("underconstruction.html", title="Basics")
 
 @app.route("/manQnA", methods=["GET"])
 def manQnA():
+    log_site_opened(manQnA.__name__, "none")
     return render_template("underconstruction.html", title="Basics")
 
 @app.route("/contact", methods=["GET"])
 def contact():
+    log_site_opened(contact.__name__, "none")
     return render_template("underconstruction.html", title="Basics")
