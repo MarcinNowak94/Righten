@@ -9,25 +9,12 @@
         "detailed": {
             "format": "%(asctime)s, %(levelname)s, %(module)s, L%(lineno)d: %(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S%z"
-        },
-        "json": {
-            "()": "RightenJSONFormatter",
-            "fmt_keys": {
-                "level": "levelname",
-                "message": "message",
-                "timestamp": "timestamp",
-                "logger": "name",
-                "module": "module",
-                "function": "funcName",
-                "line": "lineno",
-                "thread_name": "threadName"
-            }
         }
     },
     "handlers": {
         "stdout": {
             "class": "logging.StreamHandler",
-            "formatter": "simple",
+            "formatter": "detailed",
             "stream": "ext://sys.stdout"
         },
         "stderr": {
@@ -39,7 +26,7 @@
         "file": {
             "class": "logging.handlers.FileHandler",
             "level": "Debug",
-            "formatter": "json",            
+            "formatter": "detailed",            
             "filename": "E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl",
             "mode": "a",
             "encoding": "utf_8"
