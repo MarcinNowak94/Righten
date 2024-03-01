@@ -1,18 +1,25 @@
+#TODO: check https://github.com/BombaMateusz/Remember-NoteAll/blob/main/RINA/__init__.py
+#https://www.youtube.com/watch?v=4uU_uhg-8gM&list=PLCC34OHNcOtolz2Vd9ZSeSXWc8Bq23yEz&index=27&t=1s
+
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_sqlalchemy import SQLAlchemy
+import os
+from dotenv import load_dotenv
+
 from Resources.logging_definition import logger, setup_logging
 from Resources.rightenlogger import RightenJSONFormatter
 #Secure config as per https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
 #https://www.youtube.com/watch?v=L1h5gRxh8w8
-import os
-from dotenv import load_dotenv
-setup_logging()
-logger.info("Logging started")
+
+
 basepath = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basepath, '.env'))
 
 app=Flask(__name__)
+setup_logging()
+logger.info("Righten Application started", extra={"action": "Application started"})
+
 app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
 version="debug_local"
 if version=="debug_local":
@@ -30,6 +37,5 @@ if (app.config['DEBUG']):
     for key, variable in app.config.items():
         value=str(variable)
         print("{:<35} {:<10}".format(key, value))
-
 
 from Resources import routes

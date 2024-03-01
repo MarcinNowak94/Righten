@@ -1,16 +1,17 @@
+from datetime import date
 import flask
 from flask import render_template, flash, redirect, url_for, request
 import flask_login
 from flask_login import current_user
-from sqlalchemy import delete, union_all, func
-from datetime import date
 import json
+from sqlalchemy import delete, union_all, func
 import uuid
+
 from Resources import db, app, version
 from Resources.models import *
 from Resources.forms import *
 from Resources.__init__ import bcrypt
-#NICE-TO-HAVE: Add event logging
+
 
 #https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
 #Dumping decimal data
