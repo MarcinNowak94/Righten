@@ -32,7 +32,7 @@ class DecimalEncoder(json.JSONEncoder):
       return str(obj)
     return json.JSONEncoder.default(self, obj)
 
-def addtodb(entry, table):
+def addtodb(entry):
     result=False
     errors=""
     try:
@@ -54,7 +54,7 @@ def addtodb(entry, table):
                 "function": addtodb.__name__,
                 "user": current_user.uuid,
                 "error": errors,
-                "table": table
+                "table": entry.__table__.description
                 }
             )
     return result
@@ -636,7 +636,7 @@ def income():
                 Source=form.source.data,
                 Comment=form.comment.data
         )
-        addtodb(entry, "Income")
+        addtodb(entry)
         return redirect(redirect_url(url_for("income", next="income")))
     log_site_opened(income.__name__, current_user.uuid)
     return render_template("incometable.html", title="Income", entries=entries, form=form)
@@ -655,7 +655,7 @@ def bills():
                 Medium=form.medium.data,
                 Comment=form.comment.data
         )
-        addtodb(entry, "Bills")
+        addtodb(entry)
         #TODO: Log data addition
         return redirect(redirect_url(url_for("bills", next="bills")))
     
@@ -678,7 +678,7 @@ def expenditures():
                 isCash=form.isCash.data,
                 Comment=form.comment.data
         )
-        addtodb(entry, "Expenditures")
+        addtodb(entry)
         return redirect(redirect_url())
     
     log_site_opened(expenditures.__name__, current_user.uuid)
@@ -696,7 +696,7 @@ def products():
                 Comment=form.comment.data,
                 Priority=form.priority.data
         )
-        addtodb(entry, "Products")
+        addtodb(entry)
         #TODO: Log data addition
         return redirect(redirect_url())
     
@@ -714,7 +714,7 @@ def producttypes():
                 Comment=form.comment.data,
                 Priority=form.priority.data
         )
-        addtodb(entry, "Producttypes")
+        addtodb(entry)
         #TODO: Log data addition
         return redirect(redirect_url())
     
@@ -748,7 +748,7 @@ def delete(table, entry_id):
             extra={
                 "action": "Database delete",
                 "result": "Success" if result else "Failure",
-                "function": addtodb.__name__,
+                "function": delete.__name__,
                 "user": current_user.uuid,
                 "error": errors,
                 "table": table,
