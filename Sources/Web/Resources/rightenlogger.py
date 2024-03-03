@@ -30,6 +30,12 @@ LOG_RECORD_BUILTIN_ATTRS = {
 }
 
 class RightenJSONFormatter(logging.Formatter):
+    """Righten log formatter, processess data into JSON.   
+
+    Arguments:
+        :logging.Formatter: -- base class
+    """
+
     def __init__(
             self,
             *,
@@ -38,13 +44,23 @@ class RightenJSONFormatter(logging.Formatter):
         super().__init__()
         self.fmt_keys = fmt_keys if fmt_keys is not None else {}
     
-    #Store log in json formatted string
     #@override
     def format(self, record: logging.LogRecord) -> str:
+        """Formats record into JSON formatted string"""
+
         message = self._prepare_log_dict(record)
         return json.dumps(message, default=str)
     
     def _prepare_log_dict(self, record: logging.LogRecord):
+        """Prepares log dictionary
+
+        Arguments:
+            :record: -- log record to process 
+
+        Returns:
+            Message formatted as JSON dictionary
+        """
+
         basic_fields={
             "timestamp": dt.datetime.fromtimestamp(
                 record.created, tz=dt.timezone.utc
@@ -73,9 +89,28 @@ class RightenJSONFormatter(logging.Formatter):
 
         return message
 
-#Extra stuff, unused but can be in future - can be used for sanitizing, censoring and altering data 
-#Custom filter, returns true if message should be processed
 class NonErrorFilter(logging.Filter):
-   #@override
+    """Custom filter, returns true if message should be processed
+    
+    Extra stuff, unused but can be in future - can be used for sanitizing, censoring and altering data 
+
+    Arguments:
+        :logging.Filter: -- base class
+
+    Returns:
+        :true: -- if log should be processed
+        :false: -- if record should be dropped
+    """
+    #@override
+    
     def filter(self, record: logging.LogRecord) -> bool | logging.LogRecord:
+        """Returns all log records except ERROR
+
+        Arguments:
+            :record: -- log record to process
+
+        Returns:
+            :true: -- if log should be processed
+            :false: -- if record should be dropped
+        """
         return record.levelno <=logging.INFO

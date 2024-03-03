@@ -14,16 +14,14 @@ from Resources.rightenlogger import RightenJSONFormatter
 
 
 basepath = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basepath, '.env'))
+load_dotenv(os.path.join(basepath, ".env"))
 
 app=Flask(__name__)
-setup_logging()
-logger.info("Righten Application started", extra={"action": "Application started"})
 
 app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
 version="debug_local"
 if version=="debug_local":
-    app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3' #Local SQLite3
+    app.config["SQLALCHEMY_DATABASE_URI"]='sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3' #Local SQLite3
 
 db=SQLAlchemy(app)
 bcrypt=Bcrypt(app)
@@ -32,7 +30,12 @@ if not app.config['SECRET_KEY']:
     logger.ERROR("No SECRET_KEY set for Flask application!", extra={"action": "Application configuration error", "config": app.config.items()})
     raise ValueError("No SECRET_KEY set for Flask application")
 
-#Print all variables if in debug mode
+#logfile="/logs/righten/rightenlog.jsonl"
+
+logfile_tmp="E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl"
+app.config["LOG_FILE"] = "E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl" if version=="debug_local" else "/logs/righten.jsonl"
+setup_logging(app.config["LOG_FILE"])
+# Print all variables if in debug mode
 logger.debug("Righten Application started", extra={"action": "Application started", "config": app.config.items()})
 
 from Resources import routes

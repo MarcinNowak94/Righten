@@ -14,6 +14,7 @@ from Resources.forms import *
 from Resources.__init__ import bcrypt
 
 def log_site_opened(sitename, userid) -> None:
+    """Logs that site was opened by provided user"""
     logger.info(
         "User visited site",
         extra={
@@ -27,12 +28,14 @@ def log_site_opened(sitename, userid) -> None:
 #https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
 #Dumping decimal data
 class DecimalEncoder(json.JSONEncoder):
+  """Dumps decimal data in JSON format"""
   def default(self, obj):
     if isinstance(obj, Decimal):
       return str(obj)
     return json.JSONEncoder.default(self, obj)
 
-def addtodb(entry):
+def addtodb(entry) -> bool:
+    """Commit entry to database and log changes"""
     result=False
     errors=""
     try:
@@ -59,7 +62,10 @@ def addtodb(entry):
             )
     return result
 
-def createchartdataset(dbdata, fill="false"):
+def createchartdataset(dbdata: list, fill="false") -> list:
+    """Formats provided sets od data into unified chart data set {date, value} 
+    with labels. To display data on the same graph dates in all sets are 
+    normalized meaning entrioes for missing dates are added with value 0."""
     months=[]
     sets={}
 
@@ -91,8 +97,14 @@ def createchartdataset(dbdata, fill="false"):
             )
     return dataset
 
-#As per https://stackoverflow.com/questions/14277067/redirect-back-in-flask
-def redirect_url(default='index'):
+def redirect_url(default='index') -> str:
+    """Returns redirect url either:
+    1. 'next' argument in request
+    2. referrer
+    3. provided site
+    4. default site - index    
+    As per https://stackoverflow.com/questions/14277067/redirect-back-in-flask
+    """
     return request.args.get('next') or \
            request.referrer or \
            url_for(default)
@@ -384,6 +396,7 @@ def passwordreset():
     log_site_opened(spending.__name__, "none") #TODO: log username once provided
     return render_template('underconstruction.html')
 
+#NICE-TO-HAVE: add email password change confirmation
 @app.route('/passwordchange', methods=['GET', 'POST'])
 @flask_login.login_required
 def passwordchange():
