@@ -1,5 +1,4 @@
 #TODO: check https://github.com/BombaMateusz/Remember-NoteAll/blob/main/RINA/__init__.py
-#https://www.youtube.com/watch?v=4uU_uhg-8gM&list=PLCC34OHNcOtolz2Vd9ZSeSXWc8Bq23yEz&index=27&t=1s
 
 from flask import Flask
 from flask_bcrypt import Bcrypt
@@ -10,13 +9,12 @@ from dotenv import load_dotenv
 from Resources.logging_definition import logger, setup_logging
 from Resources.rightenlogger import RightenJSONFormatter
 #Secure config as per https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
-#https://www.youtube.com/watch?v=L1h5gRxh8w8
-
-
-basepath = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basepath, ".env"))
 
 app=Flask(__name__)
+
+# As per https://www.youtube.com/watch?v=L1h5gRxh8w8
+basepath = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basepath, ".env"))
 
 app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
 version="debug_local"
@@ -33,7 +31,7 @@ if not app.config['SECRET_KEY']:
 #logfile="/logs/righten/rightenlog.jsonl"
 
 logfile_tmp="E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl"
-app.config["LOG_FILE"] = "E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl" if version=="debug_local" else "/logs/righten.jsonl"
+app.config["LOG_FILE"] = "E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl" if version=="debug_local" else "/logs/rightenlog.jsonl"
 setup_logging(app.config["LOG_FILE"])
 # Print all variables if in debug mode
 logger.debug("Righten Application started", extra={"action": "Application started", "config": app.config.items()})

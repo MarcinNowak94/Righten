@@ -19,4 +19,3 @@ Sources/Database/RightenDB/*
 Sources/.env
 *__pycache__*
 Sources/Logs/rightenlog.jsonl
-Sources/Logs/rightenlog.jsonl

@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS "ExpendituresTransitory" (
 	"isCash"	BOOLEAN DEFAULT FALSE
 );
 CREATE TABLE IF NOT EXISTS "UserSettings" (
-	"Setting"	TEXT NOT NULL UNIQUE,
+	"Setting"	TEXT PRIMARY KEY,
 	"Value"	TEXT
 );
 CREATE TABLE IF NOT EXISTS "AccountDataImport" (
@@ -13823,6 +13823,7 @@ SELECT
 	,"Summary"."Minimum"					AS "Minimum"
 	,"Summary"."Average"					AS "Average"
 	,"Summary"."Maximum"					AS "Maximum"
+	,ROUND("Summary"."Stddev"/"Summary"."Average", 2)	AS "Variability"
 	,"Products"."Priority"					AS "ProductPriority"
 	,"ProductTypes"."Priority"				AS "TypePriority"
 	,COALESCE("Summary"."Common", 'Absent')	AS "Common"
@@ -13851,6 +13852,7 @@ FROM (	SELECT
 		   ,ROUND(AVG("Amount"),2)	AS "Average"
 		   ,MIN("Amount")			AS "Minimum"
 		   ,MAX("Amount")			AS "Maximum"
+		   ,Round(STDDEV("Amount"), 2)	AS "Stddev"
 		FROM "ExpendituresEnriched"
 		GROUP BY "Product"
 		ORDER BY "BoughtTimes" DESC))
@@ -13868,6 +13870,7 @@ SELECT
     ,"Summary"."Minimum"					AS "Minimum"
     ,"Summary"."Average"					AS "Average"
     ,"Summary"."Maximum"					AS "Maximum"
+	,ROUND("Summary"."Stddev"/"Summary"."Average", 2)	AS "Variability"
 	,"ProductTypes"."Priority"				AS "Priority"
 	,COALESCE("Summary"."Common", 'Absent')	AS "Common"
 	,"ProductTypes"."Comment"				AS "Comment"
@@ -13896,6 +13899,7 @@ FROM (	SELECT
 		   ,MIN("Amount")			AS "Minimum"
 		   ,ROUND(AVG("Amount"),2)	AS "Average"
 		   ,MAX("Amount")			AS "Maximum"
+		   ,Round(STDDEV("Amount"), 2)	AS "Stddev"
 		FROM "ExpendituresEnriched"
 		GROUP BY "Type"
 		ORDER BY "Times" DESC))

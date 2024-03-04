@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.10-buster
+FROM python:3.12-bullseye
 WORKDIR /righten
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt

@@ -92,7 +92,7 @@ def setup_logging_JSON_config(config_file_path: str):
     Arguments:
         :logfile: -- logfile destination
     # FIXME: loading config from file produces error - RightenJSONFormatter is not recognized
-    #current file: "E:\Projects\Git\Righten\Sources\Web\Resources\logging_config.json"
+    #current file: E:\Projects\Git\Righten\Sources\Web\Resources\logging_config.json
     """
     
     config_file = pathlib.Path(config_file_path)
