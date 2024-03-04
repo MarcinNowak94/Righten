@@ -362,7 +362,7 @@ def register():
                 isActive=True
         )
         useradded=addtodb(user)
-        if useradded and version!="debug_local":
+        if useradded and app.config["ENV"] != "development":
             #TODO: create schema in postgreSQL
             print("TODO: create schema in postgreSQL")
         logger.info(

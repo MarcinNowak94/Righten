@@ -17,23 +17,48 @@ basepath = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basepath, ".env"))
 
 app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
-version="debug_local"
-if version=="debug_local":
-    app.config["SQLALCHEMY_DATABASE_URI"]='sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3' #Local SQLite3
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    "sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3"
+    if app.config["ENV"] == "development"
+    else "postgresql+psycopg2://postgres:postgres@rightendb:5432/RightenDB"
+    )
 
 db=SQLAlchemy(app)
 bcrypt=Bcrypt(app)
 
-if not app.config['SECRET_KEY']:
-    logger.ERROR("No SECRET_KEY set for Flask application!", extra={"action": "Application configuration error", "config": app.config.items()})
+if not app.config["SECRET_KEY"]:
+    logger.ERROR(
+        "No SECRET_KEY set for Flask application!",
+        extra={
+            "action": "Application configuration error",
+            "config": app.config.items()
+            }
+        )
     raise ValueError("No SECRET_KEY set for Flask application")
 
-#logfile="/logs/righten/rightenlog.jsonl"
+app.config["CERT_FILE"] = (
+    "E:\\Projects\\Git\\Righten\\Sources\\Web\\cert.pem"
+    if app.config["ENV"] == "development"
+    else "/righten/cert.pem")
+app.config["KEY_FILE"] = (
+    "E:\\Projects\\Git\\Righten\\Sources\\Web\\key.pem"
+    if app.config["ENV"] == "development"
+    else "/righten/key.pem")
 
-logfile_tmp="E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl"
-app.config["LOG_FILE"] = "E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl" if version=="debug_local" else "/logs/rightenlog.jsonl"
+app.config["LOG_FILE"] = (
+    "E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl"
+    if app.config["ENV"] == "development"
+    else "/logs/rightenlog.jsonl"
+    )
+
 setup_logging(app.config["LOG_FILE"])
 # Print all variables if in debug mode
-logger.debug("Righten Application started", extra={"action": "Application started", "config": app.config.items()})
+logger.debug(
+    "Righten Application started",
+    extra={
+        "action": "Application started",
+        "config": app.config.items()
+        }
+    )
 
 from Resources import routes
