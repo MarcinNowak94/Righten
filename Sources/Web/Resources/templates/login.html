@@ -21,6 +21,10 @@
             <div class="col">
                 {{ form.submit(class="btn btn-success", value="Login")}}
             </div>
+
+            <div class="col">
+                <a href="{{ url_for('passwordreset_generatetoken') }}" class="btn btn-warning btn-sm" id="ForgotPassword">Forgot password?</a>
+            </div>
         </div>
         </fieldset>
     </form>

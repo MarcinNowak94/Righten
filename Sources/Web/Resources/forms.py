@@ -5,9 +5,19 @@ from datetime import date
 from Resources.models import *
 from Resources.logging_definition import logger
 
+def user_valid(form, field):
+    """User validator, client-side"""
+
+    with app.app_context():
+        usr=db.session.query(Users).filter_by(Username=field.data).first()
+    if usr is None:
+        raise ValidationError("User %s is not valid!"%(field.data))
+
 def get_PasswordField_protytpe(
+        label: str, 
         placeholder: str,
-        extravalidators=None) -> PasswordField:
+        extravalidators=None
+    ) -> PasswordField:
     """Single place for password field application requirements
 
     Arguments:
@@ -25,7 +35,7 @@ def get_PasswordField_protytpe(
     if not extravalidators is None:
         validators+=extravalidators
     
-    return PasswordField(validators=validators, render_kw={"placeholder": placeholder})
+    return PasswordField(label=label, validators=validators, render_kw={"placeholder": placeholder})
 
 class CommonForm(FlaskForm):
     """Base class with elements common to most Input forms
@@ -55,7 +65,7 @@ class UserForm(FlaskForm):
     """
     
     username=StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-    password=get_PasswordField_protytpe("Password")
+    password=get_PasswordField_protytpe("Password", "Password")
     submit=SubmitField("Submit")
 
 #Keyword: autocomplete
@@ -153,8 +163,8 @@ class ProductTypeInputForm(FlaskForm):
     FIXME: check for duplicates  - idea, build blacklist regex from existing data or create own validator
     """
     
-    type= StringField("Type", validators=[DataRequired()])
-    priority=IntegerField("Priority (%)", validators=[DataRequired(), NumberRange(min=1,max=100)], default=50)
+    type = StringField("Type", validators=[DataRequired()])
+    priority = IntegerField("Priority (%)", validators=[DataRequired(), NumberRange(min=1,max=100)], default=50)
     comment = StringField("Comment", validators=[])
     submit = SubmitField("SubmitField")
 
@@ -194,7 +204,7 @@ class RegisterForm(UserForm):
         :passwordrepeated: -- password validity check
     """
 
-    passwordrepeated=get_PasswordField_protytpe("Repeat password")
+    passwordrepeated=get_PasswordField_protytpe("Password repeated", "Repeat password")
 
 class LoginForm(UserForm):
     """User login form, has all UserForm fields
@@ -218,25 +228,62 @@ class SettingsForm(FlaskForm):
     accountactive=BooleanField(default=False)
     submit=SubmitField("Submit")
 
-class PasswordChangeForm(FlaskForm):
-    """Password change form, consists of three password fields
+class PasswordConfirmationForm(FlaskForm):
+    """Base form for password changes operations, consists of two password fields
 
     Arguments:
         :FlaskForm: -- base class
     
     Fields:
-        :password: -- current user passowrd
         :newpassword: -- new user provided password
         :passwordrepeated: -- new user password repeated for validation
     """
 
-    password=get_PasswordField_protytpe("Current password")
-    newpassword=get_PasswordField_protytpe("New password")
-    
+    newpassword=get_PasswordField_protytpe("New password", "New password")
     passwordrepeated=get_PasswordField_protytpe(
+        "Password repated",
         "Repeat password", 
         [EqualTo(
             fieldname='newpassword', 
             message="New password and repeated new password do not match!")]
         )
+    submit=SubmitField("Submit")
+
+class PasswordChangeForm(PasswordConfirmationForm):
+    """Password change form, consists of three password fields
+
+    Arguments:
+        :PasswordConfirmationForm: -- base class
+    
+    Fields:
+        :password: -- current user passowrd
+    """
+
+    password=get_PasswordField_protytpe("Current password", "Current password")
+
+class PasswordResetForm(PasswordConfirmationForm):
+    """Password reset form, consists of two password fields
+
+    Arguments:
+        :PasswordConfirmationForm: -- base class
+    
+    Fields:
+        :password: -- current user passowrd
+    """
+
+    resettoken=StringField("ResetToken", 
+                           validators=[DataRequired()],
+                           default="Reset token")
+
+class PasswordResetGenerateTokenForm(FlaskForm):
+    """Password reset form for first stage -token generation
+
+    Arguments:
+        :FlaskForm: -- base class
+    
+    TODO: Add captcha
+    TODO: Send token via email as per https://pythonbasics.org/flask-mail/
+    """
+
+    username=StringField(validators=[InputRequired(), Length(min=4, max=20), user_valid], render_kw={"placeholder": "Username"})
     submit=SubmitField("Submit")

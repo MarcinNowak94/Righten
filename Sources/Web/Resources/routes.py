@@ -5,6 +5,7 @@ from flask import render_template, flash, redirect, url_for, request
 import flask_login
 from flask_login import current_user
 import json
+from secrets import token_urlsafe
 from sqlalchemy import delete, union_all, func
 import uuid
 
@@ -14,6 +15,8 @@ from Resources.forms import *
 from Resources.__init__ import bcrypt
 
 def get_request_data() -> json:
+    """Returns request data formated as json"""
+
     return {
         "session": request.cookies["session"],
         "useragent": request.user_agent.string,
@@ -25,28 +28,33 @@ def get_request_data() -> json:
         "ful_path": request.full_path                    
     }
 
-def log_site_opened() -> None:
-    """Logs that site was opened by user"""
+def get_current_user_ID() -> str:
+    """Get current user id or None"""
     
-    # For site 
     try:
         userid=current_user.uuid
     except AttributeError:
         userid=None
+    return userid
+
+def log_site_opened() -> None:
+    """Logs that site was opened by user"""
+    
     logger.info(
         "User visited site",
         extra={
             "action": "Site visited",
             "result": "Success",
-            "user": userid,
+            "user": get_current_user_ID(),
             "request": get_request_data()
             }
         )
 
-#https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
-#Dumping decimal data
+
 class DecimalEncoder(json.JSONEncoder):
   """Dumps decimal data in JSON format"""
+  # As per: https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
+  
   def default(self, obj):
     if isinstance(obj, Decimal):
       return str(obj)
@@ -73,7 +81,7 @@ def addtodb(entry) -> bool:
                 "action": "Database insert",
                 "result": "Success" if result else "Failure",
                 "function": addtodb.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "error": errors,
                 "table": entry.__table__.description,
                 "request": get_request_data()
@@ -111,7 +119,7 @@ def createchartdataset(dbdata: list, fill="false") -> list:
                 "action": "Chart dataset creation", 
                 "result": "Success",
                 "function": createchartdataset.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "request": get_request_data()
                 }
             )
@@ -176,7 +184,6 @@ def request_loader(request):
     currentuser.id = user
     return currentuser
 
-#TODO: add 'Forgot password?' and coresponding panel
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form=LoginForm()
@@ -208,7 +215,7 @@ def login():
                 extra={
                     "action": "Login",
                     "result": "Failure",
-                    "user": None,
+                    "user": get_current_user_ID(),
                     "params": {
                         "givenusername": username
                         },
@@ -229,7 +236,7 @@ def logout():
             "action": "Logout", 
             "result": "Success",
             "function": logout.__name__,
-            "user": current_user.uuid,
+            "user": get_current_user_ID(),
             "request": get_request_data()
             }
         )
@@ -251,7 +258,6 @@ def unauthorized_handler():
         )
     return redirect(url_for('index'))
 
-#TODO: Move Change Password to separate site
 @app.route('/settings', methods=['GET', 'POST'])
 @flask_login.login_required
 def settings():
@@ -367,7 +373,7 @@ def settings():
             extra={
                 "action": "User settings change",
                 "function": settings.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "changes": settingschanged,
                 "request": get_request_data()
                 }
@@ -405,24 +411,51 @@ def register():
     log_site_opened()
     return render_template('register.html', title="Register", form=form)
 
-#TODO
-@app.route('/paswordreset', methods=['GET', 'POST'])
-@flask_login.login_required
-def passwordreset():
-    #form=PasswordResetForm()
-    #return render_template('passwordreset.html', title="Password reset", form=form)
-    logger.info(
-        "Password reset",
-        extra={
-            "action": "User password change",
-            "result": "Success",
-            "function": passwordreset.__name__,
-            "user": current_user.uuid,
-            "request": get_request_data()
-            }
-        )
+@app.route('/passwordreset_generatetoken', methods=['GET', 'POST'])
+def passwordreset_generatetoken():
+    form=PasswordResetGenerateTokenForm()
+
+    if request.method == "POST" and form.validate_on_submit():
+        token=token_urlsafe()   #FIXME: Solely for proof of concrpt
+        logger.info(
+            "Password reset token generation",
+            extra={
+                "action": "User password change",
+                "result": "Success",
+                "token": token,
+                "provideduser": form.username,
+                "function": passwordreset.__name__,
+                "user": get_current_user_ID(),
+                "request": get_request_data()
+                }
+            )
+        return redirect(url_for('passwordreset', token=token))
+    
     log_site_opened()
-    return render_template('underconstruction.html')
+    return render_template('passwordreset_generatetoken.html', title="Generate token", form=form)
+
+#FIXME: Solely for proving concept
+@app.route('/paswordreset/<string:token>', methods=['GET', 'POST'])
+def passwordreset(token): 
+    form=PasswordResetForm()
+    form.resettoken.data=token
+    
+    if request.method == "POST" and form.validate_on_submit():
+        #TODO: reset password in DB
+        flash("Password updated successfully")
+        logger.info(
+            "Password reset",
+            extra={
+                "action": "User password change",
+                "result": "Success",
+                "function": passwordreset.__name__,
+                "user": get_current_user_ID(),
+                "request": get_request_data()
+                }
+            )
+    
+    log_site_opened()
+    return render_template('passwordreset.html', title="Password reset", form=form)
 
 #NICE-TO-HAVE: add email password change confirmation
 @app.route('/passwordchange', methods=['GET', 'POST'])
@@ -454,7 +487,7 @@ def passwordchange():
                 "action": "User password change",
                 "result": result,
                 "function": passwordchange.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "error": encounterederrors,
                 "request": get_request_data()
                 }
@@ -791,7 +824,7 @@ def delete(table, entry_id):
                 "action": "Database delete",
                 "result": "Success" if result else "Failure",
                 "function": delete.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "error": errors,
                 "table": table,
                 "entryID": entry_id,
@@ -843,7 +876,7 @@ def incomeedit(table, entry_id):
                 "action": "Database update",
                 "result": result,
                 "function": incomeedit.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "error": errors,
                 "table": "Income",
                 "entryID": entry_id,
@@ -889,7 +922,7 @@ def billsedit(table, entry_id):
                 "action": "Database update",
                 "result": result,
                 "function": billsedit.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "error": errors,
                 "table": "Bills",
                 "entryID": entry_id,
@@ -936,7 +969,7 @@ def expendituresedit(table, entry_id):
                 "action": "Database update",
                 "result": result,
                 "function": expendituresedit.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "error": errors,
                 "table": "Expenditures",
                 "entryID": entry_id,
@@ -980,7 +1013,7 @@ def producttypesedit(table, entry_id):
                 "action": "Database update",
                 "result": result,
                 "function": producttypes.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "error": errors,
                 "table": "ProductTypes",
                 "entryID": entry_id,
@@ -1025,7 +1058,7 @@ def productsedit(table, entry_id):
                 "action": "Database update",
                 "result": result,
                 "function": productsedit.__name__,
-                "user": current_user.uuid,
+                "user": get_current_user_ID(),
                 "error": errors,
                 "table": "Products",
                 "entryID": entry_id,
