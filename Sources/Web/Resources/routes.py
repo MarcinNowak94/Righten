@@ -8,20 +8,38 @@ import json
 from sqlalchemy import delete, union_all, func
 import uuid
 
-from Resources import db, app, version
+from Resources import db, app
 from Resources.models import *
 from Resources.forms import *
 from Resources.__init__ import bcrypt
 
-def log_site_opened(sitename, userid) -> None:
-    """Logs that site was opened by provided user"""
+def get_request_data() -> json:
+    return {
+        "session": request.cookies["session"],
+        "useragent": request.user_agent.string,
+        "accessroute": request.access_route,
+        "sourceip": request.remote_addr,
+        "sourceport": request.environ["REMOTE_PORT"],
+        "method": request.method,
+        "server": request.server,
+        "ful_path": request.full_path                    
+    }
+
+def log_site_opened() -> None:
+    """Logs that site was opened by user"""
+    
+    # For site 
+    try:
+        userid=current_user.uuid
+    except AttributeError:
+        userid=None
     logger.info(
         "User visited site",
         extra={
             "action": "Site visited",
             "result": "Success",
-            "function": sitename,
-            "user": userid
+            "user": userid,
+            "request": get_request_data()
             }
         )
 
@@ -57,7 +75,8 @@ def addtodb(entry) -> bool:
                 "function": addtodb.__name__,
                 "user": current_user.uuid,
                 "error": errors,
-                "table": entry.__table__.description
+                "table": entry.__table__.description,
+                "request": get_request_data()
                 }
             )
     return result
@@ -92,7 +111,8 @@ def createchartdataset(dbdata: list, fill="false") -> list:
                 "action": "Chart dataset creation", 
                 "result": "Success",
                 "function": createchartdataset.__name__,
-                "user": current_user.uuid
+                "user": current_user.uuid,
+                "request": get_request_data()
                 }
             )
     return dataset
@@ -111,12 +131,12 @@ def redirect_url(default='index') -> str:
 
 @app.route("/")
 def index():
-    log_site_opened(index.__name__, "none")
+    log_site_opened()
     return render_template('index.html', title="Main apage");
 
 @app.route("/layout")
 def layout():
-    log_site_opened(layout.__name__, "none")
+    log_site_opened()
     return render_template("layout.html")
 
 #User authentication -----------------------------------------------------------
@@ -176,7 +196,8 @@ def login():
                 extra={
                     "action": "Login",
                     "result": "Success",
-                    "user": usr.ID
+                    "user": usr.ID,
+                    "request": get_request_data()
                     }
                 )
             return redirect(redirect_url(url_for("index", next="index")))
@@ -187,10 +208,11 @@ def login():
                 extra={
                     "action": "Login",
                     "result": "Failure",
-                    "user": "none",
+                    "user": None,
                     "params": {
                         "givenusername": username
-                        }
+                        },
+                    "request": get_request_data()
                     }
                 )
         return redirect(redirect_url(url_for("login", next="index")))
@@ -207,7 +229,8 @@ def logout():
             "action": "Logout", 
             "result": "Success",
             "function": logout.__name__,
-            "user": current_user.uuid
+            "user": current_user.uuid,
+            "request": get_request_data()
             }
         )
     flask_login.logout_user()
@@ -222,7 +245,8 @@ def unauthorized_handler():
             "action": "Access attempt",
             "result": "Failure",
             "function": unauthorized_handler.__name__,
-            "reason": "Login required"
+            "reason": "Login required",
+            "request": get_request_data()
             }
         )
     return redirect(url_for('index'))
@@ -232,7 +256,7 @@ def unauthorized_handler():
 @flask_login.login_required
 def settings():
     result="Success"
-    changeerror="none"
+    changeerror=None
     settingschanged=[]
 
     userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
@@ -344,14 +368,16 @@ def settings():
                 "action": "User settings change",
                 "function": settings.__name__,
                 "user": current_user.uuid,
-                "changes": settingschanged
+                "changes": settingschanged,
+                "request": get_request_data()
                 }
             )
         return redirect(redirect_url())
-    log_site_opened(register.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("settings.html", form=form)
 
 #User registration https://www.youtube.com/watch?v=71EU8gnZqZQ&t=45s
+# NICE-TO-HAVE: Add account activation
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form=RegisterForm()
@@ -364,18 +390,19 @@ def register():
         useradded=addtodb(user)
         if useradded and app.config["ENV"] != "development":
             #TODO: create schema in postgreSQL
-            print("TODO: create schema in postgreSQL")
+            pass
         logger.info(
             "New user registered",
             extra={
                 "action": "User add",
                 "result": "Success",
                 "function": register.__name__,
-                "user": user.ID
+                "user": user.ID,
+                "request": get_request_data()
                 }
             )
         return redirect(redirect_url(url_for("login", next="login")))
-    log_site_opened(register.__name__, "none")
+    log_site_opened()
     return render_template('register.html', title="Register", form=form)
 
 #TODO
@@ -390,10 +417,11 @@ def passwordreset():
             "action": "User password change",
             "result": "Success",
             "function": passwordreset.__name__,
-            "user": current_user.uuid
+            "user": current_user.uuid,
+            "request": get_request_data()
             }
         )
-    log_site_opened(spending.__name__, "none") #TODO: log username once provided
+    log_site_opened()
     return render_template('underconstruction.html')
 
 #NICE-TO-HAVE: add email password change confirmation
@@ -427,11 +455,12 @@ def passwordchange():
                 "result": result,
                 "function": passwordchange.__name__,
                 "user": current_user.uuid,
-                "error": encounterederrors
+                "error": encounterederrors,
+                "request": get_request_data()
                 }
             )
         return redirect(redirect_url())
-    log_site_opened(passwordchange.__name__, current_user.uuid)
+    log_site_opened()
     return render_template('passwordchange.html', title="Password reset", form=form)
 
 #Summaries and visualizations --------------------------------------------------
@@ -456,7 +485,7 @@ def incomesummary():
     IncomeTypesByTime=db.session.query(MonthlyIncomeByType).all()
     IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
 
-    log_site_opened(incomesummary.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("incomesummary.html",
                            title="Income",
                            IncomeSummarydata=json.dumps(incometypesummary, cls=DecimalEncoder),
@@ -487,7 +516,7 @@ def billssummary():
     BillsTypespermonth=db.session.query(MonthlyBillsByMedium).all();
     BillsTypesData=createchartdataset(BillsTypespermonth)
 
-    log_site_opened(billssummary.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("billssummary.html",
                            title="Bills",
                            BillsTypeAmounts=json.dumps(BillsTypeAmounts, cls=DecimalEncoder),
@@ -521,7 +550,7 @@ def expendituressummary():
     TopProductsChartData=db.session.query(Top10ProductsMonthly).all();
     TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
 
-    log_site_opened(expendituressummary.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("expendituressummary.html",
                            title="Expenditures",
                            ExpendituresSummaryData=json.dumps(ExpendituresSummaryData, cls=DecimalEncoder),
@@ -552,7 +581,7 @@ def spending():
         #Priority data is average of month priorities, thus target priority is 100-target  
         PriorityTargetData.append({"x":Month,"y":100-int(PriorityTarget.Value)})
     
-    log_site_opened(spending.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("spendingsummary.html",
                            title="Spending",
                            MonthlySpendingData=json.dumps(MonthlySpendingData, cls=DecimalEncoder),
@@ -598,7 +627,7 @@ def finances():
         BilanceTotalLabels.append(Source+' '+str(round((abs(Amount)/Total)*100,2))+'%')
         BilanceTotalValues.append(Amount)
 
-    log_site_opened(finances.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("financialposture.html",
                            title="Finances",
                            BilanceTotalLabels=json.dumps(BilanceTotalLabels, cls=DecimalEncoder),
@@ -616,7 +645,7 @@ def finances():
 @app.route("/productssummary")
 @flask_login.login_required
 def productssummary():
-    log_site_opened(productssummary.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("underconstruction.html",
                         title="Products"
                         )
@@ -626,7 +655,7 @@ def productssummary():
 @app.route("/producttypessummary")
 @flask_login.login_required
 def producttypessummary():
-    log_site_opened(producttypessummary.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("underconstruction.html",
                         title="Product types"
                         )
@@ -651,7 +680,7 @@ def income():
         )
         addtodb(entry)
         return redirect(redirect_url(url_for("income", next="income")))
-    log_site_opened(income.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("incometable.html", title="Income", entries=entries, form=form)
 
 #TODO: add average bills year to date
@@ -672,7 +701,7 @@ def bills():
         #TODO: Log data addition
         return redirect(redirect_url(url_for("bills", next="bills")))
     
-    log_site_opened(bills.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("billstable.html", title="Bills", entries=entries, form=form)
 
 #TODO: add average expenditures year to date
@@ -694,7 +723,7 @@ def expenditures():
         addtodb(entry)
         return redirect(redirect_url())
     
-    log_site_opened(expenditures.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("expenditurestable.html", title="Expenditures", entries=entries, form=form)
 
 @app.route("/products", methods=["GET", "POST"])
@@ -713,7 +742,7 @@ def products():
         #TODO: Log data addition
         return redirect(redirect_url())
     
-    log_site_opened(products.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("productstable.html", title="Products", entries=entries, form=form)
 
 @app.route("/producttypes", methods=["GET", "POST"])
@@ -731,7 +760,7 @@ def producttypes():
         #TODO: Log data addition
         return redirect(redirect_url())
     
-    log_site_opened(producttypes.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("producttypestable.html", title="Product Types", entries=entries, form=form)
 
 
@@ -765,7 +794,8 @@ def delete(table, entry_id):
                 "user": current_user.uuid,
                 "error": errors,
                 "table": table,
-                "entryID": entry_id
+                "entryID": entry_id,
+                "request": get_request_data()
                 }
             )
     return redirect(redirect_url())
@@ -816,11 +846,12 @@ def incomeedit(table, entry_id):
                 "user": current_user.uuid,
                 "error": errors,
                 "table": "Income",
-                "entryID": entry_id
+                "entryID": entry_id,
+                "request": get_request_data()
                 }
             )
         return redirect(redirect_url())
-    log_site_opened(incomeedit.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("incomeedit.html", title="Income Edit", form=form)
 
 
@@ -861,11 +892,12 @@ def billsedit(table, entry_id):
                 "user": current_user.uuid,
                 "error": errors,
                 "table": "Bills",
-                "entryID": entry_id
+                "entryID": entry_id,
+                "request": get_request_data()
                 }
             )
         return redirect(redirect_url())
-    log_site_opened(billsedit.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("billsedit.html", title="Bills Edit", form=form)
 
 @app.route("/expendituresedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -907,12 +939,13 @@ def expendituresedit(table, entry_id):
                 "user": current_user.uuid,
                 "error": errors,
                 "table": "Expenditures",
-                "entryID": entry_id
+                "entryID": entry_id,
+                "request": get_request_data()
                 }
             )
             
         return redirect(redirect_url())
-    log_site_opened(expendituresedit.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("expendituresedit.html", title="Expenditures Edit", form=form)
 
 @app.route("/producttypesedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -950,11 +983,12 @@ def producttypesedit(table, entry_id):
                 "user": current_user.uuid,
                 "error": errors,
                 "table": "ProductTypes",
-                "entryID": entry_id
+                "entryID": entry_id,
+                "request": get_request_data()
                 }
             )
         return redirect(redirect_url())
-    log_site_opened(producttypesedit.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("producttypesedit.html", title="Product Types edit", form=form)
 
 @app.route("/productsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
@@ -994,41 +1028,42 @@ def productsedit(table, entry_id):
                 "user": current_user.uuid,
                 "error": errors,
                 "table": "Products",
-                "entryID": entry_id
+                "entryID": entry_id,
+                "request": get_request_data()
                 }
             )
         return redirect(redirect_url())
-    log_site_opened(productsedit.__name__, current_user.uuid)
+    log_site_opened()
     return render_template("productsedit.html", title="Products Edit", form=form)
 
 #Manual pages ------------------------------------------------------------------
 
 @app.route("/manbasic", methods=["GET"])
 def manbasic():
-    log_site_opened(manbasic.__name__, "none")
+    log_site_opened()
     return render_template("manbasic.html", title="Basics")
 
 @app.route("/mandata", methods=["GET"])
 def mandata():
-    log_site_opened(mandata.__name__, "none")
+    log_site_opened()
     return render_template("underconstruction.html", title="Basics")
 
 @app.route("/manvisual", methods=["GET"])
 def manvisual():
-    log_site_opened(manvisual.__name__, "none")
+    log_site_opened()
     return render_template("underconstruction.html", title="Basics")
 
 @app.route("/manaction", methods=["GET"])
 def manaction():
-    log_site_opened(manaction.__name__, "none")
+    log_site_opened()
     return render_template("underconstruction.html", title="Basics")
 
 @app.route("/manQnA", methods=["GET"])
 def manQnA():
-    log_site_opened(manQnA.__name__, "none")
+    log_site_opened()
     return render_template("underconstruction.html", title="Basics")
 
 @app.route("/contact", methods=["GET"])
 def contact():
-    log_site_opened(contact.__name__, "none")
+    log_site_opened()
     return render_template("underconstruction.html", title="Basics")

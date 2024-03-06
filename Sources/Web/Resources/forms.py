@@ -52,8 +52,6 @@ class UserForm(FlaskForm):
 
     Arguments:
         :FlaskForm: -- base class
-
-    #NICE-TO-HAVE: enforce better passowrd policy
     """
     
     username=StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
@@ -103,22 +101,28 @@ class IncomeInputForm(CommonForm):
                 render_kw={"placeholder": "Income source"}
                 )
 
-# Keyword: autocomplete
-# TODO: Allow new input as per https://stackoverflow.com/questions/58354678/wtforms-textfield-searchfield-with-autocompletion-for-flask-app-similar-to-a-go
 class BillsInputForm(CommonForm):
     """Bills input form, has all common fields and Bill table specific fields
 
     Arguments:
         :CommonForm: -- Base class with elements common to most Input forms
+
+    TODO: Allow new input as per https://stackoverflow.com/questions/58354678/wtforms-textfield-searchfield-with-autocompletion-for-flask-app-similar-to-a-go
+    solution Keyword: Autocomplete
     """
 
     with app.app_context():
       medias=[]
       for medium in db.session.query(Bills.Medium).distinct():
           medias.append(medium[0])
-    medium=SelectField("Medium", validators=[DataRequired()],
-                          choices=medias
-                        )
+    medium=StringField(
+                "Medium", 
+                validators=[DataRequired()],
+                render_kw={"placeholder": "Medium"}
+                )
+    #medium=SelectField("Medium", validators=[DataRequired()],
+    #                      choices=medias
+    #                    )
 
 class ExpenditureInputForm(CommonForm):
     """Expenditures input form, has all common fields and Expenditures table specific fields
@@ -146,7 +150,7 @@ class ProductTypeInputForm(FlaskForm):
     Arguments:
         :FlaskForm: -- Base class
     
-    #FIXME: check for duplicates  - idea, build blacklist regex from existing data
+    FIXME: check for duplicates  - idea, build blacklist regex from existing data or create own validator
     """
     
     type= StringField("Type", validators=[DataRequired()])
@@ -160,7 +164,7 @@ class ProductInputForm(FlaskForm):
     Arguments:
         :FlaskForm: -- Base class
     
-    #FIXME: check for duplicates  - idea, build blacklist regex from existing data
+    FIXME: check for duplicates  - idea, build blacklist regex from existing data or create own validator
     """
     
     with app.app_context():

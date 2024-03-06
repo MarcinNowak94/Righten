@@ -6,7 +6,6 @@ from sqlalchemy.ext.automap import automap_base
 #NICE-TO-HAVE: create factory function to recreate full schema as classes
 #Currently 'public' schema, need to figure out how to make and access separate schemas for each user
 #https://stackoverflow.com/questions/2342999/postgres-is-there-a-way-to-tie-a-user-to-a-schema
-
 with app.app_context():
     Base = automap_base()
     Base.prepare(autoload_with=db.engine, reflect=True)
