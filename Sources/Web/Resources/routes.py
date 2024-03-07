@@ -14,11 +14,21 @@ from Resources.models import *
 from Resources.forms import *
 from Resources.__init__ import bcrypt
 
+class DecimalEncoder(json.JSONEncoder):
+  """Dumps decimal data in JSON format"""
+  # As per: https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
+  
+  def default(self, obj):
+    if isinstance(obj, Decimal):
+      return str(obj)
+    return json.JSONEncoder.default(self, obj)
+
 def get_request_data() -> json:
     """Returns request data formated as json"""
+    cookie = request.cookies["session"] if request.cookies else None
 
     return {
-        "session": request.cookies["session"],
+        "session": cookie,
         "useragent": request.user_agent.string,
         "accessroute": request.access_route,
         "sourceip": request.remote_addr,
@@ -50,15 +60,81 @@ def log_site_opened() -> None:
             }
         )
 
+def check_password(
+        user: Users, 
+        password: str
+    ) -> bool:
+    """Checks user password and logs event
 
-class DecimalEncoder(json.JSONEncoder):
-  """Dumps decimal data in JSON format"""
-  # As per: https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
-  
-  def default(self, obj):
-    if isinstance(obj, Decimal):
-      return str(obj)
-    return json.JSONEncoder.default(self, obj)
+    Arguments:
+        user -- User record check 
+        newpass -- given password
+
+    Returns:
+        True if succeeded
+    """
+
+    result = bcrypt.check_password_hash(
+                    user.Password, 
+                    password.encode('utf-8')
+                    )
+    
+    extra={
+        "action": "User password check",
+        "result": "Success" if result is True else "Failure",
+        "function": check_password.__name__,
+        "user": user.Username,
+        "error": None if result is True else "Password incorrect",
+        "request": get_request_data()
+        }
+
+    if result is True:
+        logger.info("Password check passed",extra)
+    else:
+        logger.warn("Password check failed",extra)
+
+    return result
+
+def change_password(
+        user: Users, 
+        newpass: str
+    ) -> bool:
+    """Changes user password in database
+
+    Arguments:
+        user -- User record to update 
+        newpass -- new password
+
+    Returns:
+        True if succeeded
+    """
+
+    user.Password = bcrypt.generate_password_hash(newpass)
+    extra={
+            "action": "User password change",
+            "result": None,
+            "function": change_password.__name__,
+            "user": user.Username,
+            "error": None,
+            "request": get_request_data()
+        }
+
+    try:
+        db.session.commit()
+        flash("Password updated", "success")
+        result = True
+    except Exception as error:
+        db.session.flush()
+        flash("Password not updated", "danger")
+        result = True
+        extra["error"] = error
+    pass
+    extra["result"] = "Success" if result is True else "Failure"
+    logger.info(
+        "Password change",
+        extra
+        )
+    return result
 
 def addtodb(entry) -> bool:
     """Commit entry to database and log changes"""
@@ -186,21 +262,29 @@ def request_loader(request):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form=LoginForm()
+    form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
-        username=form.username.data
-        usr=db.session.query(Users).filter_by(Username=username).first()
-        #if user does not exist password is not checked
-        if (usr 
-            and bcrypt.check_password_hash(usr.Password, form.password.data.encode('utf-8'))
-            and usr.isActive):
+        username = form.username.data
+        usr = db.session.query(Users).filter_by(Username=username).first()
+        errors = {}
+        
+        # Silent check tree
+        if usr is None:
+            errors["User exist"]=False
+        else:
+            if not usr.isActive:
+                errors["User is active"]=False
+            if not check_password(usr, form.password.data):
+                errors["Password is valid"]=False
+
+        if not errors:
             user = User()
             user.id = username
             flask_login.login_user(user)
             flash("User logged in", "success")
             logger.info(
                 "User logged in",
-                extra={
+                extra = {
                     "action": "Login",
                     "result": "Success",
                     "user": usr.ID,
@@ -209,16 +293,18 @@ def login():
                 )
             return redirect(redirect_url(url_for("index", next="index")))
 
+        # No details as to deter password bruteforce
         flash("Failed to log in", "danger")
         logger.info(
                 "User failed to logged in", 
-                extra={
+                extra = {
                     "action": "Login",
                     "result": "Failure",
                     "user": get_current_user_ID(),
                     "params": {
                         "givenusername": username
                         },
+                    "errors" : errors,
                     "request": get_request_data()
                     }
                 )
@@ -442,18 +528,11 @@ def passwordreset(token):
     
     if request.method == "POST" and form.validate_on_submit():
         #TODO: reset password in DB
-        flash("Password updated successfully")
-        logger.info(
-            "Password reset",
-            extra={
-                "action": "User password change",
-                "result": "Success",
-                "function": passwordreset.__name__,
-                "user": get_current_user_ID(),
-                "request": get_request_data()
-                }
+        userentry = db.one_or_404(
+            db.select(Users).filter_by(token=form.resettoken.data)
             )
-    
+        change_password(userentry, form.newpassword.data)
+
     log_site_opened()
     return render_template('passwordreset.html', title="Password reset", form=form)
 
@@ -461,38 +540,22 @@ def passwordreset(token):
 @app.route('/passwordchange', methods=['GET', 'POST'])
 @flask_login.login_required
 def passwordchange():
-    result=""
-    encounterederrors=[]
-    userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
-    form=PasswordChangeForm()
+    form = PasswordChangeForm()
     
     if request.method == "POST" and form.validate_on_submit():
+        userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
+        isvalidpassword=check_password(userentry, form.password.data)
+        if not isvalidpassword:
+            flash("Password incorrect", "danger")
+
         if (form.password.data
             and userentry.isActive
-            and bcrypt.check_password_hash(userentry.Password, form.password.data.encode('utf-8'))):
-            userentry.Password=bcrypt.generate_password_hash(form.password.data)
-            try:
-                db.session.commit()
-                flash("Password updated", "success")
-                result="Success"
-            except Exception as error:
-                db.session.flush()
-                flash("Password not updated", "danger")
-                result="Failed"
-                encounterederrors=error
-            pass
-        logger.info(
-            "Password change",
-            extra={
-                "action": "User password change",
-                "result": result,
-                "function": passwordchange.__name__,
-                "user": get_current_user_ID(),
-                "error": encounterederrors,
-                "request": get_request_data()
-                }
-            )
+            and isvalidpassword
+            ):
+            change_password(userentry, form.newpassword.data)
+        
         return redirect(redirect_url())
+    
     log_site_opened()
     return render_template('passwordchange.html', title="Password reset", form=form)
 
@@ -806,7 +869,7 @@ def producttypes():
 @flask_login.login_required
 def delete(table, entry_id):
     result=False
-    errors=""
+    errors=None
     try:
         db.session.query(tables[table]).filter_by(ID=entry_id).delete()
         db.session.commit()
@@ -854,7 +917,7 @@ def incomeedit(table, entry_id):
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"
-        errors=""
+        errors=None
         entry.DateTime=date.fromisoformat(form.datetime.data)
         entry.Amount=form.amount.data.real
         entry.Type=form.type.data
@@ -887,7 +950,6 @@ def incomeedit(table, entry_id):
     log_site_opened()
     return render_template("incomeedit.html", title="Income Edit", form=form)
 
-
 @app.route("/billsedit/<string:table>/<int:entry_id>", methods=["GET", "POST"])
 @flask_login.login_required
 def billsedit(table, entry_id):
@@ -902,7 +964,7 @@ def billsedit(table, entry_id):
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"
-        errors=""
+        errors=None
         entry.DateTime=date.fromisoformat(form.datetime.data)
         entry.Amount=form.amount.data.real
         entry.Medium=form.medium.data
@@ -948,7 +1010,7 @@ def expendituresedit(table, entry_id):
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"
-        errors=""
+        errors=None
         entry.DateTime=date.fromisoformat(form.datetime.data)
         entry.Amount=form.amount.data.real
         entry.ProductID=form.productID.data
@@ -994,7 +1056,7 @@ def producttypesedit(table, entry_id):
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"
-        errors=""
+        errors=None
         entry.Type=form.type.data
         entry.Priority=form.priority.data
         entry.Comment=form.comment.data
@@ -1038,7 +1100,7 @@ def productsedit(table, entry_id):
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"
-        errors=""
+        errors=None
         entry.Product=form.product.data
         entry.TypeID=form.typeID.data
         entry.Priority=form.priority.data

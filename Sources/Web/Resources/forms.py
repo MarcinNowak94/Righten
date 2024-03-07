@@ -64,7 +64,7 @@ class UserForm(FlaskForm):
         :FlaskForm: -- base class
     """
     
-    username=StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    username=StringField(validators=[InputRequired(), Length(min=4, max=40)], render_kw={"placeholder": "Username"})
     password=get_PasswordField_protytpe("Password", "Password")
     submit=SubmitField("Submit")
 
