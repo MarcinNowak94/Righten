@@ -417,9 +417,21 @@ def settings():
 
     userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
     # Settings must be separate to update them separately
-    priority = db.session.query(UserSettings).filter_by(Setting="ProductPriorityTarget").first()
-    spending = db.session.query(UserSettings).filter_by(Setting="SpendingTarget").first()
-    savings = db.session.query(UserSettings).filter_by(Setting="SavingsTarget").first()
+    priority = db.session.query(UserSettings).\
+                            filter_by(
+                                Setting="ProductPriorityTarget",
+                                UserID=current_user.uuid).\
+                            first()
+    spending = db.session.query(UserSettings).\
+                            filter_by(
+                                Setting="SpendingTarget",
+                                UserID=current_user.uuid).\
+                            first()
+    savings = db.session.query(UserSettings).\
+                            filter_by(
+                                Setting="SavingsTarget",
+                                UserID=current_user.uuid).\
+                            first()
 
     form=SettingsForm(
         productprioritytarget=Decimal(priority.Value),
@@ -841,13 +853,17 @@ def producttypessummary():
 @flask_login.login_required
 def income():
     form = IncomeInputForm()
-    entries = db.session.query(Income).order_by(Income.DateTime.desc(),Income.ID.desc()).all()
+    entries = db.session.query(Income).\
+                            filter_by(UserID=current_user.uuid).\
+                            order_by(Income.DateTime.desc(),Income.ID.desc()).\
+                            all()
     if form.validate_on_submit():
         entry = Income(DateTime=date.fromisoformat(form.datetime.data),
                 Amount=form.amount.data,
                 Type=form.type.data,
                 Source=form.source.data,
-                Comment=form.comment.data
+                Comment=form.comment.data,
+                UserID=current_user.uuid
         )
         addtodb(entry, notify=True)
         return redirect(redirect_url(url_for("income", next="income")))
@@ -860,16 +876,19 @@ def income():
 @app.route("/bills", methods=["GET", "POST"])
 @flask_login.login_required
 def bills():
-    form = BillsInputForm()
-    entries = db.session.query(Bills).order_by(Bills.DateTime.desc()).all()
+    form = BillsInputForm(current_user.uuid)
+    entries = db.session.query(Bills).\
+                            filter_by(UserID=current_user.uuid).\
+                            order_by(Bills.DateTime.desc()).\
+                            all()
     if form.validate_on_submit():
         entry = Bills(DateTime=date.fromisoformat(form.datetime.data),
                 Amount=form.amount.data,
                 Medium=form.medium.data,
-                Comment=form.comment.data
+                Comment=form.comment.data,
+                UserID=current_user.uuid
         )
         addtodb(entry, notify = True)
-        #TODO: Log data addition
         return redirect(redirect_url(url_for("bills", next="bills")))
     
     log_site_opened()
@@ -882,14 +901,18 @@ def bills():
 @flask_login.login_required
 def expenditures():
     form = ExpenditureInputForm()
-    entries = db.session.query(ExpendituresEnriched).order_by(ExpendituresEnriched.columns.DateTime.desc()).all()
+    entries = db.session.query(ExpendituresEnriched).\
+                            filter_by(UserID=current_user.uuid).\
+                            order_by(ExpendituresEnriched.columns.DateTime.desc()).\
+                            all()
     if form.validate_on_submit():
         #TODO: GET ProductID, table[] usage is setup for generalization
         entry = Expenditures(DateTime=date.fromisoformat(form.datetime.data),
                 Amount=form.amount.data,
                 ProductID=form.productID.data,
                 isCash=form.isCash.data,
-                Comment=form.comment.data
+                Comment=form.comment.data,
+                UserID=current_user.uuid
         )
         addtodb(entry, notify=True)
         return redirect(redirect_url())
@@ -901,13 +924,16 @@ def expenditures():
 @flask_login.login_required
 def products():
     form = ProductInputForm()
-    entries = db.session.query(ProductSummary).all()
+    entries = db.session.query(ProductSummary).\
+                            filter_by(UserID=current_user.uuid).\
+                            all()
     if form.validate_on_submit():
         #TODO: GET ProductID, table[] usage is setup for generalization
         entry = Products(Product=form.product.data,
                 TypeID=form.typeID.data,
                 Comment=form.comment.data,
-                Priority=form.priority.data
+                Priority=form.priority.data,
+                UserID=current_user.uuid
         )
         addtodb(entry, notify=True)
         return redirect(redirect_url())
@@ -919,15 +945,18 @@ def products():
 @flask_login.login_required
 def producttypes():
     form = ProductTypeInputForm()
-    entries = db.session.query(TypeSummary).all()
+    entries = db.session.query(TypeSummary).\
+                            filter_by(UserID=current_user.uuid).\
+                            all()
     if form.validate_on_submit():
         #TODO: GET ProductID, table[] usage is setup for generalization
         entry = ProductTypes(Type=form.type.data,
                 Comment=form.comment.data,
-                Priority=form.priority.data
+                Priority=form.priority.data,
+                UserID=current_user.uuid
         )
         addtodb(entry, notify = True)
-        #TODO: Log data addition
+
         return redirect(redirect_url())
     
     log_site_opened()
@@ -945,7 +974,11 @@ def delete(table, entry_id):
     result=False
     errors=None
     try:
-        db.session.query(tables[table]).filter_by(ID=entry_id).delete()
+        db.session.query(tables[table]).\
+                        filter_by(
+                            ID=entry_id,
+                            UserID=current_user.uuid).\
+                        delete()
         db.session.commit()
         flash("Data removed", "success")
         result=True
@@ -987,7 +1020,8 @@ def incomeedit(table, entry_id):
         amount=entry.Amount,
         comment=entry.Comment,
         type=entry.Type,
-        source=entry.Source,
+        source=entry.Source
+        # Should not be necessary ,UserID=current_user.uuid
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"
@@ -1035,6 +1069,7 @@ def billsedit(table, entry_id):
         amount=entry.Amount,
         comment=entry.Comment,
         medium=entry.Medium
+        # Should not be necessary ,UserID=current_user.uuid
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"
@@ -1081,6 +1116,7 @@ def expendituresedit(table, entry_id):
         comment=entry.Comment,
         productID=entry.ProductID,
         isCash=entry.isCash
+        # Should not be necessary ,UserID=current_user.uuid
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"
@@ -1127,6 +1163,7 @@ def producttypesedit(table, entry_id):
         type=entry.Type,
         priority=entry.Priority,
         comment=entry.Comment
+        # Should not be necessary ,UserID=current_user.uuid
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"
@@ -1171,6 +1208,7 @@ def productsedit(table, entry_id):
         typeID=entry.TypeID,
         priority=entry.Priority,
         comment=entry.Comment
+        # Should not be necessary ,UserID=current_user.uuid
     )
     if request.method == "POST" and form.validate_on_submit():
         result="Success"

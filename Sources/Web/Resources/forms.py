@@ -111,6 +111,7 @@ class IncomeInputForm(CommonForm):
                 render_kw={"placeholder": "Income source"}
                 )
 
+# TODO: add current_user.uuid as param
 class BillsInputForm(CommonForm):
     """Bills input form, has all common fields and Bill table specific fields
 
@@ -124,6 +125,7 @@ class BillsInputForm(CommonForm):
     with app.app_context():
       medias=[]
       for medium in db.session.query(Bills.Medium).distinct():
+                                #filter_by(UserID=current_user.uuid).distinct():\
           medias.append(medium[0])
     medium=StringField(
                 "Medium", 
