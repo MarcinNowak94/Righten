@@ -71,8 +71,10 @@ CREATE TABLE IF NOT EXISTS "ExpendituresTransitory" (
 	"isCash"	BOOLEAN DEFAULT FALSE
 );
 CREATE TABLE IF NOT EXISTS "UserSettings" (
-	"Setting"	TEXT PRIMARY KEY,
-	"Value"	TEXT
+	"UserID"	TEXT NOT NULL,
+	"Setting"	TEXT NOT NULL,
+	"Value"	TEXT NOT NULL,
+	PRIMARY KEY("Setting","UserID")
 );
 CREATE TABLE IF NOT EXISTS "AccountDataImport" (
 	"field1"	TEXT,
@@ -13605,10 +13607,20 @@ INSERT INTO "AccountData" ("Data księgowania","Data operacji","Tytuł operacji"
  ('2023-12-01','2023-12-01','literally nothing','','',-0.9,NULL,4355),
  ('2023-12-02','2023-12-02','literally nothing','','',-3712.5,NULL,4356),
  ('2023-12-03','2023-12-01','literally nothing','','',-11.4,NULL,4357);
-INSERT INTO "UserSettings" ("Setting","Value") VALUES 
- ('ProductPriorityTarget','33'),
- ('SpendingTarget', '1500'),
- ('SavingsTarget', '200');
+INSERT INTO "UserSettings" ("UserID", "Setting","Value") VALUES 
+ ('0665fe1c-7e28-43eb-96c7-5a2677d6ae03','ProductPriorityTarget','33'),
+ ('0665fe1c-7e28-43eb-96c7-5a2677d6ae03','SpendingTarget', '1500'),
+ ('0665fe1c-7e28-43eb-96c7-5a2677d6ae03','SavingsTarget', '200'),
+ ('9394d310-7bbc-4ef0-9d62-069604999d6a','ProductPriorityTarget','33'),
+ ('9394d310-7bbc-4ef0-9d62-069604999d6a','SpendingTarget', '1500'),
+ ('9394d310-7bbc-4ef0-9d62-069604999d6a','SavingsTarget', '200'),
+ ('22feb4a-45a6-46f1-ad33-288a52726dfa','ProductPriorityTarget','33'),
+ ('22feb4a-45a6-46f1-ad33-288a52726dfa','SpendingTarget', '1500'),
+ ('22feb4a-45a6-46f1-ad33-288a52726dfa','SavingsTarget', '200'),
+ ('3f2968b3-f765-490e-99ec-6ab8236ea06e','ProductPriorityTarget','33'),
+ ('3f2968b3-f765-490e-99ec-6ab8236ea06e','SpendingTarget', '1500'),
+ ('3f2968b3-f765-490e-99ec-6ab8236ea06e','SavingsTarget', '200');
+
 CREATE VIEW "MonthlyBills" AS
 SELECT 
 	SUBSTRING(TO_CHAR("DateTime", 'YYYY-MM-DD'), 1, 7)				as "Month"

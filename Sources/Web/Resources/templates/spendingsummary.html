@@ -35,6 +35,7 @@
             let ProductPriorityData = JSON.parse({{ ProductPriorityData | tojson }})
             let TypePriorityData = JSON.parse({{ TypePriorityData | tojson }})
             let PriorityTargetData = JSON.parse({{ PriorityTargetData | tojson }})
+            let SpendingTargetData = JSON.parse({{ SpendingTargetData | tojson }})
             
 
             let MonthlySpending = new Chart(document.getElementById("MonthlySpending"), {
@@ -69,6 +70,17 @@
                             target: 'origin',
                             above: 'rgb(192, 75, 75)',   // Area will be red above the origin
                             below: 'rgb(75, 192, 192)'    // And blue below the origin
+                        }
+                    },
+                    {
+                        label: "Spending target",
+                        data: SpendingTargetData,
+                        fill: false,
+                        borderColor: 'rgba(192, 75, 75, 0.3)',
+                        lineTension: 0.1,
+                        fill: {
+                            target: 'end',
+                            below: 'rgba(192, 75, 75, 0.3)'    // And blue below the origin
                         }
                     }
                     ]

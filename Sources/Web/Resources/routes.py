@@ -136,24 +136,36 @@ def change_password(
         )
     return result
 
-def addtodb(entry) -> bool:
-    """Commit entry to database and log changes"""
-    result=False
-    errors=""
+def addtodb(entry, notify=False) -> bool:
+    """Commit entry to database and log changes
+
+    Arguments:
+        :entry: -- data to add to database
+
+    Keyword Arguments:
+        :notify: -- Wether to notify user of changes or not (default: {False})
+
+    Returns:
+        True if operation was successful
+    """
+    result = False
+    errors = None
     try:
         db.session.add(entry)
         db.session.commit()
-        flash("Data added", "success")
-        result=True
+        if notify is True:
+            flash("Data added", "success")
+        result = True
     except Exception as error:
         db.session.flush()
-        flash("Data not added", "danger")
-        result=False
-        errors=error
+        if notify is True:
+            flash("Data not added", "danger")
+        result = False
+        errors = error
     
-    logger.info(
+    logger.debug(
             "Database insert attempt",
-            extra={
+            extra = {
                 "action": "Database insert",
                 "result": "Success" if result else "Failure",
                 "function": addtodb.__name__,
@@ -164,6 +176,58 @@ def addtodb(entry) -> bool:
                 }
             )
     return result
+
+def createuser(user: Users) -> bool:
+    """Creates user with specified data and initializes settings with default values
+
+    Arguments:
+        :user: -- User to be created
+
+    Returns:
+        True if creation is successfull
+    """
+
+    # NICE-TO-HAVE: Populate with statistical data from app or GUS 
+    settings={
+        "ProductPriorityTarget":	33,
+        "SpendingTarget":	3000,
+        "SavingsTarget":	100
+    }
+
+    success = False
+    success = addtodb(user, notify=True)
+    operations={
+        "UserCreation" : success
+    } 
+
+    for setting in settings:
+        usersetting = UserSettings(
+            UserID=user.ID,
+            Setting=setting,
+            Value=settings[setting]
+        )
+        # Notify = False or else every setting change generates separate notification
+        success = addtodb(usersetting, notify=False)
+        operations[setting]=success
+
+    for operation in operations:
+        if operations[operation] is False: 
+            success = False
+            break
+
+    logger.info(
+        "New user registered",
+        extra={
+            "action": "User add",
+            "result": "Success" if success else "Failure",
+            "function": register.__name__,
+            "user": user.ID,
+            "operations": operations,
+            "request": get_request_data()
+            }
+        )
+
+    return success
 
 def createchartdataset(dbdata: list, fill="false") -> list:
     """Formats provided sets od data into unified chart data set {date, value} 
@@ -352,7 +416,7 @@ def settings():
     settingschanged=[]
 
     userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
-    #Settings must be separate to update them separately
+    # Settings must be separate to update them separately
     priority = db.session.query(UserSettings).filter_by(Setting="ProductPriorityTarget").first()
     spending = db.session.query(UserSettings).filter_by(Setting="SpendingTarget").first()
     savings = db.session.query(UserSettings).filter_by(Setting="SavingsTarget").first()
@@ -479,20 +543,12 @@ def register():
                 Password=bcrypt.generate_password_hash(form.password.data),
                 isActive=True
         )
-        useradded=addtodb(user)
-        if useradded and app.config["ENV"] != "development":
-            #TODO: create schema in postgreSQL
-            pass
-        logger.info(
-            "New user registered",
-            extra={
-                "action": "User add",
-                "result": "Success",
-                "function": register.__name__,
-                "user": user.ID,
-                "request": get_request_data()
-                }
-            )
+
+        if createuser(user):
+            flash("Account created successfully", "success")
+        else:
+            flash("Account creation failed", "error")
+
         return redirect(redirect_url(url_for("login", next="login")))
     log_site_opened()
     return render_template('register.html', title="Register", form=form)
@@ -661,11 +717,13 @@ def expendituressummary():
 def spending():
     Spending=db.session.query(MonthlySpending).all()
     PriorityTarget=db.session.query(UserSettings).filter_by(Setting="ProductPriorityTarget").first()
+    SpendingTarget=db.session.query(UserSettings).filter_by(Setting="SpendingTarget", UserID=current_user.uuid).first()
     MonthlySpendingData=[]
     CashPercentageData=[]
     MonthlyPossibleSavingsData=[]
     ProductPriorityData=[]
     TypePriorityData=[]
+    SpendingTargetData=[]
     PriorityTargetData=[]
     for Month, Total, CashPercentage, AverageProductPriority, AverageTypePriority, PossibleSavings, AverageDaily in Spending:
         MonthlySpendingData.append({"x":Month,"y":Total})
@@ -673,9 +731,11 @@ def spending():
         MonthlyPossibleSavingsData.append({"x":Month,"y":PossibleSavings})
         ProductPriorityData.append({"x":Month,"y":AverageProductPriority})
         TypePriorityData.append({"x":Month,"y":AverageTypePriority})
-        #Priority target is deeming which products are deemed as unnecessary expense
-        #Priority data is average of month priorities, thus target priority is 100-target  
+        
+        # Priority target is deeming which products are deemed as unnecessary expense
+        # Priority data is average of month priorities, thus target priority is 100-target  
         PriorityTargetData.append({"x":Month,"y":100-int(PriorityTarget.Value)})
+        SpendingTargetData.append({"x":Month,"y":SpendingTarget.Value})
     
     log_site_opened()
     return render_template("spendingsummary.html",
@@ -685,7 +745,8 @@ def spending():
                            MonthlyPossibleSavingsData=json.dumps(MonthlyPossibleSavingsData, cls=DecimalEncoder),
                            ProductPriorityData=json.dumps(ProductPriorityData, cls=DecimalEncoder),
                            TypePriorityData=json.dumps(TypePriorityData, cls=DecimalEncoder),
-                           PriorityTargetData=json.dumps(PriorityTargetData, cls=DecimalEncoder)
+                           PriorityTargetData=json.dumps(PriorityTargetData, cls=DecimalEncoder),
+                           SpendingTargetData=json.dumps(SpendingTargetData, cls=DecimalEncoder)
                            )
 
 #TODO: Financial posture
@@ -694,16 +755,24 @@ def spending():
 @flask_login.login_required
 def finances():
     StatisticData=db.session.query(Statistics).all()
-    BilanceData=db.session.query(MonthlyBilanceSingle).all();
+    BilanceData=db.session.query(MonthlyBilanceSingle).all()
+    SavingsTargetData=(db.session.query(UserSettings).filter_by(Setting="SavingsTarget", UserID=current_user.uuid).first()).Value
     Bilance=[]
     Breakeven=[]
     BilanceSet=[]
+    SavingsTarget=[]
+    sets = {
+        "Bilance": Bilance,
+        "Breakeven": Breakeven,
+        "Savings Target": SavingsTarget
+        }
+    
     #Adding breakeven line 
     for Month, Amount in BilanceData:
         Bilance.append({"x":Month,"y":Amount})
         Breakeven.append({"x":Month,"y":0})
-
-    sets={"Bilance":Bilance, "Breakeven":Breakeven}
+        SavingsTarget.append({"x":Month,"y":SavingsTargetData})
+    
     for set in sets:
         BilanceSet.append({"label": set, "data": sets[set]})
     
@@ -741,6 +810,12 @@ def finances():
 @app.route("/productssummary")
 @flask_login.login_required
 def productssummary():
+    # TODO: filter results to products chosen by user in GUI
+    Top10Products = db.session.query(Top10ProductsMonthly).all()
+    
+    Top10ProductsData = createchartdataset(Top10Products)
+
+
     log_site_opened()
     return render_template("underconstruction.html",
                         title="Products"
@@ -774,7 +849,7 @@ def income():
                 Source=form.source.data,
                 Comment=form.comment.data
         )
-        addtodb(entry)
+        addtodb(entry, notify=True)
         return redirect(redirect_url(url_for("income", next="income")))
     log_site_opened()
     return render_template("incometable.html", title="Income", entries=entries, form=form)
@@ -793,7 +868,7 @@ def bills():
                 Medium=form.medium.data,
                 Comment=form.comment.data
         )
-        addtodb(entry)
+        addtodb(entry, notify = True)
         #TODO: Log data addition
         return redirect(redirect_url(url_for("bills", next="bills")))
     
@@ -816,7 +891,7 @@ def expenditures():
                 isCash=form.isCash.data,
                 Comment=form.comment.data
         )
-        addtodb(entry)
+        addtodb(entry, notify=True)
         return redirect(redirect_url())
     
     log_site_opened()
@@ -834,8 +909,7 @@ def products():
                 Comment=form.comment.data,
                 Priority=form.priority.data
         )
-        addtodb(entry)
-        #TODO: Log data addition
+        addtodb(entry, notify=True)
         return redirect(redirect_url())
     
     log_site_opened()
@@ -852,7 +926,7 @@ def producttypes():
                 Comment=form.comment.data,
                 Priority=form.priority.data
         )
-        addtodb(entry)
+        addtodb(entry, notify = True)
         #TODO: Log data addition
         return redirect(redirect_url())
     
