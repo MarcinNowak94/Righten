@@ -342,6 +342,7 @@ login_manager.session_protection="strong"
 class User(flask_login.UserMixin):
     pass
 
+# NICE-TO-HAVE: Load all user settings here
 @login_manager.user_loader
 def user_loader(checkeduser):
     users=db.session.query(Users).all()
@@ -356,6 +357,7 @@ def user_loader(checkeduser):
             return currentuser
     return
 
+# TODO: Optimize
 @login_manager.request_loader
 def request_loader(request):
     users=db.session.query(Users).all()
@@ -725,11 +727,14 @@ def billssummary():
         BillsTypes.append(Medium)
 
     MonthlyBillsData = []
-    for Month, Amount in db.session.query(MonthlyBills).\
+    for Month, Amount in db.session.query(MonthlyBills.columns.Month,
+                                          MonthlyBills.columns.Amount).\
                                 filter_by(UserID=current_user.uuid).all():
         MonthlyBillsData.append({"x": Month, "y":Amount})
     
-    BillsTypespermonth = db.session.query(MonthlyBillsByMedium).\
+    BillsTypespermonth = db.session.query(MonthlyBillsByMedium.columns.Month,
+                                          MonthlyBillsByMedium.columns.Amount,
+                                          MonthlyBillsByMedium.columns.Medium).\
                                 filter_by(UserID=current_user.uuid).all()
     BillsTypesData = createchartdataset(BillsTypespermonth)
 
@@ -747,24 +752,35 @@ def billssummary():
 @app.route("/expendituressummary")
 @flask_login.login_required
 def expendituressummary():
-    ExpendituresSummarydata=db.session.query(TypeSummary.columns.Type,
-                                             TypeSummary.columns.Amount)\
-                                                .order_by(TypeSummary.columns.Amount.desc()).all()
+    ExpendituresSummarydata = db.session.query(TypeSummary.columns.Type,
+                                             TypeSummary.columns.Amount).\
+                                        filter_by(UserID=current_user.uuid).\
+                                        order_by(TypeSummary.columns.Amount.desc()).all()
     ExpendituresSummaryData=[]
     ExpendituresSummaryTypes=[]
     for Type, Amount in ExpendituresSummarydata:
         ExpendituresSummaryData.append(Amount)
         ExpendituresSummaryTypes.append(Type)
 
-    ExpendituresOverTime=db.session.query(MonthlyExpenditures).all()
+    ExpendituresOverTime = db.session.query(MonthlyExpenditures.columns.Month,
+                                            MonthlyExpenditures.columns.Amount).\
+                        filter_by(UserID=current_user.uuid).all()
     MonthlyExpendituresData=[]
     for Month, Amount in ExpendituresOverTime:
         MonthlyExpendituresData.append({"x":Month,"y":Amount})
 
-    TopTypeExpendituresData=db.session.query(Top10ProductTypesMonthly).all();
+    TopTypeExpendituresData = db.session.query(
+                                Top10ProductTypesMonthly.columns.Month,
+                                Top10ProductTypesMonthly.columns.Sum,
+                                Top10ProductTypesMonthly.columns.Type).\
+                        filter_by(UserID=current_user.uuid).all()
     TopTypeExpenditures=createchartdataset(TopTypeExpendituresData, "true")
 
-    TopProductsChartData=db.session.query(Top10ProductsMonthly).all();
+    TopProductsChartData = db.session.query(
+                                Top10ProductsMonthly.columns.Month,
+                                Top10ProductsMonthly.columns.Sum,
+                                Top10ProductsMonthly.columns.Product).\
+                        filter_by(UserID=current_user.uuid).all()
     TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
 
     log_site_opened()
@@ -777,12 +793,19 @@ def expendituressummary():
                            TopProductsExpenditures=json.dumps(TopProductsExpenditures, cls=DecimalEncoder)
                            )
 
+# NICE-TO-HAVE: Add stacked year graph to show trend
 @app.route("/spending")
 @flask_login.login_required
 def spending():
-    Spending=db.session.query(MonthlySpending).all()
-    PriorityTarget=db.session.query(UserSettings).filter_by(Setting="ProductPriorityTarget").first()
-    SpendingTarget=db.session.query(UserSettings).filter_by(Setting="SpendingTarget", UserID=current_user.uuid).first()
+    Spending = db.session.query(MonthlySpending).\
+                        filter_by(UserID=current_user.uuid).all()
+    # All settings are stored as text, thus type cast to int
+    PriorityTarget = int((db.session.query(UserSettings).\
+        filter_by(UserID=current_user.uuid, Setting="ProductPriorityTarget").\
+        first()).Value)
+    SpendingTarget = int((db.session.query(UserSettings).\
+        filter_by(UserID=current_user.uuid, Setting="SpendingTarget").\
+        first()).Value)
     MonthlySpendingData=[]
     CashPercentageData=[]
     MonthlyPossibleSavingsData=[]
@@ -790,17 +813,17 @@ def spending():
     TypePriorityData=[]
     SpendingTargetData=[]
     PriorityTargetData=[]
-    for Month, Total, CashPercentage, AverageProductPriority, AverageTypePriority, PossibleSavings, AverageDaily in Spending:
+    for UserID, Month, Total, CashPercentage, AverageProductPriority, AverageTypePriority, PossibleSavings, AverageDaily in Spending:
         MonthlySpendingData.append({"x":Month,"y":Total})
         CashPercentageData.append({"x":Month,"y":CashPercentage})        
         MonthlyPossibleSavingsData.append({"x":Month,"y":PossibleSavings})
         ProductPriorityData.append({"x":Month,"y":AverageProductPriority})
         TypePriorityData.append({"x":Month,"y":AverageTypePriority})
         
-        # Priority target is deeming which products are deemed as unnecessary expense
+        # Priority target describes which products are deemed as unnecessary expense
         # Priority data is average of month priorities, thus target priority is 100-target  
-        PriorityTargetData.append({"x":Month,"y":100-int(PriorityTarget.Value)})
-        SpendingTargetData.append({"x":Month,"y":SpendingTarget.Value})
+        PriorityTargetData.append({"x":Month,"y":100-PriorityTarget})
+        SpendingTargetData.append({"x":Month,"y":SpendingTarget})
     
     log_site_opened()
     return render_template("spendingsummary.html",
@@ -819,9 +842,15 @@ def spending():
 @app.route("/finances")
 @flask_login.login_required
 def finances():
-    StatisticData=db.session.query(Statistics).all()
-    BilanceData=db.session.query(MonthlyBilanceSingle).all()
-    SavingsTargetData=(db.session.query(UserSettings).filter_by(Setting="SavingsTarget", UserID=current_user.uuid).first()).Value
+    # NICE-TO-HAVE: Add statistic type, and get only financial here
+    StatisticData = db.session.query(Statistics).\
+                        filter_by(UserID=current_user.uuid).all()
+    BilanceData = db.session.query(MonthlyBilanceSingle.columns.Month,
+                                   MonthlyBilanceSingle.columns.Amount).\
+                        filter_by(UserID=current_user.uuid).all()
+    SavingsTargetData = (db.session.query(UserSettings).\
+                       filter_by(UserID=current_user.uuid, Setting="SavingsTarget").\
+                        first()).Value
     Bilance=[]
     Breakeven=[]
     BilanceSet=[]
@@ -841,11 +870,15 @@ def finances():
     for set in sets:
         BilanceSet.append({"label": set, "data": sets[set]})
     
-    BilanceSources=db.session.query(MonthlyBilance).all()
+    BilanceSources = db.session.query(MonthlyBilance.columns.Month,
+                                      MonthlyBilance.columns.Amount,
+                                      MonthlyBilance.columns.Source).\
+                        filter_by(UserID=current_user.uuid).all()
     BilanceSourcesData=createchartdataset(BilanceSources, "true")
 
-    BilanceTotal=db.session.query(MonthlyBilance.columns.Source,
-                                  db.func.round(db.func.sum(MonthlyBilance.columns.Amount)))\
+    BilanceTotal = db.session.query(MonthlyBilance.columns.Source,
+                                  db.func.round(db.func.sum(MonthlyBilance.columns.Amount))).\
+                                    filter_by(UserID=current_user.uuid)\
                                     .group_by(MonthlyBilance.columns.Source).all()
 
     Total=0
@@ -876,9 +909,16 @@ def finances():
 @flask_login.login_required
 def productssummary():
     # TODO: filter results to products chosen by user in GUI
-    monthlyProducts = db.session.query(MonthlyProducts).all()
+    monthlyProducts = db.session.query(MonthlyProducts.columns.Month,
+                                       MonthlyProducts.columns.Product,
+                                       MonthlyProducts.columns.Items,
+                                       MonthlyProducts.columns.Amount).\
+                        filter_by(UserID=current_user.uuid).all()
     
-    Top10Products = db.session.query(Top10ProductsMonthly).all()
+    Top10Products = db.session.query(Top10ProductsMonthly.columns.Month,
+                                     Top10ProductsMonthly.columns.Sum,
+                                     Top10ProductsMonthly.columns.Product).\
+                        filter_by(UserID=current_user.uuid).all()
     
     Top10ProductsData = createchartdataset(Top10Products)
 
