@@ -3,20 +3,47 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-xs-10, col-sm-6">
-            <div class="card card-style mb-2">
-                <div class="card-body">
-                    <div class="chart-container" style="position: relative;">
-                        <canvas id="ExpendituresOverTime"></canvas>
+        <form action="" method="POST">
+            {{ form.csrf_token() }}
+            <fieldset class="form-group">
+                <div class="row form-group">
+                    <div class="col form-group">
+                        {{ form.limit.label(class="form-control-label") }}
+                        {% if form.limit.errors %}
+                        {{ form.limit(class="form-control form-control-sm is-invalid") }}
+                        {% for error in form.limit.errors %}
+                        <div class="invalid-feedback">
+                            <span>{{error}}</span>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        {{ form.limit(class="form-control form-control-sm") }}
+                        {% endif %}
+                    </div>
+                    <div class="col form-group">
+                        {{ form.products.label(class="form-control-label") }}
+                        {% if form.products.errors %}
+                        {{ form.products(class="form-control form-control-sm is-invalid") }}
+                        {% for error in form.products.errors %}
+                        <div class="invalid-feedback">
+                            <span>{{error}}</span>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        {{ form.products(class="form-control form-control-sm") }}
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        {{ form.submit(class="btn btn-success", value="Check")}}
                     </div>
                 </div>
-            </div>
-        </div>
+            </fieldset>
+        </form>
         <div class="col-xs-10, col-sm-6">
             <div class="card card-style mb-2">
                 <div class="card-body">
                     <div class="chart-container" style="position: relative;">
-                        <canvas id="TopTypeExpenditures"></canvas>
+                        <canvas id="TopProducts"></canvas>
                     </div>
                 </div>
             </div>
@@ -24,107 +51,85 @@
     </div>
 
     <div class="row">
-        <div class="col-xs-10, col-sm-6">
-            <div class="card card-style mb-2">
-                <div class="card-body">
-                    <div class="chart-container" style="position: relative;">
-                        <canvas id="ExpendituresSummary"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-10, col-sm-6">
-            <div class="card card-style mb-2">
-                <div class="card-body">
-                    <div class="chart-container" style="position: relative;">
-                        <canvas id="TopProductsSummary"></canvas>
-                    </div>
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="TopProductsLine"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<div class="col-sm-10 ml-auto mr-auto ">
+    <H2>Selected Products summary</H2>
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Product</th>
+                <th scope="col">Type</th>
+                <th scope="col">TotalSpentOn</th>
+                <th scope="col">BoughtTimes</th>
+                <th scope="col">ProductPriority</th>
+                <th scope="col">TypePriority</th>
+                <th scope="col">FirstBought</th>
+                <th scope="col">LastBought</th>
+                <th scope="col">Minimum</th>
+                <th scope="col">Average</th>
+                <th scope="col">Maximum</th>
+                <th scope="col">Variability</th>
+                <th scope="col">Common</th>
+                <th scope="col">Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+                    <tr>
+                        <td>{{entry.ID}}</td>
+                        <td>{{entry.Product}}</td>
+                        <td>{{entry.Type}}</td>
+                        <td>{{entry.Amount}}</td>
+                        <td>{{entry.Times}}</td>
+                        <td>{{entry.ProductPriority}}</td>
+                        <td>{{entry.TypePriority}}</td>
+                        <td>{{entry.First}}</td>
+                        <td>{{entry.Last}}</td>
+                        <td>{{entry.Minimum}}</td>
+                        <td>{{entry.Average}}</td>
+                        <td>{{entry.Maximum}}</td>
+                        <td>{{entry.Variability}}</td>
+                        <td>{{entry.Common}}</td>
+                        <td>{{entry.Comment}}</td>
+                    </tr>
+            {% endfor %}
+    </tbody>
+    </table>
+</div>
+
 
     {% block javascript %}
+        <!--Added as per: https://www.chartjs.org/chartjs-plugin-zoom/latest/guide/integration.html-->
+        <script src="path/to/chartjs/dist/chart.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+        <script src="path/to/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
         <script>
-            let ExpendituresSummaryData = JSON.parse({{ ExpendituresSummaryData | tojson }})
-            let ExpendituresSummaryTypes = JSON.parse({{ ExpendituresSummaryTypes | tojson }})
-            let MonthlyExpenditures = JSON.parse({{ MonthlyExpenditures | tojson }})
-            let TopTypeExpenditures = JSON.parse({{ TopTypeExpenditures | tojson }})
-            let TopProductsExpenditures = JSON.parse({{ TopProductsExpenditures | tojson }})
+            let top_products_chart = JSON.parse({{ top_products_chart | tojson }})
+            let top_products_line = JSON.parse({{ top_products_line | tojson }})
 
-            let ExpendituresSummarychart = new Chart(document.getElementById("ExpendituresSummary"), {
+            let TopProducts = new Chart(document.getElementById("TopProducts"), {
                 type: 'pie',
-                data: {
-                    labels: ExpendituresSummaryTypes,
-                    datasets: [{
-                        label: "Expenditures type",
-                        data: ExpendituresSummaryData,
-                        backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
-                            '#B276B2', '#E16851', '#FB8267'],
-    
-                        borderWidth: 1,
-                        hoverBorderColor: "black",
-                        hoverBorderWidth: 2,
-                        hoverBackgroundColor: 'rgba(154, 245, 140)',
-                        pointHoverRadius: 5
-                    }]
-                },
-                options: {
-                        title: {
-                            display: true,
-                                text: "Expenditures type summary",
-                                    fontSize: 20,
-                        },
-                        legend: {
-                            position: "right",
-                                labels: {
-                                fontColor: "gray"
-                            },
-                            display: true
-                        },
-    
-                        elements: {
-                            hitRadius: 3,
-                        }
-                }
+                data: top_products_chart
             })
-
-            let ExpendituresOverTime = new Chart(document.getElementById("ExpendituresOverTime"), {
-                type: "line",
-                data: {
-                    datasets: [{
-                        label: "Expenditures",
-                        data: MonthlyExpenditures,
-                        fill: false,
-                        borderColor: "rgb(75, 192, 192)",
-                        lineTension: 0.1
-                    }]
-                }
-            })
-
-            let TopTypeExpenditureschart = new Chart(document.getElementById("TopTypeExpenditures"), {
+            let TopProductsLine = new Chart(document.getElementById("TopProductsLine"), {
                 type: "line",
                 title: {
                         display: true,
-                        text: "Top 10 Types",
+                        text: "Top products",
                         fontSize: 20,
                         },
                 data: {
-                    datasets: TopTypeExpenditures
-                }
-            })
-
-            let TopProductsExpenditureschart = new Chart(document.getElementById("TopProductsSummary"), {
-                type: "line",
-                title: {
-                        display: true,
-                        text: "Top 10 Types",
-                        fontSize: 20,
-                        },
-                data: {
-                    datasets: TopProductsExpenditures
+                    datasets: top_products_line
                 }
             })
         </script>

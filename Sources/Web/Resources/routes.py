@@ -245,10 +245,7 @@ def createchartdataset(dbdata: list, fill="false") -> list:
     #Fill type dictionaries with amount or 0 
     for Month, Amount, Type in dbdata:
         for set in sets:
-            if not Type==set:
-                sets[set].append({"x": Month, "y": 0})
-            else:
-                sets[set].append({"x": Month, "y": Amount})
+            sets[set].append({"x": Month, "y": Amount if Type==set else 0})
 
     dataset=[]
     for set in sets:
@@ -885,27 +882,50 @@ def finances():
 # - spending by Product (move from expenditures?)
 # - Top 10 low priority product spending Calculate (Amount*(100-priority))
 #TODO: Add product picker and corresponding graph
-@app.route("/productssummary")
+@app.route("/productssummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def productssummary():
     # TODO: filter results to products chosen by user in GUI
-    monthlyProducts = db.session.query(MonthlyProducts.columns.Month,
-                                       MonthlyProducts.columns.Product,
-                                       MonthlyProducts.columns.Items,
-                                       MonthlyProducts.columns.Amount).\
-                        filter_by(UserID=current_user.uuid).all()
-    
-    Top10Products = db.session.query(Top10ProductsMonthly.columns.Month,
-                                     Top10ProductsMonthly.columns.Sum,
-                                     Top10ProductsMonthly.columns.Product).\
-                        filter_by(UserID=current_user.uuid).all()
-    
-    Top10ProductsData = createchartdataset(Top10Products)
+    limit = 10
+    selected_products=[]
 
+    form = ProductVisualizationForm()
+    if request.method == "POST" and form.validate_on_submit():
+        limit = form.limit.data
+        selected_products = form.products.data
+
+    top_products=db.session.query(ProductSummary.columns.Product,
+                                 ProductSummary.columns.Amount).\
+                            filter_by(UserID=current_user.uuid).\
+                            order_by(ProductSummary.columns.Times.desc()).\
+                            limit(limit).all()
+    form.products.default
+
+    selection_products_list= (product for product, amount in top_products)
+    selected_products.extend(selection_products_list)
+    form.products.default=selected_products # Set all displayed products as chosen
+
+    monthly_products = db.session.query(MonthlyProducts.columns.Month,
+                                       MonthlyProducts.columns.Amount,
+                                       MonthlyProducts.columns.Product,
+                                       ).\
+                        filter_by(UserID=current_user.uuid).\
+                        where(MonthlyProducts.columns.Product.in_(selected_products)).all()
+    products_table = db.session.query(ProductSummary).\
+                        filter_by(UserID=current_user.uuid).\
+                        where(ProductSummary.columns.Product.in_(selected_products)).\
+                        order_by(ProductSummary.columns.Times.desc()).all()
+    
+    top_products_chart = createpiechartdataset(top_products, addperc=True)
+    top_products_line = createchartdataset(monthly_products)
 
     log_site_opened()
-    return render_template("underconstruction.html",
-                        title="Products"
+    return render_template("productsummary.html",
+                        title="Products",
+                        top_products_chart=json.dumps(top_products_chart, cls=DecimalEncoder),
+                        top_products_line=json.dumps(top_products_line, cls=DecimalEncoder),
+                        entries=products_table,
+                        form=form
                         )
 
 #TODO: producttypessummary

@@ -1,9 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, IntegerField, DecimalField, SubmitField, BooleanField, PasswordField
+from wtforms import StringField, SelectField, IntegerField, DecimalField, SubmitField, BooleanField, PasswordField, SelectMultipleField
 from wtforms.validators import DataRequired, Regexp, NumberRange, InputRequired, Length, ValidationError, EqualTo
 from datetime import date
 from Resources.models import *
 from Resources.logging_definition import logger
+
+MAX_VISUALIZATION_ITEMS=15
 
 def user_valid(form, field):
     """User validator, client-side"""
@@ -289,3 +291,39 @@ class PasswordResetGenerateTokenForm(FlaskForm):
 
     username=StringField(validators=[InputRequired(), Length(min=4, max=20), user_valid], render_kw={"placeholder": "Username"})
     submit=SubmitField("Submit")
+
+class ProductVisualizationForm(FlaskForm):
+    """Product summary visualization form, decides which products data are 
+    selected from database to be visualized
+
+    Arguments:
+        :FlaskForm: -- base class
+    """
+
+    with app.app_context():
+        user_products_count = db.session.query(
+                                            ProductSummary.columns.Product,
+                                            ProductSummary.columns.Amount).count()
+                                        #filter_by(UserID=current_user.uuid)
+        user_products = db.session.query(Products.Product).all()
+                                        #filter_by(UserID=current_user.uuid)
+        top10_user_products = db.session.query(ProductSummary.columns.Product).\
+                                        order_by(ProductSummary.columns.Times).\
+                                        limit(10)
+    choices=[]
+    for product in user_products:
+        choices.append(product[0])
+
+    limit = IntegerField(
+                validators=[
+                    InputRequired(),
+                    # Setting reasonable limit, otherwise graph gets too crowded 
+                    NumberRange(
+                        min=1,
+                        max=MAX_VISUALIZATION_ITEMS if user_products_count>MAX_VISUALIZATION_ITEMS else user_products_count)
+                    ],
+                default=10)
+    products = SelectMultipleField(
+                    choices=choices,
+                    default=top10_user_products)
+    submit = SubmitField("Submit")

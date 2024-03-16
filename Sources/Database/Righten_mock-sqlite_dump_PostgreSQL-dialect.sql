@@ -13843,7 +13843,7 @@ FROM (
 			,ROUND(SUM("Amount"),2)			AS "Amount"
 	FROM "ExpendituresEnriched"
 	GROUP BY "UserID", "Product", "Month"
-	ORDER BY "UserID", "Month" DESC, "Amount" DESC
+	ORDER BY "UserID", "Month" ASC, "Amount" DESC
 );
 CREATE VIEW "MonthlyCommonProducts" AS
 SELECT *
