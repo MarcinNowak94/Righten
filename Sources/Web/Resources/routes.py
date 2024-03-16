@@ -289,12 +289,14 @@ def createpiechartdataset(
     total=0
     if addperc is True:
         for label, value in data:
-            total+=value
+            # Some datasets contain negative values
+            total+=abs(value)
         #sum=sum(value for label, value in data)
 
     for label, value in data:
         if addperc is True:
-            label+=" "+str(round((value/total)*100))+"%"
+            # Some datasets contain negative values
+            label+=" "+str(round((abs(value)/total)*100))+"%"
         labels.append(label)
         values.append(value)
 
@@ -634,7 +636,7 @@ def passwordreset_generatetoken():
     log_site_opened()
     return render_template('passwordreset_generatetoken.html', title="Generate token", form=form)
 
-#FIXME: Solely for proving concept
+# FIXME: Solely for proving concept
 @app.route('/paswordreset/<string:token>', methods=['GET', 'POST'])
 def passwordreset(token): 
     form=PasswordResetForm()
@@ -650,7 +652,7 @@ def passwordreset(token):
     log_site_opened()
     return render_template('passwordreset.html', title="Password reset", form=form)
 
-#NICE-TO-HAVE: add email password change confirmation
+# NICE-TO-HAVE: add email password change confirmation
 @app.route('/passwordchange', methods=['GET', 'POST'])
 @flask_login.login_required
 def passwordchange():
@@ -673,9 +675,8 @@ def passwordchange():
     log_site_opened()
     return render_template('passwordchange.html', title="Password reset", form=form)
 
-#Summaries and visualizations --------------------------------------------------
+# Summaries and visualizations -------------------------------------------------
 
-#TODO: Add percentages in piechart as in finances
 @app.route("/incomesummary")
 @flask_login.login_required
 def incomesummary():
@@ -710,84 +711,71 @@ def incomesummary():
                            Summary=summary
                            )
 
-#TODO: Add percentages in piechart as in finances
 @app.route("/billssummary")
 @flask_login.login_required
 def billssummary():
-    BillsTypeAmounts = []
-    BillsTypes = []
-    Summary = db.session.query(BillsSummary).\
+    summary = db.session.query(BillsSummary).\
                                 filter_by(UserID=current_user.uuid).all()
-    for Medium, Amount in db.session.query(BillsSummary.columns.Medium,
+    bills_types = db.session.query(BillsSummary.columns.Medium,
                                            BillsSummary.columns.Amount).\
                                             filter_by(UserID=current_user.uuid).\
                                             order_by(BillsSummary.columns.Amount.desc())\
-                                                .all():
-        BillsTypeAmounts.append(Amount)
-        BillsTypes.append(Medium)
-
-    MonthlyBillsData = []
-    for Month, Amount in db.session.query(MonthlyBills.columns.Month,
+                                                .all()
+    monthly_bills = db.session.query(MonthlyBills.columns.Month,
                                           MonthlyBills.columns.Amount).\
-                                filter_by(UserID=current_user.uuid).all():
-        MonthlyBillsData.append({"x": Month, "y":Amount})
-    
-    BillsTypespermonth = db.session.query(MonthlyBillsByMedium.columns.Month,
+                                filter_by(UserID=current_user.uuid).all()
+    bill_types_per_month = db.session.query(MonthlyBillsByMedium.columns.Month,
                                           MonthlyBillsByMedium.columns.Amount,
                                           MonthlyBillsByMedium.columns.Medium).\
                                 filter_by(UserID=current_user.uuid).all()
-    BillsTypesData = createchartdataset(BillsTypespermonth)
+    
+    bills_type_chart = createpiechartdataset(bills_types, addperc=True)
+    bills_types_data = createchartdataset(bill_types_per_month)
+    monthly_bills_data = []
+    for month, amount in monthly_bills:
+        monthly_bills_data.append({"x": month, "y":amount})
 
     log_site_opened()
     return render_template("billssummary.html",
                            title="Bills",
-                           BillsTypeAmounts=json.dumps(BillsTypeAmounts, cls=DecimalEncoder),
-                           BillsTypes=json.dumps(BillsTypes, cls=DecimalEncoder),
-                           MonthlyBillsData=json.dumps(MonthlyBillsData, cls=DecimalEncoder),
-                           BillsTypesData=json.dumps(BillsTypesData, cls=DecimalEncoder),
-                           Summary=Summary
+                           BillsTypechart=json.dumps(bills_type_chart, cls=DecimalEncoder),
+                           MonthlyBillsData=json.dumps(monthly_bills_data, cls=DecimalEncoder),
+                           BillsTypesData=json.dumps(bills_types_data, cls=DecimalEncoder),
+                           Summary=summary
                            )
 
-#TODO: Add percentages in piechart as in finances
 @app.route("/expendituressummary")
 @flask_login.login_required
 def expendituressummary():
-    ExpendituresSummarydata = db.session.query(TypeSummary.columns.Type,
+    expenditures_summary = db.session.query(TypeSummary.columns.Type,
                                              TypeSummary.columns.Amount).\
                                         filter_by(UserID=current_user.uuid).\
                                         order_by(TypeSummary.columns.Amount.desc()).all()
-    ExpendituresSummaryData=[]
-    ExpendituresSummaryTypes=[]
-    for Type, Amount in ExpendituresSummarydata:
-        ExpendituresSummaryData.append(Amount)
-        ExpendituresSummaryTypes.append(Type)
-
     ExpendituresOverTime = db.session.query(MonthlyExpenditures.columns.Month,
                                             MonthlyExpenditures.columns.Amount).\
                         filter_by(UserID=current_user.uuid).all()
-    MonthlyExpendituresData=[]
-    for Month, Amount in ExpendituresOverTime:
-        MonthlyExpendituresData.append({"x":Month,"y":Amount})
-
     TopTypeExpendituresData = db.session.query(
                                 Top10ProductTypesMonthly.columns.Month,
                                 Top10ProductTypesMonthly.columns.Sum,
                                 Top10ProductTypesMonthly.columns.Type).\
                         filter_by(UserID=current_user.uuid).all()
-    TopTypeExpenditures=createchartdataset(TopTypeExpendituresData, "true")
-
     TopProductsChartData = db.session.query(
                                 Top10ProductsMonthly.columns.Month,
                                 Top10ProductsMonthly.columns.Sum,
                                 Top10ProductsMonthly.columns.Product).\
                         filter_by(UserID=current_user.uuid).all()
-    TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
 
+    expenditures_summary_chart = createpiechartdataset(expenditures_summary, addperc=True)
+    TopTypeExpenditures=createchartdataset(TopTypeExpendituresData, "true")
+    TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
+    MonthlyExpendituresData=[]
+    for Month, Amount in ExpendituresOverTime:
+        MonthlyExpendituresData.append({"x":Month,"y":Amount})
+    
     log_site_opened()
     return render_template("expendituressummary.html",
                            title="Expenditures",
-                           ExpendituresSummaryData=json.dumps(ExpendituresSummaryData, cls=DecimalEncoder),
-                           ExpendituresSummaryTypes=json.dumps(ExpendituresSummaryTypes, cls=DecimalEncoder), 
+                           ExpendituresSummaryChart=json.dumps(expenditures_summary_chart, cls=DecimalEncoder),
                            MonthlyExpenditures=json.dumps(MonthlyExpendituresData, cls=DecimalEncoder),
                            TopTypeExpenditures=json.dumps(TopTypeExpenditures, cls=DecimalEncoder),
                            TopProductsExpenditures=json.dumps(TopProductsExpenditures, cls=DecimalEncoder)
@@ -837,8 +825,7 @@ def spending():
                            SpendingTargetData=json.dumps(SpendingTargetData, cls=DecimalEncoder)
                            )
 
-#TODO: Financial posture
-#TODO: add average income year to date
+# NICE-TO-HAVE: green color above SavingsTarget 
 @app.route("/finances")
 @flask_login.login_required
 def finances():
@@ -848,9 +835,21 @@ def finances():
     BilanceData = db.session.query(MonthlyBilanceSingle.columns.Month,
                                    MonthlyBilanceSingle.columns.Amount).\
                         filter_by(UserID=current_user.uuid).all()
+    BilanceSources = db.session.query(MonthlyBilance.columns.Month,
+                                      MonthlyBilance.columns.Amount,
+                                      MonthlyBilance.columns.Source).\
+                        filter_by(UserID=current_user.uuid).all()
+    BilanceTotal = db.session.query(MonthlyBilance.columns.Source,
+                                  db.func.round(db.func.sum(MonthlyBilance.columns.Amount))).\
+                                    filter_by(UserID=current_user.uuid)\
+                                    .group_by(MonthlyBilance.columns.Source).all()
     SavingsTargetData = (db.session.query(UserSettings).\
-                       filter_by(UserID=current_user.uuid, Setting="SavingsTarget").\
+                       filter_by(UserID=current_user.uuid,
+                                 Setting="SavingsTarget").\
                         first()).Value
+    
+    BilanceSourcesData=createchartdataset(BilanceSources, "true")
+
     Bilance=[]
     Breakeven=[]
     BilanceSet=[]
@@ -869,32 +868,13 @@ def finances():
     
     for set in sets:
         BilanceSet.append({"label": set, "data": sets[set]})
-    
-    BilanceSources = db.session.query(MonthlyBilance.columns.Month,
-                                      MonthlyBilance.columns.Amount,
-                                      MonthlyBilance.columns.Source).\
-                        filter_by(UserID=current_user.uuid).all()
-    BilanceSourcesData=createchartdataset(BilanceSources, "true")
 
-    BilanceTotal = db.session.query(MonthlyBilance.columns.Source,
-                                  db.func.round(db.func.sum(MonthlyBilance.columns.Amount))).\
-                                    filter_by(UserID=current_user.uuid)\
-                                    .group_by(MonthlyBilance.columns.Source).all()
-
-    Total=0
-    for Source, Amount in BilanceTotal:
-        Total=Total+abs(Amount)
-    BilanceTotalLabels=[]
-    BilanceTotalValues=[]
-    for Source, Amount in BilanceTotal:
-        BilanceTotalLabels.append(Source+' '+str(round((abs(Amount)/Total)*100,2))+'%')
-        BilanceTotalValues.append(Amount)
+    BilanceTotalchart=createpiechartdataset(BilanceTotal, addperc=True)
 
     log_site_opened()
     return render_template("financialposture.html",
                            title="Finances",
-                           BilanceTotalLabels=json.dumps(BilanceTotalLabels, cls=DecimalEncoder),
-                           BilanceTotalValues=json.dumps(BilanceTotalValues, cls=DecimalEncoder),
+                           BilanceTotalchart=json.dumps(BilanceTotalchart, cls=DecimalEncoder),
                            BilanceSourcesData=json.dumps(BilanceSourcesData, cls=DecimalEncoder),
                            BilanceData=json.dumps(BilanceSet, cls=DecimalEncoder),
                            StatisticData=StatisticData
