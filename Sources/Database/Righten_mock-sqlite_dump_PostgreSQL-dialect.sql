@@ -13851,6 +13851,18 @@ FROM "MonthlyProducts"
 WHERE "Items">(
 	SELECT AVG("Items")
 	FROM "MonthlyProducts");
+CREATE VIEW "MonthlyProductTypes" AS
+SELECT *
+FROM (
+	SELECT	"UserID"
+			,TO_CHAR("DateTime", 'YYYY-MM') AS "Month"
+			,"Type"
+			,COUNT("Type")                  AS "Items"
+			,ROUND(SUM("Amount"),2)         AS "Amount"
+	FROM "ExpendituresEnriched"
+	GROUP BY "UserID", "Type", "Month"
+	ORDER BY "UserID", "Month" ASC, "Amount" DESC
+);
 CREATE VIEW "ProductSummary" AS
 SELECT
 	"Products"."UserID"						AS "UserID"

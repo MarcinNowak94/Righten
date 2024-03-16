@@ -1,0 +1,129 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4">
+            <form action="" method="POST">
+                {{ form.csrf_token() }}
+                <fieldset class="form-group">
+                        <div class="row form-group">
+                            {{ form.limit.label(class="form-control-label") }}
+                            {% if form.limit.errors %}
+                                {{ form.limit(class="form-control form-control-sm is-invalid") }}
+                                {% for error in form.limit.errors %}
+                                    <div class="invalid-feedback">
+                                        <span>{{error}}</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                {{ form.limit(class="form-control form-control-sm") }}
+                            {% endif %}
+                        </div>
+                        <div class="row form-group">
+                            {{ form.types.label(class="form-control-label") }}
+                            {% if form.types.errors %}
+                                {{ form.types(class="form-control form-control-sm is-invalid") }}
+                                {% for error in form.types.errors %}
+                                    <div class="invalid-feedback">
+                                        <span>{{error}}</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                {{ form.types(class="form-control form-control-sm") }}
+                            {% endif %}
+                        </div>
+                        <div class="row">
+                            {{ form.submit(class="btn btn-success", value="Check")}}
+                        </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="col-sm-8">
+            <div class="chart-container" style="position: relative;">
+                <canvas id="TopTypesPie"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="TopTypesLine"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-xs-12 ml-auto">
+    <H2>Selected Types summary</H2>
+    <table class="table table-xs table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Type</th>
+                <th scope="col">Spent</th>
+                <th scope="col">Bought</th>
+                <th scope="col">Priority</th>
+                <th scope="col">First Bought</th>
+                <th scope="col">Last Bought</th>
+                <th scope="col">Min</th>
+                <th scope="col">Avg</th>
+                <th scope="col">Max</th>
+                <th scope="col">Variability</th>
+                <th scope="col">Common</th>
+                <th scope="col">Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+                    <tr>
+                        <td>{{entry.ID}}</td>
+                        <td>{{entry.Type}}</td>
+                        <td>{{entry.Amount}}</td>
+                        <td>{{entry.Times}}</td>
+                        <td>{{entry.Priority}}</td>
+                        <td>{{entry.First}}</td>
+                        <td>{{entry.Last}}</td>
+                        <td>{{entry.Minimum}}</td>
+                        <td>{{entry.Average}}</td>
+                        <td>{{entry.Maximum}}</td>
+                        <td>{{entry.Variability}}</td>
+                        <td>{{entry.Common}}</td>
+                        <td>{{entry.Comment}}</td>
+                    </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+    {% block javascript %}
+        <!--Added as per: https://www.chartjs.org/chartjs-plugin-zoom/latest/guide/integration.html-->
+        <script src="path/to/chartjs/dist/chart.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+        <script src="path/to/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
+        <script>
+            let top_types_chart = JSON.parse({{ top_types_chart | tojson }})
+            let top_types_line = JSON.parse({{ top_types_line | tojson }})
+
+            let TopProducts = new Chart(document.getElementById("TopTypesPie"), {
+                type: 'pie',
+                data: top_types_chart
+            })
+            let TopProductsLine = new Chart(document.getElementById("TopTypesLine"), {
+                type: "line",
+                title: {
+                        display: true,
+                        text: "Top product types",
+                        fontSize: 20,
+                        },
+                data: {
+                    datasets: top_types_line
+                }
+            })
+        </script>
+    {% endblock %}
+{% endblock %}

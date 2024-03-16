@@ -327,3 +327,38 @@ class ProductVisualizationForm(FlaskForm):
                     choices=choices,
                     default=top10_user_products)
     submit = SubmitField("Submit")
+
+class TypeVisualizationForm(FlaskForm):
+    """Type summary visualization form, decides which types data are 
+    selected from database to be visualized
+
+    Arguments:
+        :FlaskForm: -- base class
+    """
+
+    with app.app_context():
+        user_types_count = db.session.query(TypeSummary.columns.Type,
+                                            TypeSummary.columns.Amount).count()
+                                        #filter_by(UserID=current_user.uuid)
+        user_types = db.session.query(ProductTypes.Type).all()
+                                        #filter_by(UserID=current_user.uuid)
+        top10_user_types = db.session.query(TypeSummary.columns.Type).\
+                                        order_by(TypeSummary.columns.Times).\
+                                        limit(10)
+    choices=[]
+    for type in user_types:
+        choices.append(type[0])
+
+    limit = IntegerField(
+                validators=[
+                    InputRequired(),
+                    # Setting reasonable limit, otherwise graph gets too crowded 
+                    NumberRange(
+                        min=1,
+                        max=MAX_VISUALIZATION_ITEMS if user_types_count>MAX_VISUALIZATION_ITEMS else user_types_count)
+                    ],
+                default=10)
+    types = SelectMultipleField(
+                    choices=choices,
+                    default=top10_user_types)
+    submit = SubmitField("Submit")

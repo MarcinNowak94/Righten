@@ -48,8 +48,12 @@ def get_current_user_ID() -> str:
         userid=None
     return userid
 
-def log_site_opened() -> None:
-    """Logs that site was opened by user"""
+def log_site_opened(params=None) -> None:
+    """Logs that site was opened by user
+
+    Arguments:
+        :params: -- variables used while displaying site
+    """
     
     logger.info(
         "User visited site",
@@ -57,7 +61,8 @@ def log_site_opened() -> None:
             "action": "Site visited",
             "result": "Success",
             "user": get_current_user_ID(),
-            "request": get_request_data()
+            "request": get_request_data(),
+            "params": params
             }
         )
 
@@ -885,7 +890,6 @@ def finances():
 @app.route("/productssummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def productssummary():
-    # TODO: filter results to products chosen by user in GUI
     limit = 10
     selected_products=[]
 
@@ -899,7 +903,6 @@ def productssummary():
                             filter_by(UserID=current_user.uuid).\
                             order_by(ProductSummary.columns.Times.desc()).\
                             limit(limit).all()
-    form.products.default
 
     selection_products_list= (product for product, amount in top_products)
     selected_products.extend(selection_products_list)
@@ -919,7 +922,12 @@ def productssummary():
     top_products_chart = createpiechartdataset(top_products, addperc=True)
     top_products_line = createchartdataset(monthly_products)
 
-    log_site_opened()
+    params={
+        "limit": limit,
+        "selectedproducts": selected_products
+    }
+
+    log_site_opened(params=params)
     return render_template("productsummary.html",
                         title="Products",
                         top_products_chart=json.dumps(top_products_chart, cls=DecimalEncoder),
@@ -930,12 +938,53 @@ def productssummary():
 
 #TODO: producttypessummary
 #TODO: Add type picker and corresponding graph
-@app.route("/producttypessummary")
+@app.route("/producttypessummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def producttypessummary():
-    log_site_opened()
-    return render_template("underconstruction.html",
-                        title="Product types"
+    limit = 10
+    selected_types=[]
+
+    form = TypeVisualizationForm()
+    if request.method == "POST" and form.validate_on_submit():
+        limit = form.limit.data
+        selected_types = form.types.data
+
+    top_types=db.session.query(TypeSummary.columns.Type,
+                                 TypeSummary.columns.Amount).\
+                            filter_by(UserID=current_user.uuid).\
+                            order_by(TypeSummary.columns.Times.desc()).\
+                            limit(limit).all()
+
+    selection_types_list= (type for type, amount in top_types)
+    selected_types.extend(selection_types_list)
+    form.types.default=selected_types # Set all displayed types as chosen
+
+    monthly_types = db.session.query(MonthlyProductTypes.columns.Month,
+                                       MonthlyProductTypes.columns.Amount,
+                                       MonthlyProductTypes.columns.Type,
+                                       ).\
+                        filter_by(UserID=current_user.uuid).\
+                        where(MonthlyProductTypes.columns.Type.in_(selected_types)).all()
+    types_table = db.session.query(TypeSummary).\
+                        filter_by(UserID=current_user.uuid).\
+                        where(TypeSummary.columns.Type.in_(selected_types)).\
+                        order_by(TypeSummary.columns.Times.desc()).all()
+    
+    top_types_chart = createpiechartdataset(top_types, addperc=True)
+    top_types_line = createchartdataset(monthly_types)
+
+    params={
+        "limit": limit,
+        "selectedtypes": selected_types
+    }
+
+    log_site_opened(params=params)
+    return render_template("typesummary.html",
+                        title="types",
+                        top_types_chart=json.dumps(top_types_chart, cls=DecimalEncoder),
+                        top_types_line=json.dumps(top_types_line, cls=DecimalEncoder),
+                        entries=types_table,
+                        form=form
                         )
 
 

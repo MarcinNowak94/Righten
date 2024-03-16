@@ -30,9 +30,9 @@ with app.app_context():
     MonthlyBills = Table("MonthlyBills", db.metadata, autoload_with=db.engine)
     MonthlyExpenditures = Table("MonthlyExpenditures", db.metadata, autoload_with=db.engine)
     MonthlyIncome = Table("MonthlyIncome", db.metadata, autoload_with=db.engine)
-    MonthlyExpendituresbyType = Table("MonthlyExpendituresbyType", db.metadata, autoload_with=db.engine)
     MonthlyProducts = Table("MonthlyProducts", db.metadata, autoload_with=db.engine)
     MonthlyCommonProducts = Table("MonthlyCommonProducts", db.metadata, autoload_with=db.engine)
+    MonthlyProductTypes = Table("MonthlyProductTypes", db.metadata, autoload_with=db.engine)
     ProductSummary = Table("ProductSummary", db.metadata, autoload_with=db.engine)
     TypeSummary = Table("TypeSummary", db.metadata, autoload_with=db.engine)
     BillsSummary = Table("BillsSummary", db.metadata, autoload_with=db.engine)
@@ -45,6 +45,7 @@ with app.app_context():
     MonthlyBilanceSingle = Table("MonthlyBilanceSingle", db.metadata, autoload_with=db.engine)
     MonthlySpending = Table("MonthlySpending", db.metadata, autoload_with=db.engine)
     Statistics = Table("Statistics", db.metadata, autoload_with=db.engine)
+    
 
 # Maps used to generalize functions - to refer to table by objectname alone
 tables = {
@@ -63,9 +64,9 @@ views = {
     "MonthlyBills" : MonthlyBills,
     "MonthlyExpenditures" : MonthlyExpenditures,
     "MonthlyIncome" : MonthlyIncome,
-    "MonthlyExpendituresbyType" : MonthlyExpendituresbyType,
     "MonthlyProducts" : MonthlyProducts,
     "MonthlyCommonProducts" : MonthlyCommonProducts,
+    "MonthlyProductTypes" : MonthlyProductTypes,
     "ProductSummary" : ProductSummary,
     "TypeSummary" : TypeSummary,
     "BillsSummary" : BillsSummary,
