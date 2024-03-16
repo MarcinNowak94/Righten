@@ -78,46 +78,13 @@
 
     {% block javascript %}
         <script>
-            let IncomeSummarydata = JSON.parse({{ IncomeSummarydata | tojson }})
-            let IncomeSummarylabels = JSON.parse({{ IncomeSummarylabels | tojson }})
+            let IncomeTypechart = JSON.parse({{ IncomeTypechart | tojson }})
             let MonthlyIncome = JSON.parse({{ MonthlyIncome | tojson }})
             let IncomeTypesByTimeDataset = JSON.parse({{ IncomeTypesByTimeDataset | tojson }})
 
             let IncomeSummarychart = new Chart(document.getElementById("IncomeSummary"), {
                     type: 'pie',
-                    data: {
-                        labels: IncomeSummarylabels,
-                        datasets: [{
-                            label: "Income type",
-                            data: IncomeSummarydata,
-                            backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
-                                '#B276B2', '#E16851', '#FB8267'],
-
-                            borderWidth: 1,
-                            hoverBorderColor: "black",
-                            hoverBorderWidth: 2,
-                            hoverBackgroundColor: 'rgba(154, 245, 140)',
-                            pointHoverRadius: 5
-                        }]
-                    },
-                    options: {
-                            title: {
-                                display: true,
-                                    text: "Income type summary",
-                                        fontSize: 20,
-                            },
-                            legend: {
-                                position: "right",
-                                    labels: {
-                                    fontColor: "gray"
-                                },
-                                display: true
-                            },
-
-                            elements: {
-                                hitRadius: 3,
-                            }
-                    }
+                    data: IncomeTypechart
                 })
 
             let IncomeOverTime = new Chart(document.getElementById("IncomeOverTime"), {

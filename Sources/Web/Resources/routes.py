@@ -1,3 +1,4 @@
+from typing import SupportsComplex, List, Dict
 from datetime import date
 from decimal import Decimal
 import flask
@@ -265,6 +266,48 @@ def createchartdataset(dbdata: list, fill="false") -> list:
             )
     return dataset
 
+def createpiechartdataset(
+        data: List[Dict[str, SupportsComplex]],
+        value_descriptor="Amount",
+        addperc=False
+        ):
+    """Creates data for jschart piechart
+
+    Arguments:
+        :data: -- Data to chart in form: [Label, value] 
+
+    Keyword Arguments:
+        :value_descriptor: -- Text displayed beside value on mouse hover (default: {"Amount"})
+        :addperc: -- Adds percentage to label (default: {False})
+
+    Returns:
+        JSON formatted jschart piechart data
+    """
+
+    labels=[]
+    values=[]
+    total=0
+    if addperc is True:
+        for label, value in data:
+            total+=value
+        #sum=sum(value for label, value in data)
+
+    for label, value in data:
+        if addperc is True:
+            label+=" "+str(round((value/total)*100))+"%"
+        labels.append(label)
+        values.append(value)
+
+    chartdata={
+        "labels": labels,
+        "datasets": [{
+            "label": value_descriptor,
+            "data": values
+        }]
+    }
+
+    return chartdata
+
 def redirect_url(default='index') -> str:
     """Returns redirect url either:
     1. 'next' argument in request
@@ -408,6 +451,7 @@ def unauthorized_handler():
         )
     return redirect(url_for('index'))
 
+# NICE-TO-HAVE: Refactoring
 @app.route('/settings', methods=['GET', 'POST'])
 @flask_login.login_required
 def settings():
@@ -633,52 +677,61 @@ def passwordchange():
 @app.route("/incomesummary")
 @flask_login.login_required
 def incomesummary():
-    IncomeSummarydata=db.session.query(TotalIncomeByType).all()
-    incometypesummary=[]
-    incometypes=[]
-    Summary = db.session.query(IncomeSummary).all()
-    for sum, type in IncomeSummarydata:
-        incometypesummary.append(sum)
-        incometypes.append(type)
-
-    IncomeOverTime=db.session.query(MonthlyIncome).all()
-    monthlyincomedata=[]
-    for Month, Amount in IncomeOverTime:
-        monthlyincomedata.append({"x": Month, "y": Amount})
-
-    IncomeTypesByTime=db.session.query(MonthlyIncomeByType).all()
+    IncomeSummarydata = db.session.query(IncomeSummaryByType.columns.Type,
+                                         IncomeSummaryByType.columns.Amount).\
+                                filter_by(UserID=current_user.uuid).all()
+    summary = db.session.query(IncomeSummary).\
+                                filter_by(UserID=current_user.uuid).all()
+    IncomeOverTime = db.session.query(
+                                    MonthlyIncome.columns.Month,
+                                    MonthlyIncome.columns.Amount).\
+                                filter_by(UserID=current_user.uuid).all()
+    IncomeTypesByTime = db.session.query(
+                                MonthlyIncomeByType.columns.Month,
+                                MonthlyIncomeByType.columns.Amount,
+                                MonthlyIncomeByType.columns.Type).\
+                                filter_by(UserID=current_user.uuid).all()
+    
+    IncomeTypechart=createpiechartdataset(IncomeSummarydata, addperc=True)
     IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
+
+    monthlyincomedata = []
+    for month, amount in IncomeOverTime:
+        monthlyincomedata.append({"x": month, "y": amount})
 
     log_site_opened()
     return render_template("incomesummary.html",
                            title="Income",
-                           IncomeSummarydata=json.dumps(incometypesummary, cls=DecimalEncoder),
-                           IncomeSummarylabels=json.dumps(incometypes, cls=DecimalEncoder),
+                           IncomeTypechart=json.dumps(IncomeTypechart, cls=DecimalEncoder),
                            MonthlyIncome=json.dumps(monthlyincomedata, cls=DecimalEncoder),
                            IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset, cls=DecimalEncoder),
-                           Summary=Summary
+                           Summary=summary
                            )
 
 #TODO: Add percentages in piechart as in finances
 @app.route("/billssummary")
 @flask_login.login_required
 def billssummary():
-    BillsTypeAmounts=[]
-    BillsTypes=[]
-    Summary = db.session.query(BillsSummary).all()
+    BillsTypeAmounts = []
+    BillsTypes = []
+    Summary = db.session.query(BillsSummary).\
+                                filter_by(UserID=current_user.uuid).all()
     for Medium, Amount in db.session.query(BillsSummary.columns.Medium,
-                                           BillsSummary.columns.Amount)\
-                                            .order_by(BillsSummary.columns.Amount.desc())\
+                                           BillsSummary.columns.Amount).\
+                                            filter_by(UserID=current_user.uuid).\
+                                            order_by(BillsSummary.columns.Amount.desc())\
                                                 .all():
         BillsTypeAmounts.append(Amount)
         BillsTypes.append(Medium)
 
-    MonthlyBillsData=[]
-    for Month, Amount in db.session.query(MonthlyBills).all():
+    MonthlyBillsData = []
+    for Month, Amount in db.session.query(MonthlyBills).\
+                                filter_by(UserID=current_user.uuid).all():
         MonthlyBillsData.append({"x": Month, "y":Amount})
     
-    BillsTypespermonth=db.session.query(MonthlyBillsByMedium).all();
-    BillsTypesData=createchartdataset(BillsTypespermonth)
+    BillsTypespermonth = db.session.query(MonthlyBillsByMedium).\
+                                filter_by(UserID=current_user.uuid).all()
+    BillsTypesData = createchartdataset(BillsTypespermonth)
 
     log_site_opened()
     return render_template("billssummary.html",
@@ -823,6 +876,8 @@ def finances():
 @flask_login.login_required
 def productssummary():
     # TODO: filter results to products chosen by user in GUI
+    monthlyProducts = db.session.query(MonthlyProducts).all()
+    
     Top10Products = db.session.query(Top10ProductsMonthly).all()
     
     Top10ProductsData = createchartdataset(Top10Products)

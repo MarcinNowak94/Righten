@@ -39,7 +39,6 @@ with app.app_context():
     MonthlyIncomeByType = Table("MonthlyIncomeByType", db.metadata, autoload_with=db.engine)
     IncomeSummary = Table("IncomeSummary", db.metadata, autoload_with=db.engine)
     IncomeSummaryByType = Table("IncomeSummaryByType", db.metadata, autoload_with=db.engine)
-    TotalIncomeByType = Table("TotalIncomeByType", db.metadata, autoload_with=db.engine)
     MonthlyBillsByMedium = Table("MonthlyBillsByMedium", db.metadata, autoload_with=db.engine)
     Top10ProductTypesMonthly = Table("Top10ProductTypesMonthly", db.metadata, autoload_with=db.engine)
     Top10ProductsMonthly = Table("Top10ProductsMonthly", db.metadata, autoload_with=db.engine)
@@ -73,7 +72,6 @@ views = {
     "MonthlyIncomeByType" : MonthlyIncomeByType,
     "IncomeSummary" : IncomeSummary,
     "IncomeSummaryByType" : IncomeSummaryByType,
-    "TotalIncomeByType" : TotalIncomeByType,
     "MonthlyBillsByMedium" : MonthlyBillsByMedium,
     "Top10ProductTypesMonthly" : Top10ProductTypesMonthly,
     "Top10ProductsMonthly" : Top10ProductsMonthly,
