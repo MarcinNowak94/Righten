@@ -792,7 +792,7 @@ funkcjonalnych. Nagłówki z powodu objętości zostały skrócone, legenda:}
     \hline
     {Poradniki} & {M} & {TAK} & {Poradniki zarządzania finansami}\\
     \hline
-    {Rejestr zdarzeń} & {S} & {NIE} & {Logi z działania aplikacji}\\
+    {Rejestr zdarzeń} & {S} & {TAK} & {Logi z działania aplikacji}\\
     \hline
     {Informacja zwrotna} & {S} & {NIE} & {Kontrolki informacji zwrotnej i opinii użytkownika}\\
     \hline
@@ -850,9 +850,9 @@ funkcjonalnych. Nagłówki z powodu objętości zostały skrócone, legenda:}
     \hline
     {Eksport danych} & {C} & {NIE} & {Eksport danych do standardowego formatu}\\
     \hline
-    {Własne progi} & {C} & {NIE} & {Progi wydatków określane przez użytkownika w ustawieniach}\\
+    {Własne progi} & {C} & {TAK} & {Progi wydatków określane przez użytkownika w ustawieniach}\\
     \hline
-    {Cele oszczędnościowe} & {C} & {NIE} & {Cele oszczędnościowe określane przez użytkownika w ustawieniach}\\
+    {Cele oszczędnościowe} & {C} & {TAK} & {Cele oszczędnościowe określane przez użytkownika w ustawieniach}\\
     \hline
     {Porady} & {C} & {TAK} & {Porady na podstawie danych wprowadzonych do aplikacji 
     pomagające użytkownikom w poprawie usprawnień budżetu}\\
@@ -1291,9 +1291,9 @@ services:
     #Persistent server configuration
     volumes:
         - ./Database/dbconnections.json:/pgadmin4/servers.json\end{lstlisting}
-    {Definicja infrastruktury aplikacji w Docker-compose.yaml na podstawie 
-    której powoływane jest całe środowisko aplikacji.}
 \end{minipage}
+{Definicja infrastruktury aplikacji w Docker-compose.yaml na podstawie 
+której powoływane jest całe środowisko aplikacji.}
 
 \begin{figure}[H]           %requires float package
     \centering
@@ -1314,7 +1314,10 @@ w modelu danych w obu warstwach wymagają coraz większych nakładów pracy po
 stronie logiki serwera aplikacji aby usługa działała poprawnie. W projekcie 
 Righten zastosowano mechanizm refleksji \cite{refleksja} zaprezentowany na 
 listingu \ref*{lst:refleksja} który ma za zadanie utrzymać spójność modelu 
-danych między warstwami.}
+danych między warstwami, przy czym mechanizmy wczytywania tabel oraz widoków są 
+różne. Ponadto zmapowane obiekty klas przechowuje tabela pomocnicza tables 
+używana w funkcjach których działanie jest niezależne od struktury wewnętrznej 
+tabeli.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Refleksja obiektów bazy},
@@ -1359,10 +1362,6 @@ tables={
     "MonthlyBills" : MonthlyBills
     #(...)
 }\end{lstlisting}
-{Refleksja obiektów bazy na klasy do użytku w warstwie aplikacji. Na uwagę 
-zasługuje fakt iż mechanizm wczytywania tabel oraz widoków jest inny. Ponadto 
-zmapowane obiekty klas przechowuje tabela pomocnicza tables używana w funkcjach 
-których działanie jest niezależne od struktury wewnętrznej tabeli.}
 \end{minipage}
 
 {Formularze do wprowadzania danych przez użytkownika zdefiniowane w pliku 
@@ -1370,7 +1369,13 @@ forms.py wykorzystują framework WTForms. Ponieważ część danych w tabelach
 podstawowych się pokrywa, aby uprościć kod stworzono klasę bazową CommonForm 
 która definiuje wszystkie pola wspólne i skorzystano z dziedziczenia aby w 
 klasach pochodnych móc definiować wyłacznie pozostałe pola. Przykład tego 
-mechanizmu prezentuje listing \ref*{lst:formularze}.}
+mechanizmu prezentuje listing \ref*{lst:formularze}. Przedstawia on klasę bazową
+ CommonForm która zawiera pola wspólne dla wszystkich tabel oraz przykład klasy 
+pochodnej IncomeInputForm która definiuje pola szczegółowe dla danej tabeli. 
+Każde z pól określa klasa w któej zdefiniowano jego nazwę, walidatory oraz dane 
+źródłowe do uzupełnienia list rozwijanych jeśli są wymagane. Ponieważ 
+komunikacja w aplikacji jest zabezpieczona zapytania do bazy musi wykonać sama 
+aplikacja co wymaga instrukcji with app.app\_context().}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Formularze do wprowadzania danych przez użytkownika},
@@ -1387,12 +1392,11 @@ mechanizmu prezentuje listing \ref*{lst:formularze}.}
 #Base class with common elements
 class CommonForm(FlaskForm):
     datetime = StringField("DateTime", 
-                           validators=[DataRequired(),
-                                       Regexp("((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])", 
-                                              message="Date must be in format: YYYY-MM-DD")
-                                      ],
-                           default=date.today().isoformat())
-    amount = DecimalField("Amount", validators=[DataRequired()])
+        validators=[DataRequired(), Regexp("((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])", 
+        message="Date must be in format: YYYY-MM-DD")],
+        default=date.today().isoformat())
+    amount = DecimalField("Amount", 
+                          validators=[DataRequired()])
     comment = StringField("Comment", validators=[])
     submit = SubmitField("SubmitField")
 
@@ -1402,22 +1406,16 @@ class IncomeInputForm(CommonForm):
       sources=[]
       for type in db.session.query(Income.Type).distinct():
           types.append(type[0])
-      for source in db.session.query(Income.Source).distinct():
+      for source in 
+            db.session.query(Income.Source).distinct():
           sources.append(source[0])
 
     type = SelectField("Type", validators=[DataRequired()],
-                          choices=types,
-                        )
-    #NICE-TO-HAVE: display only sources viable for specified type
-    source = SelectField("Source", validators=[DataRequired()],
-                          choices=sources
-                        )\end{lstlisting}
-{Klasa bazowa CommonForm któa zawiera pola wspólne dla wszystkich tabel oraz 
-przykład klasy pochodnej IncomeInputForm która definiuje pola szczegółowe dla 
-danej tabeli. Każde z pól określa klasa w któej zdefiniowano jego nazwę, 
-walidatory oraz dane źródłowe do uzupełnienia list rozwijanych jeśli są 
-wymagane. Ponieważ komunikacja w aplikacji jest zabezpieczona zapytania do bazy 
-musi wykonać sama aplikacja co wymaga instrukcji with app.app\_context().}
+                          choices=types)
+    
+    source = SelectField("Source", 
+                         validators=[DataRequired()],
+                         choices=sources)\end{lstlisting}
 \end{minipage}
 
 {Strony zdefiniowano w pliku routes.py, wśród nich na wyróżnienie zasługują dwa 
@@ -1426,6 +1424,21 @@ główne typy: strony do zarządzania danymi widoczne na listingu
 i usuwa swoje dane w aplikacji oraz strony z podsumowaniami jak zaprezentowana 
 na listingu \ref*{lst:strony-podsumowania} które prezentują użytkownikowi dane w
  formie różnorodnych wizualizacji.}
+
+{Aplikacja udostępnia użytkownikowi wprowadzanie danych przez dedykowany 
+formularz (przykład opisano w listingu \ref*{lst:formularze}), oraz wyświetla 
+dane już wprowadzone przez użytkownika wraz z opcjami usunięcia i edycji każdego
+z rekordów. Aplikacja sprawdza poprawność danych wprowadzonych przez 
+użytkownika i wysyła je do bazy.}
+
+{Każda strona prezentacji danych ma odmienny układ projektowany z myślą o 
+funkcji jakąbędzie pełnić dla użytkownika tak, aby przedstawiać dane w sposób 
+prosty, jasny i nie zaciemniać obrazu nadmiarem informacji. Każda z nich 
+podobnie do przykładowej pobiera dane z bazy, przetwarza je do formatu kolekcji 
+prezentowanych na grafach (osie x i y), lub w formie zestawów etykiet i wartości
+do prezentacji w formie tabel lub wykresów kołowych. Następnie warstwa 
+serwera przetwarza dane do formatu json \cite{JSON} którym wysyłane są do 
+szablonów i prezentowane użytkownikowi przez frontend.}
 
 {Znaczniki czasu w aplikacjie przechowywane są w formacie zgodnym ze standardem 
 ISO 8601 \cite{ISO 8601} ponieważ jednolity format ułatwia obsługę i 
@@ -1475,14 +1488,6 @@ def incomesummary():
                            IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset, cls=DecimalEncoder),
                            Summary=Summary
                            )\end{lstlisting}
-{Kazda strona prezentacji danych ma odmienny układ projektowany z myślą o 
-funkcji jakąbędzie pełnić dla użytkownika tak, aby przedstawiać dane w sposób 
-prosty, jasny i nie zaciemniać obrazu nadmiarem informacji. Każda z nich 
-podobnie do przykładowej pobiera dane z bazy, przetwarza je do formatu kolekcji 
-prezentowanych na grafach (osie x i y), lub w formie zestawów etykiet i wartości
- do prezentacji w formie tabel lub wykresów kołowych. Następnie warstwa 
-serwera przetwarza dane do formatu json \cite{JSON} którym wysyłane są do 
-szablonów i prezentowane użytkownikowi przez frontend.}
 \end{minipage}
 
 \begin{minipage}{\textwidth}
@@ -1513,11 +1518,6 @@ def income():
         addtodb(entry)
         return redirect(redirect_url(url_for("income", next="income")))
     return render_template("incometable.html", title="Income", entries=entries, form=form)\end{lstlisting}
-{Aplikacja udostępnia użytkownikowi wprowadzanie danych przez dedykowany 
-formularz (przykład opisano w listingu \ref*{lst:formularze}), oraz wyświetla 
-dane już wprowadzone przez użytkownika wraz z opcjami usunięcia i edycji każdego
- z rekordów. Aplikacja sprawdza poprawność danych wprowadzonych przez 
-użytkownika i wysyła je do bazy.}
 \end{minipage}
 
 {Przykładowy szablon strony wymaga szerszego opisu ponieważ zależnie od jego 
@@ -1559,10 +1559,10 @@ jedną wspólną funkcję generyczną dla wszystkich tabel.}
         let MonthlyIncome = JSON.parse({{ MonthlyIncome | tojson }})
         let IncomeTypesByTimeDataset = JSON.parse({{ IncomeTypesByTimeDataset | tojson }})
     (...)\end{lstlisting}
+\end{minipage}
 {Początek bloku skryptowego JavaScript \cite{JavaScript} strony, frontend 
 odbiera dane wysłane z backendu i przetwarza (parsuje) dane z tekstu do obiektu 
 w formacie JSON \cite{JSON}.}
-\end{minipage}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Tworzenie obiektów wizualizacji w szablonach stron},
@@ -1592,8 +1592,8 @@ let IncomeTypesOverTime = new Chart(document.getElementById("IncomeTypesOverTime
         datasets: IncomeTypesByTimeDataset
     }
 })\end{lstlisting}
-{Tworzenie obiektów klas chart.js.}
 \end{minipage}
+{Tworzenie obiektów klas chart.js.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Panale wizualizacji w szablonach stron},
@@ -1616,9 +1616,9 @@ let IncomeTypesOverTime = new Chart(document.getElementById("IncomeTypesOverTime
         </div>
     </div>
 </div>\end{lstlisting}
+\end{minipage}
 {Komponenty które służą do prezentacji przygotowanych wizualizacji 
 użytkownikowi.}
-\end{minipage}
 
 
 \begin{minipage}{\textwidth}
@@ -1672,13 +1672,14 @@ użytkownikowi.}
     </form>
 </div>
 <br></br>\end{lstlisting}
+\end{minipage}
 {Formularze wprowadzania danych występują na stronach zarządzania danymi. Każde 
 pole formularza ma odpowiednią kontrolkę z walidacją danych i obsługę błędów 
 oraz przycisk do zatwierdzenia formularza który wysyła wprowadzone przez 
 użytkownika dane do aplikacij. Komunikację zabezpiecza token CSRF (Cross-Site 
 Request Forgery) \cite{CSRF}, dzięki czemu aplikacja nie przyjmuje żądań HTTP 
 wysłanych z zewnątz aplikacji.}
-\end{minipage}
+
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Zestawienia danych w szablonach stron},
@@ -1723,12 +1724,10 @@ wysłanych z zewnątz aplikacji.}
     </tbody>
     </table>
 </div>\end{lstlisting}
+\end{minipage}
 {Aplikacja na podstawie dostarczonego w postaci JSON obierktu z rekordami w 
 locie tworzy tabelę z wszystkimi danymi a także linkami do edycji oraz usunięcia
  dla każdego z rekordów.}
-\end{minipage}
-
-%#TODO: describe expenditures table - displaying ExpendituresEnriched view while editting underlying data 
 
 \section{\customstylesection{Wybrane fragmenty kodu bazy danych}}
 {Baza danych aplikacji stworzona została na podstawie wymagań, następnie była 
@@ -1738,7 +1737,10 @@ samych założeń funkcji oraz w odpowiedzi na wykryte błędy i nowe wymogi dan
 powstałe w trakcie implementacji. W toku prac tabele podstawowe rozszerzono 
 o dodatkowe pola jak isCash w tabeli Expenditures której definicję prezentuje 
 listing \ref*{lst:dbexpenditures-finalna} (przed zmianami 
-\ref*{lst:dbexpenditures-wstępna}), oraz większość widoków.}
+\ref*{lst:dbexpenditures-wstępna}), oraz większość widoków. Tabela Expenditures 
+zawiera wydatki wprowadzone przez użytkownika, wersję wstępną zaimplementowano 
+w technologii SQLite3 \cite{SQLite}, nmatomiast wersję finalną w technologii 
+PostgreSQL \cite{PostgreSQL}.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Tabela Expenditures - wersja wstępna},
@@ -1761,10 +1763,9 @@ CREATE TABLE [Expenditures] (
     PRIMARY KEY([ID] AUTOINCREMENT),
     FOREIGN KEY([ProductID]) REFERENCES [Products]([ID])
 );\end{lstlisting}
-{Tabela Expenditures zawiera wydatki wprowadzone przez użytkownika. Listing 
-przedstawia pierwszą wstępną wersję tabeli w technologii SQLite3 \cite{SQLite}.}
 \end{minipage}
 
+% #FIXME: Update to real final table definition
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Tabela Expenditures - wersja wstępna},
         language=SQL,
@@ -1796,8 +1797,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public."Expenditures"
     OWNER to postgres;\end{lstlisting}
-{Tabela Expenditures zawiera wydatki wprowadzone przez użytkownika. Listing 
-przedstawia finalną wersję tabeli w technologii PostgreSQL \cite{PostgreSQL}.}
 \end{minipage}
 
 {Zgodnie z założeniami projektu widoki przejęły ciężar przetwarzania danych. W 
@@ -1806,7 +1805,9 @@ czego przykładem może być pola Cash, ProductPriority i TypePriority w widoku
 ExpendituresEnriched wymienionym na listingu 
 \ref*{lst:dbwidoki-expendituresenriched} - we wstępnej wersji projektu pola te 
 nie występowały ponieważ funkcje które je wykorzystuja powstałyna późniejszym 
-etapie. Powstały także zupełnie nowe widoki jak ProductSummary widoczny na 
+etapie. Widok ExpendituresEnriched prezentuje dane o wydatkach użytkownika w 
+czytelny sposób, wzbogacone o dodatkowe pola któe nie występują w tabeli 
+podstawowej. Powstały także zupełnie nowe widoki jak ProductSummary widoczny na 
 listingu \ref*{lst:dbwidoki-productsummary} który oblicza przydatne dane 
 statystyczne prezentowane później użytkownikowi zamiast surowych danych z tabeli
  podstawowej o produktach. Wstępnie zaprojektowane skomplikowane widoki 
@@ -1816,40 +1817,6 @@ który podzielono na podstawowy MonthlyProducts oraz MonthlyCommonProducts
 widoczne na listingu \ref*{lst:dbwidoki-monthycommonproduct} którego logika 
 stała się dzięki temu o wiele krótsza a więc i łatwiejsza w utrzymaniu.}
 
-\begin{minipage}{\textwidth}
-    \begin{lstlisting}[ caption={Widok rozwinięty w toku projektu - ExpendituresEnriched},
-        language=SQL,
-        deletekeywords={IDENTITY},
-        deletekeywords={[2]INT},
-        morekeywords={clustered},
-        framesep=8pt,
-        xleftmargin=40pt,
-        framexleftmargin=40pt,
-        frame=tb,
-        framerule=0pt,
-        label={lst:dbwidoki-expendituresenriched}]
-CREATE VIEW "ExpendituresEnriched" AS
-  SELECT
-   "Expenditures"."ID"        AS "ID",
-   "Expenditures"."DateTime"  AS "DateTime",
-   "Expenditures"."Amount"    AS "Amount",
-   "Products"."Product"       AS "Product",
-   "ProductTypes"."Type"      AS "Type",
-   (CASE WHEN 
-     ("Expenditures"."isCash"=FALSE)
-    THEN 'NO' ELSE 'YES' END) AS "Cash",
-    "Expenditures"."Comment"  AS "Comment",
-    "Products"."Priority"     AS "ProductPriority", --Nowe pole
-    "ProductTypes"."Priority" AS "TypePriority"     --Nowe pole
-  FROM "Expenditures"
-  LEFT JOIN "Products"
-   ON "Expenditures"."ProductID"="Products"."ID"
-  LEFT JOIN "ProductTypes"
-   ON "Products"."TypeID"="ProductTypes"."ID"
-  ORDER BY "DateTime";\end{lstlisting}
-{Widok ExpendituresEnriched prezentuje dane o wydatkach użytkownika w czytelny 
-sposób, wzbogacone o dodatkowe pola któe nie występują w tabeli podstawowej.}
-\end{minipage}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Widok nowy - ProductSummary},
@@ -1913,8 +1880,42 @@ AS "Summary"
 ON "Products"."Product"="Summary"."Product"
 LEFT JOIN "ProductTypes" ON
 "Products"."TypeID"="ProductTypes"."ID";\end{lstlisting}
+\end{minipage}
+
 {Widok ProductSummary zawiera podsumowanie o zakupionych przez użytkownika 
 produktach w formie danych statystycznych.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Widok rozwinięty w toku projektu - ExpendituresEnriched},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbwidoki-expendituresenriched}]
+CREATE VIEW "ExpendituresEnriched" AS
+  SELECT
+   "Expenditures"."ID"        AS "ID",
+   "Expenditures"."DateTime"  AS "DateTime",
+   "Expenditures"."Amount"    AS "Amount",
+   "Products"."Product"       AS "Product",
+   "ProductTypes"."Type"      AS "Type",
+   (CASE WHEN 
+     ("Expenditures"."isCash"=FALSE)
+    THEN 'NO' ELSE 'YES' END) AS "Cash",
+    "Expenditures"."Comment"  AS "Comment",
+    "Products"."Priority" AS "ProductPriority", --Nowe pole
+    "ProductTypes"."Priority" AS "TypePriority" --Nowe pole
+  FROM "Expenditures"
+  LEFT JOIN "Products"
+   ON "Expenditures"."ProductID"="Products"."ID"
+  LEFT JOIN "ProductTypes"
+   ON "Products"."TypeID"="ProductTypes"."ID"
+  ORDER BY "DateTime";\end{lstlisting}
 \end{minipage}
 
 \begin{minipage}{\textwidth}
@@ -1947,9 +1948,9 @@ CREATE VIEW "MonthlyCommonProducts" AS
     WHERE "Items">(
         SELECT AVG("Items")
         FROM "MonthlyProducts");\end{lstlisting}
+\end{minipage}
 {Początkowo był to jeden widok jednak aby wyliczyć średnią ilość produktów 
 zapytanie wymagało powielenia logiki.}
-\end{minipage}
 
 {Ponadto część przetwarzania z samej aplikacji stopniowo przeniesiona zostaje do
  widoku Statistics, którego wynik prezentowany jest użytkownikowi w jednym z 
@@ -1987,7 +1988,10 @@ standardowe funkcje środowiska programistycznego jak możliwość zatrzymania
 wykonywanego kodu czy inspekcji wartości zmiennych są niedostępne. Z tego powodu
  w konfiguracji zaszyto przełącznik w formie zmiennej debug\_version, cały kod 
 z nim związany rozsiany jest po kilku plikach - ich wycinki prezentuje listing 
-\ref{lst:debugversion}.}
+\ref{lst:debugversion}. Mechanizm ten decyduje o wartości zmiennych 
+środowiskowych wskazujących ważne pliki wymagane do uruchomienia aplikacji. W 
+efekcie zmieniając wartość w jednym miejscu można przełączyć aplikację w tryb 
+testowania lub wdrożenia wykorzystujące rozbieżne technologie.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Fragmenty kodu prezentujące mechanizm debug\_version},
@@ -2021,10 +2025,6 @@ if version=="debug_local":
     app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3' #Local SQLite3
 
 db=SQLAlchemy(app)\end{lstlisting}
-{Mechanizm ten decyduje o wartości zmiennych środowiskowych wskazujących ważne 
-pliki wymagane do uruchomienia aplikacji. W efekcie zmieniając wartość w jednym 
-miejscu można przełączyć aplikację w tryb testowania lub wdrożenia 
-wykorzystujące rozbieżne technologie.}
 \end{minipage}
 
 
@@ -2141,13 +2141,13 @@ FROM (
 )
 GROUP BY [Month]
 ORDER BY [Month] ASC;\end{lstlisting}
+\end{minipage}
 {Zapytanie SQL w dialekcie SQLite sprzed migracji bazy na technologię 
 PostgreSQL. Przykładowo: jeśli w miesiącu zakupiono 50 produktów, jednego dnia 2
  za gotówkę (DailyCashPercentage 100\%), w drugim dniu 48 kartą 
 (DailyCashPercentage 0\%), widok prezentował informację że 50\% produktów 
 miesięcznie zakupiono za gotówkę (0+100/2=50), podczas gdy faktycznie wartość ta
- wynosiła 4\% (2/50). }
-\end{minipage}
+ wynosiła 4\% (2/50).}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Widok MonthlySpending - poprawiona średnia średnich dziennych (dialekt PostgreSQL)},
@@ -2204,9 +2204,9 @@ FROM (
   ORDER BY "Month" ASC
 ) AS "Monthly"
 LEFT JOIN "Daily" ON "Monthly"."Month"="Daily"."Month";\end{lstlisting}
+\end{minipage}
 {Zapytanie SQL w dialekcie PostgreSQL po migracji bazy. Zapytanie oblicza osobno
  średnie miesięczne oraz dodaje średnie dzienne.}
-\end{minipage}
 
 {Z ciekawszych problemów które wykryto w warstwie serwerowej na uwagę zasługuje 
 problem z przechowywaniem haseł użytkowników. W trakcie implementacji panelu 
@@ -2220,7 +2220,9 @@ fragment danych dodawany do hasła przed zaszyfrowaniem aby zwiększyć entropi�
 wgłębieniu się w dokumentację biblioteki zmieniono kod aplikacji tak, by 
 wykorzystać funkcję bcrypt.check\_password\_hash która porównuje zapisany skrót 
 hasła z danymi w formie jawnej. Poprawiony fragment kodu prezentuje listing 
-\ref{lst:login-hash}.}
+\ref{lst:login-hash}. Funkcja ta wykorzystuje sól zapisaną na początku 
+docelowego skrótu, dodając go do testowanego hasła, hashując je i porównując 
+ciągi - w wyniku zwraca jedynie informajcę czy hash jest prawidłowy.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Panel logowania - weryfikacja zgodności hasła},
@@ -2251,9 +2253,6 @@ def login():
         flash("Failed to log in", "danger")
         return redirect(redirect_url(url_for("login", next="index")))
     return render_template("login.html", title="Login", form=form)\end{lstlisting}
-{Funkcja ta wykorzystuje sól zapisaną na początku docelowego skrótu, dodając go 
-do testowanego hasła, hashując je i porównując ciągi - w wyniku zwraca jedynie 
-informajcę czy hash jest prawidłowy.}
 \end{minipage}
 
 %gets mushed with listing
@@ -2273,7 +2272,9 @@ import obiektu app reprezentującego aplikację w pamięci we wskazanym module i
 dodanie polecenia with app.context, które wykorzystuje już zestawioną sesję 
 aplikacji do wykonania kodu, co nie narusza dodanych reguł zabezpieczeń 
 połączenia. Problematyczny fragment modułu wraz z opisanymi zmianami 
-zaprezentowano na listingu \ref{lst:models-kontekstapplikacji}.}
+zaprezentowano na listingu \ref{lst:models-kontekstapplikacji}. Wprowadzenie 
+zabezpieczenia CSRF wymagało zmiany sposobu mapowania obiektów bazy danych na 
+obiekty aplikacji.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Fragment modułu models.py - kouminkacja z bazą z wykorzystaniem kontekstu aplikacji},
@@ -2297,8 +2298,6 @@ with app.app_context():
     Bills=Base.classes.Bills
     ProductTypes=Base.classes.ProductTypes
     #(...)\end{lstlisting}
-{Wprowadzenie zabezpieczenia CSRF wymagało zmiany sposobu mapowania obiektów 
-bazy danych na obiekty aplikacji.}
 \end{minipage}
 
 
