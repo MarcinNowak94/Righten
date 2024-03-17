@@ -111,17 +111,32 @@
 
             let TopProducts = new Chart(document.getElementById("TopTypesPie"), {
                 type: 'pie',
-                data: top_types_chart
+                data: top_types_chart,
+                options: {
+                    maintainAspectRatio: false
+                }
             })
             let TopProductsLine = new Chart(document.getElementById("TopTypesLine"), {
-                type: "line",
-                title: {
-                        display: true,
-                        text: "Top product types",
-                        fontSize: 20,
-                        },
+                type: "bar",
                 data: {
                     datasets: top_types_line
+                },
+                options: {
+                    plugins: {
+                    title: {
+                        display: true,
+                        text: "Top and selected product types"
+                    },
+                    },
+                    responsive: true,
+                    scales: {
+                    x: {
+                        stacked: true,
+                    },
+                    y: {
+                        stacked: true
+                    }
+                    }
                 }
             })
         </script>
