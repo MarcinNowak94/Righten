@@ -766,19 +766,30 @@ def expendituressummary():
                                 Top10ProductsMonthly.columns.Sum,
                                 Top10ProductsMonthly.columns.Product).\
                         filter_by(UserID=current_user.uuid).all()
+    SpendingTargetValue = (db.session.query(UserSettings).\
+                       filter_by(UserID=current_user.uuid,
+                                 Setting="SpendingTarget").\
+                        first()).Value
 
     expenditures_summary_chart = createpiechartdataset(expenditures_summary, addperc=True)
     TopTypeExpenditures=createchartdataset(TopTypeExpendituresData, "true")
     TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
     MonthlyExpendituresData=[]
+    SpendingTarget=[]
+    
     for Month, Amount in ExpendituresOverTime:
         MonthlyExpendituresData.append({"x":Month,"y":Amount})
+        SpendingTarget.append({"x":Month,"y":SpendingTargetValue})
+    
+    ExpendituresSet=[]
+    ExpendituresSet.append({"label": "Exenditures", "data": MonthlyExpendituresData})
+    ExpendituresSet.append({"label": "Spending target", "data": SpendingTarget})
     
     log_site_opened()
     return render_template("expendituressummary.html",
                            title="Expenditures",
+                           ExpendituresSet=json.dumps(ExpendituresSet, cls=DecimalEncoder),
                            ExpendituresSummaryChart=json.dumps(expenditures_summary_chart, cls=DecimalEncoder),
-                           MonthlyExpenditures=json.dumps(MonthlyExpendituresData, cls=DecimalEncoder),
                            TopTypeExpenditures=json.dumps(TopTypeExpenditures, cls=DecimalEncoder),
                            TopProductsExpenditures=json.dumps(TopProductsExpenditures, cls=DecimalEncoder)
                            )
@@ -803,10 +814,12 @@ def spending():
     TypePriorityData=[]
     SpendingTargetData=[]
     PriorityTargetData=[]
+    total_possible_savings = 0
     for UserID, Month, Total, CashPercentage, AverageProductPriority, AverageTypePriority, PossibleSavings, AverageDaily in Spending:
         MonthlySpendingData.append({"x":Month,"y":Total})
         CashPercentageData.append({"x":Month,"y":CashPercentage})        
         MonthlyPossibleSavingsData.append({"x":Month,"y":PossibleSavings})
+        total_possible_savings+=PossibleSavings
         ProductPriorityData.append({"x":Month,"y":AverageProductPriority})
         TypePriorityData.append({"x":Month,"y":AverageTypePriority})
         
@@ -824,7 +837,8 @@ def spending():
                            ProductPriorityData=json.dumps(ProductPriorityData, cls=DecimalEncoder),
                            TypePriorityData=json.dumps(TypePriorityData, cls=DecimalEncoder),
                            PriorityTargetData=json.dumps(PriorityTargetData, cls=DecimalEncoder),
-                           SpendingTargetData=json.dumps(SpendingTargetData, cls=DecimalEncoder)
+                           SpendingTargetData=json.dumps(SpendingTargetData, cls=DecimalEncoder),
+                           total_possible_savings=round(total_possible_savings,2)
                            )
 
 # NICE-TO-HAVE: green color above SavingsTarget 
@@ -870,9 +884,7 @@ def finances():
     
     for set in sets:
         BilanceSet.append({"label": set, "data": sets[set]})
-
     BilanceTotalchart=createpiechartdataset(BilanceTotal, addperc=True)
-
     log_site_opened()
     return render_template("financialposture.html",
                            title="Finances",
@@ -882,11 +894,10 @@ def finances():
                            StatisticData=StatisticData
                            )
 
-#TODO: productssummary. Add panels:
+# Nice-TO-HAVE: Add panels:
 # - Product priority over time
 # - spending by Product (move from expenditures?)
 # - Top 10 low priority product spending Calculate (Amount*(100-priority))
-#TODO: Add product picker and corresponding graph
 @app.route("/productssummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def productssummary():
@@ -899,14 +910,20 @@ def productssummary():
         selected_products = form.products.data
 
     top_products=db.session.query(ProductSummary.columns.Product,
-                                 ProductSummary.columns.Amount).\
+                                  ProductSummary.columns.Amount).\
                             filter_by(UserID=current_user.uuid).\
                             order_by(ProductSummary.columns.Times.desc()).\
                             limit(limit).all()
 
-    selection_products_list= (product for product, amount in top_products)
+    selection_products_list=(product for product, amount in top_products)
     selected_products.extend(selection_products_list)
     form.products.default=selected_products # Set all displayed products as chosen
+
+    chosen_products=db.session.query(ProductSummary.columns.Product,
+                                 ProductSummary.columns.Amount).\
+                            filter_by(UserID=current_user.uuid).\
+                            where(ProductSummary.columns.Product.in_(selected_products)).\
+                            order_by(ProductSummary.columns.Times.desc()).all()  
 
     monthly_products = db.session.query(MonthlyProducts.columns.Month,
                                        MonthlyProducts.columns.Amount,
@@ -919,7 +936,8 @@ def productssummary():
                         where(ProductSummary.columns.Product.in_(selected_products)).\
                         order_by(ProductSummary.columns.Times.desc()).all()
     
-    top_products_chart = createpiechartdataset(top_products, addperc=True)
+    # Combine top products and selected products data
+    top_products_chart = createpiechartdataset(chosen_products, addperc=True)
     top_products_line = createchartdataset(monthly_products)
 
     params={
@@ -936,8 +954,6 @@ def productssummary():
                         form=form
                         )
 
-#TODO: producttypessummary
-#TODO: Add type picker and corresponding graph
 @app.route("/producttypessummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def producttypessummary():
@@ -959,6 +975,12 @@ def producttypessummary():
     selected_types.extend(selection_types_list)
     form.types.default=selected_types # Set all displayed types as chosen
 
+    chosen_types=db.session.query(TypeSummary.columns.Type,
+                                 TypeSummary.columns.Amount).\
+                            filter_by(UserID=current_user.uuid).\
+                            where(TypeSummary.columns.Type.in_(selected_types)).\
+                            order_by(TypeSummary.columns.Times.desc()).all()
+
     monthly_types = db.session.query(MonthlyProductTypes.columns.Month,
                                        MonthlyProductTypes.columns.Amount,
                                        MonthlyProductTypes.columns.Type,
@@ -970,7 +992,7 @@ def producttypessummary():
                         where(TypeSummary.columns.Type.in_(selected_types)).\
                         order_by(TypeSummary.columns.Times.desc()).all()
     
-    top_types_chart = createpiechartdataset(top_types, addperc=True)
+    top_types_chart = createpiechartdataset(chosen_types, addperc=True)
     top_types_line = createchartdataset(monthly_types)
 
     params={

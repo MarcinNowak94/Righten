@@ -48,8 +48,8 @@
 
     {% block javascript %}
         <script>
+            let ExpendituresSet = JSON.parse({{ ExpendituresSet | tojson }})
             let ExpendituresSummaryChart = JSON.parse({{ ExpendituresSummaryChart | tojson }})
-            let MonthlyExpenditures = JSON.parse({{ MonthlyExpenditures | tojson }})
             let TopTypeExpenditures = JSON.parse({{ TopTypeExpenditures | tojson }})
             let TopProductsExpenditures = JSON.parse({{ TopProductsExpenditures | tojson }})
 
@@ -61,13 +61,7 @@
             let ExpendituresOverTime = new Chart(document.getElementById("ExpendituresOverTime"), {
                 type: "line",
                 data: {
-                    datasets: [{
-                        label: "Expenditures",
-                        data: MonthlyExpenditures,
-                        fill: false,
-                        borderColor: "rgb(75, 192, 192)",
-                        lineTension: 0.1
-                    }]
+                    datasets: ExpendituresSet
                 }
             })
 
