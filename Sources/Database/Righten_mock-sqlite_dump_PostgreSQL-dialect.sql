@@ -2,64 +2,82 @@ BEGIN TRANSACTION;
 
 CREATE TABLE "Users"
 (
-    "ID"		UUID NOT NULL,
+    "ID"		UUID PRIMARY KEY,
     "Username"	TEXT NOT NULL,
     "Password"	TEXT NOT NULL,
-    "isActive"	BOOLEAN NOT NULL DEFAULT FALSE,
-    PRIMARY KEY (ID)
+    "isActive"	BOOLEAN NOT NULL DEFAULT FALSE
 );
-INSERT INTO Users (ID, Username, Password, isActive) VALUES
-("0665fe1c-7e28-43eb-96c7-5a2677d6ae03", "inactive@righten.com", "$2b$12$W0pMd68kiAw/ZIFIoWLAiOKj2wTjfyhwJJ1sJHLEsMnJXJmJxWUDO", false),
-("9394d310-7bbc-4ef0-9d62-069604999d6a", "blocktest@righten.com", "$2b$12$W0pMd68kiAw/ZIFIoWLAiOKj2wTjfyhwJJ1sJHLEsMnJXJmJxWUDO", false),
-("722feb4a-45a6-46f1-ad33-288a52726dfa", "johndoe@righten.com", "$2b$12$.MqS4bshtc6eGy3qBDFVO.cAI2urJE.UN.Bw9.ZfnUgQpEnd05POO", true),
-("3f2968b3-f765-490e-99ec-6ab8236ea06e", "user@righten.com", "$2b$12$.MqS4bshtc6eGy3qBDFVO.cAI2urJE.UN.Bw9.ZfnUgQpEnd05POO", true)
+INSERT INTO "Users" ("ID", "Username", "Password", "isActive") VALUES
+('0665fe1c-7e28-43eb-96c7-5a2677d6ae03', 'inactive@righten.com', '$2b$12$W0pMd68kiAw/ZIFIoWLAiOKj2wTjfyhwJJ1sJHLEsMnJXJmJxWUDO', FALSE),
+('9394d310-7bbc-4ef0-9d62-069604999d6a', 'blocktest@righten.com', '$2b$12$W0pMd68kiAw/ZIFIoWLAiOKj2wTjfyhwJJ1sJHLEsMnJXJmJxWUDO', FALSE),
+('722feb4a-45a6-46f1-ad33-288a52726dfa', 'johndoe@righten.com', '$2b$12$.MqS4bshtc6eGy3qBDFVO.cAI2urJE.UN.Bw9.ZfnUgQpEnd05POO', TRUE),
+('3f2968b3-f765-490e-99ec-6ab8236ea06e', 'user@righten.com', '$2b$12$.MqS4bshtc6eGy3qBDFVO.cAI2urJE.UN.Bw9.ZfnUgQpEnd05POO', TRUE);
 CREATE TABLE IF NOT EXISTS "Income" (
-	"ID"	SERIAL PRIMARY KEY,
-	FOREIGN KEY("UserID") REFERENCES "Users"("ID"),
+	"ID"		SERIAL PRIMARY KEY,
+	"UserID" 	UUID NOT NULL,
 	"Amount"	NUMERIC(10,2),
 	"Source"	TEXT,
 	"Type"		TEXT,
 	"DateTime"	DATE,
 	"Comment"	TEXT DEFAULT NULL,
-	"Hours"		NUMERIC(10,2)
+	"Hours"		NUMERIC(10,2),
+	CONSTRAINT fk_userid
+      FOREIGN KEY("UserID")
+        REFERENCES "Users"("ID")
 );
 CREATE TABLE IF NOT EXISTS "Bills" (
 	"ID"	SERIAL PRIMARY KEY,
-	FOREIGN KEY("UserID") REFERENCES "Users"("ID"),
+	"UserID" 	UUID NOT NULL,
 	"Amount"	NUMERIC(10,2),
 	"Medium"	TEXT,
 	"DateTime"	DATE,
-	"Comment"	TEXT DEFAULT NULL
+	"Comment"	TEXT DEFAULT NULL,
+	CONSTRAINT fk_userid
+      FOREIGN KEY("UserID")
+        REFERENCES "Users"("ID")
 );
 CREATE TABLE IF NOT EXISTS "ProductTypes" (
 	"ID"		SERIAL PRIMARY KEY,
-	FOREIGN KEY("UserID") REFERENCES "Users"("ID"),
+	"UserID" 	UUID NOT NULL,
 	"Type"		TEXT NOT NULL,
 	"Comment"	TEXT DEFAULT NULL,
-	"Priority"	INTEGER NOT NULL DEFAULT 2
+	"Priority"	INTEGER NOT NULL DEFAULT 51,
+	CONSTRAINT fk_userid
+      FOREIGN KEY("UserID")
+        REFERENCES "Users"("ID")
 );
 CREATE TABLE IF NOT EXISTS "Products" (
 	"ID"		SERIAL PRIMARY KEY,
-	FOREIGN KEY("UserID") REFERENCES "Users"("ID"),
+	"UserID" 	UUID NOT NULL,
 	"Product"	TEXT NOT NULL,
 	"TypeID"	BIGINT,
 	"Comment"	TEXT DEFAULT NULL,
 	"Priority"	INTEGER NOT NULL DEFAULT 2,
-	FOREIGN KEY("TypeID") REFERENCES "ProductTypes"("ID")
+	CONSTRAINT fk_userid
+      FOREIGN KEY("UserID")
+        REFERENCES "Users"("ID"),
+	CONSTRAINT fk_typeid
+      FOREIGN KEY("TypeID")
+        REFERENCES "ProductTypes"("ID")
 );
 CREATE TABLE IF NOT EXISTS "Expenditures" (
 	"ID"		SERIAL PRIMARY KEY,
-	FOREIGN KEY("UserID") REFERENCES "Users"("ID"),
+	"UserID" 	UUID NOT NULL,
 	"DateTime"	DATE,
 	"ProductID"	BIGINT,
 	"Amount"	NUMERIC(10,2),
 	"Comment"	TEXT DEFAULT NULL,
 	"isCash"	BOOLEAN DEFAULT FALSE,
-	FOREIGN KEY("ProductID") REFERENCES "Products"("ID")
+	CONSTRAINT fk_userid
+      FOREIGN KEY("UserID")
+        REFERENCES "Users"("ID"),
+	CONSTRAINT fk_typeid
+      FOREIGN KEY("ProductID")
+        REFERENCES "Products"("ID")
 );
 CREATE TABLE IF NOT EXISTS "AccountData" (
 	"AccountID" INTEGER,
-	FOREIGN KEY("UserID") REFERENCES "Users"("ID"),
+	"UserID" 	UUID NOT NULL,
 	"Data księgowania"	DATE,
 	"Data operacji"	DATE,
 	"Tytuł operacji"	TEXT,
@@ -67,22 +85,31 @@ CREATE TABLE IF NOT EXISTS "AccountData" (
 	"Rachunek strony operacji"	TEXT,
 	"Kwota"	NUMERIC(10,2),
 	"Saldo"	NUMERIC(10,2),
-	"Pozycje historii"	INTEGER PRIMARY KEY
+	"Pozycje historii"	INTEGER PRIMARY KEY,
+	CONSTRAINT fk_userid
+      FOREIGN KEY("UserID")
+        REFERENCES "Users"("ID")
 );
 CREATE TABLE IF NOT EXISTS "ExpendituresTransitory" (
 	"ID"	SERIAL PRIMARY KEY,
-	FOREIGN KEY("UserID") REFERENCES "Users"("ID"),
+	"UserID" 	UUID NOT NULL,
 	"DateTime"	DATE,
 	"Product"	TEXT NOT NULL,
 	"Amount"	NUMERIC(10,2),
 	"Comment"	TEXT DEFAULT NULL,
-	"isCash"	BOOLEAN DEFAULT FALSE
+	"isCash"	BOOLEAN DEFAULT FALSE,
+	CONSTRAINT fk_userid
+      FOREIGN KEY("UserID")
+        REFERENCES "Users"("ID")
 );
 CREATE TABLE IF NOT EXISTS "UserSettings" (
-	FOREIGN KEY("UserID") REFERENCES "Users"("ID"),
+	"UserID" 	UUID NOT NULL,
 	"Setting"	TEXT NOT NULL,
 	"Value"	TEXT NOT NULL,
-	PRIMARY KEY("Setting","UserID")
+	PRIMARY KEY("Setting","UserID"),
+	CONSTRAINT fk_userid
+      FOREIGN KEY("UserID")
+        REFERENCES "Users"("ID")
 );
 CREATE TABLE IF NOT EXISTS "AccountDataImport" (
 	"field1"	TEXT,
@@ -1052,7 +1079,7 @@ INSERT INTO "Bills" ("ID","Amount","Medium","DateTime","Comment", "UserID") VALU
  (783,19.0,'Transport','2021-09-01','','3f2968b3-f765-490e-99ec-6ab8236ea06e'),
  (784,128.85,'Transport','2023-05-30','','3f2968b3-f765-490e-99ec-6ab8236ea06e'),
  (785,5.25,'Transport','2023-07-29','','3f2968b3-f765-490e-99ec-6ab8236ea06e'),
- (786,53.64,'Transport','2023-08-29','''3f2968b3-f765-490e-99ec-6ab8236ea06e');
+ (786,53.64,'Transport','2023-08-29','','3f2968b3-f765-490e-99ec-6ab8236ea06e');
 
 INSERT INTO "ProductTypes" ("ID","Type","Comment","Priority", "UserID") VALUES 
  (1,'AGD',NULL,90,'3f2968b3-f765-490e-99ec-6ab8236ea06e'),
@@ -13632,9 +13659,9 @@ INSERT INTO "UserSettings" ("UserID", "Setting","Value") VALUES
  ('9394d310-7bbc-4ef0-9d62-069604999d6a','ProductPriorityTarget','33'),
  ('9394d310-7bbc-4ef0-9d62-069604999d6a','SpendingTarget', '1500'),
  ('9394d310-7bbc-4ef0-9d62-069604999d6a','SavingsTarget', '200'),
- ('22feb4a-45a6-46f1-ad33-288a52726dfa','ProductPriorityTarget','33'),
- ('22feb4a-45a6-46f1-ad33-288a52726dfa','SpendingTarget', '1500'),
- ('22feb4a-45a6-46f1-ad33-288a52726dfa','SavingsTarget', '200'),
+ ('722feb4a-45a6-46f1-ad33-288a52726dfa','ProductPriorityTarget','33'),
+ ('722feb4a-45a6-46f1-ad33-288a52726dfa','SpendingTarget', '1500'),
+ ('722feb4a-45a6-46f1-ad33-288a52726dfa','SavingsTarget', '200'),
  ('3f2968b3-f765-490e-99ec-6ab8236ea06e','ProductPriorityTarget','33'),
  ('3f2968b3-f765-490e-99ec-6ab8236ea06e','SpendingTarget', '1500'),
  ('3f2968b3-f765-490e-99ec-6ab8236ea06e','SavingsTarget', '200');
@@ -13675,8 +13702,8 @@ GROUP BY "UserID", "Month", "Source"
 ORDER BY "UserID", "Month";
 CREATE VIEW "IncomeSummaryByType" AS
 SELECT
-	"Summary"."UserID"						AS "UserID"
-	,"Summary"."Type"						AS "Type"
+	"Income"."UserID"						AS "UserID"
+	,"Income"."Type"						AS "Type"
 	,COALESCE("Summary"."Amount", 0)		AS "Amount"
 	,COALESCE("Summary"."Times", 0)	    	AS "Times"
 	,"Summary"."First"						AS "First"
@@ -13712,7 +13739,13 @@ FROM (	SELECT
 AS "Summary"
 ON "Income"."Type"="Summary"."Type"
 AND "Income"."UserID"="Summary"."UserID"
-GROUP BY "Income"."Type", "Income"."UserID"
+GROUP BY "Income"."UserID",
+		 "Income"."Type",
+		 "Summary"."Amount",
+		 "Summary"."Times",
+		 "Summary"."First",
+		 "Summary"."Last",
+		 "Summary"."Common"
 ORDER BY "Times" DESC;
 CREATE VIEW "MonthlyBillsByMedium" AS
 SELECT 
@@ -13832,7 +13865,7 @@ SELECT
     ,"Type"
 FROM "ExpendituresEnriched"
 GROUP BY "UserID", "Type", "Month"
-ORDER BY "UserID", "Month" DESC, "Sum" DESC;
+ORDER BY "UserID", "Month" DESC, "Amount" DESC;
 CREATE VIEW "MonthlyProducts" AS
 SELECT *
 FROM (
@@ -13866,7 +13899,7 @@ FROM (
 CREATE VIEW "ProductSummary" AS
 SELECT
 	"Products"."UserID"						AS "UserID"
-	"Products"."ID"							AS "ID"
+	,"Products"."ID"						AS "ID"
 	,"Products"."Product"					AS "Product"
 	,"ProductTypes"."Type"					AS "Type"
 	,"Products"."Comment"					AS "Comment"
@@ -13917,7 +13950,7 @@ ON "Products"."Product"="Summary"."Product"
 AND "Products"."UserID"="Summary"."UserID"
 LEFT JOIN "ProductTypes" 
 	ON "Products"."TypeID"="ProductTypes"."ID"
-	ON "Products"."UserID"="ProductTypes"."UserID";
+	AND "Products"."UserID"="ProductTypes"."UserID";
 CREATE VIEW "TypeSummary" AS
 SELECT
 	"ProductTypes"."ID"						AS "ID"
@@ -14027,7 +14060,7 @@ SELECT
 		UNION SELECT 
 				'ExpendituresEnriched'					AS "Table"
 				,"UserID"
-				,'-'                                    AS "AccountID"
+				,NULL                                   AS "AccountID"
 				,"ExpendituresEnriched"."ID"
 				,"DateTime"
 				,TO_CHAR("DateTime", 'YYYY-MM')			AS "Month"
@@ -14058,134 +14091,24 @@ FROM (	SELECT
 		FROM "ExpendituresTransitory"
 		LEFT OUTER JOIN "Products"
 		ON "ExpendituresTransitory"."Product"="Products"."Product"
-		ON "ExpendituresTransitory"."UserID"="Products"."UserID"
+		AND "ExpendituresTransitory"."UserID"="Products"."UserID"
 )
 WHERE "Product_ID" IS NULL;
-CREATE VIEW "Statistics" AS
-	--Create intermediary table
-	WITH "StatisticsBase" AS (
-		SELECT 
-			"UserID"
-			,'Average income year to date' AS "Statistic"
-			,ROUND(AVG("Amount"),2) AS "Value"
-			,'Financial' AS "Type"
-		FROM (
-			--only 12 months ago
-			SELECT 
-				*
-			FROM "MonthlyIncome"
-			--Only historical data, ignore data added in advance
-			WHERE "Month"<TO_CHAR(NOW(),'YYYY-MM')
-			ORDER BY "Month" DESC 
-			LIMIT 12
-		)
-		UNION SELECT 
-			"UserID"
-			,'Average bills year to date' AS "Statistic"
-			,ROUND(AVG("Amount"),2) AS "Value"
-			,'Financial' AS "Type"
-		FROM (
-			--only 12 months ago
-			SELECT 
-				*
-			FROM "MonthlyBills"
-			--Only historical data, ignore data added in advance
-			WHERE "Month"<TO_CHAR(NOW(),'YYYY-MM')
-			ORDER BY "Month" DESC 
-			LIMIT 12
-		)
-		UNION SELECT 
-			"UserID"
-			'Average expenditures year to date' AS "Statistic"
-			,ROUND(AVG("Amount"),2) AS "Value"
-			,'Financial' AS "Type"
-		FROM (
-			--only 12 months ago
-			SELECT 
-				*
-			FROM "MonthlyExpenditures"
-			--Only historical data, ignore data added in advance
-			WHERE "Month"<TO_CHAR(NOW(),'YYYY-MM')
-			ORDER BY "Month" DESC 
-			LIMIT 12
-		)
-		UNION SELECT 
-			"UserID"
-			'Average monthly bilance year to date' AS "Statistic"
-			,ROUND(AVG("Amount"),2) AS "Value"
-			,'Financial' AS "Type"
-		FROM (
-			--only 12 months ago
-			SELECT 
-				*
-			FROM "MonthlyBilanceSingle"
-			--Only historical data, ignore data added in advance
-			WHERE "Month"<TO_CHAR(NOW(),'YYYY-MM')
-			ORDER BY "Month" DESC 
-			LIMIT 12
-		)
-	)
-
-	--Get data from intermediary table and compute further data
-	SELECT
-		"UserID"
-		,"Statistic"
-		,"Value"
-		,"Type"
-	FROM "StatisticsBase"
-	UNION SELECT 
-		"UserID"
-		,'Average spending year to date' AS "Statistic"
-		,SUM("Value")  AS "Value"
-		,'Financial' AS "Type"
-	FROM "StatisticsBase"
-	WHERE "Statistic" IN (
-		'Average bills year to date', 
-		'Average expenditures year to date'
-		)
-	UNION SELECT
-		"UserID"
-		,'FIRE savings requirement' AS "Statistic"
-		,SUM("Value")*12*25  AS "Value"
-		,'Financial' AS "Type"	
-	FROM "StatisticsBase"
-	WHERE "Statistic" IN (
-		'Average bills year to date',
-		'Average expenditures year to date'
-		)
-	UNION SELECT 
-		"UserID"
-		,'Net Worth' as "Statistic"
-		,SUM(Amount) as "Value"
-		,'Financial' AS "Type"
-	FROM "MonthlyBilance"
-	UNION SELECT 
-		"UserID"
-		,'Average income type occurence'   AS "Statistic"
-		,AVG("Times")                      AS "Value"
-		,'Statistical'                     AS "Type"
-	FROM ( SELECT
-			  "UserID"
-			   ,"Source"
-			   ,"Type"
-			   ,COUNT([DateTime])		AS [Times]
-			FROM [Income]
-			GROUP BY [Type], [UserID]
-			ORDER BY [Type] DESC);
 CREATE VIEW "MonthlySpending" AS
 --Create intermediary table
 WITH "Daily" AS (
 	--Average daily data by month
 	SELECT
 		"UserID"
-		,TO_CHAR("DateTime", 'YYYY-MM') AS "Month"
-		,ROUND(AVG("DailyAmount"),2)    AS "AverageDaily"
+		,"Month"
+		,ROUND(AVG("DailyAmount"),2)        AS "AverageDaily"
 	FROM (
 		--Get daily amounts
 		SELECT 
 			"UserID"
-			,"DateTime" 
-			,SUM("Amount")              AS "DailyAmount"
+			,"DateTime"
+			,TO_CHAR("DateTime", 'YYYY-MM') AS "Month"
+			,SUM("Amount")                  AS "DailyAmount"
 		FROM "ExpendituresEnriched"
 		GROUP BY "UserID", "DateTime"
 	)
@@ -14194,18 +14117,18 @@ WITH "Daily" AS (
 
 --Necessary for Alias
 SELECT 
-	"Monthly".*, 
-	"Daily"."AverageDaily"
+	"Monthly".*
+	,"Daily"."AverageDaily"
 FROM (
 	SELECT
-		"Summary"."UserID"
+		"Summary"."UserID"							AS "UserID"
 		,TO_CHAR("DateTime", 'YYYY-MM')				AS "Month"
 		,ROUND(SUM("Amount"),2)						AS "Total"
 		,ROUND(AVG(CASE WHEN "Cash"='YES'
 			  THEN 100 ELSE 0 END))					AS "CashPercentage"
 		,ROUND(AVG("ProductPriority"))				AS "AverageProductPriority"
 		,ROUND(AVG("TypePriority"))					AS "AverageTypePriority"
-		,ROUND(SUM(CASE WHEN ("ProductPriority"<[CAST("Target" AS NUMERIC)])
+		,ROUND(SUM(CASE WHEN ("ProductPriority"<CAST("Target" AS NUMERIC))
 			  THEN "Amount" ELSE 0 END),2)          AS "PossibleSavings"
 	FROM "ExpendituresEnriched" 
 	AS "Summary"
@@ -14215,7 +14138,8 @@ FROM (
 			,"Value" AS "Target"
 		FROM "UserSettings"
 		WHERE "Setting"='ProductPriorityTarget'
-	)
+	) AS "Settings"
+	ON "Settings"."UserID"="Summary"."UserID"
 	GROUP BY "Summary"."UserID", "Month"
 	ORDER BY "Summary"."UserID", "Month" ASC
 ) AS "Monthly"
@@ -14274,7 +14198,7 @@ CREATE VIEW "IncomeSummary" AS
 SELECT
 	"Income"."UserID"							AS "UserID"
 	,"Income"."Source"							AS "Source"
-	,"Summary"."Type"							AS "Type"
+	,"Income"."Type"							AS "Type"
 	,COALESCE("Summary"."Amount", 0)			AS "Amount"
 	,COALESCE("Summary"."Times", 0)	    		AS "Times"
 	,"Summary"."Minimum"						AS "Minimum"
@@ -14286,40 +14210,183 @@ SELECT
 	,COALESCE("Summary"."Common", 'Absent')		AS "Common"
 FROM "Income"
 LEFT JOIN (SELECT 
-	*
-	,(CASE WHEN ("Times">(
-					SELECT 
-						AVG("Times") AS "Average" 
-					FROM (	SELECT
-							   "UserID"
-							   ,"Source"
-							   ,"Type"
-							   ,Round(SUM("Amount"), 2)	AS "Amount"
-							   ,COUNT("DateTime")		AS "Times"
-							   ,MAX("DateTime")			AS "Last"
-							   ,MIN("DateTime")			AS "First"
-							FROM "Income"
-							GROUP BY "Source", "Type", "UserID"
-							ORDER BY "Source" DESC))) 
-	then 'Common' else 'Uncommon' end) AS "Common"
-FROM (	SELECT
-		   "UserID",
-		   "Source"
-		   ,"Type"
-		   ,Round(SUM("Amount"), 2)	AS "Amount"
-		   ,COUNT("DateTime")		AS "Times"
-		   ,MAX("DateTime")			AS "Last"
-		   ,MIN("DateTime")			AS "First"
-		   ,ROUND(AVG("Amount"),2)	AS "Average"
-		   ,MIN("Amount")			AS "Minimum"
-		   ,MAX("Amount")			AS "Maximum"
-		FROM "Income"
-		GROUP BY "Source", "Type", "UserID"
-		ORDER BY "Times" DESC))
-AS "Summary"
+		*
+		,(CASE WHEN ("Times">(
+						SELECT 
+							AVG("Times") AS "Average" 
+						FROM (	SELECT
+								"UserID"
+								,"Source"
+								,"Type"
+								,Round(SUM("Amount"), 2)	AS "Amount"
+								,COUNT("DateTime")		AS "Times"
+								,MAX("DateTime")			AS "Last"
+								,MIN("DateTime")			AS "First"
+								FROM "Income"
+								GROUP BY "Source", "Type", "UserID"
+								ORDER BY "Source" DESC))) 
+		then 'Common' else 'Uncommon' end) AS "Common"
+	FROM (	SELECT
+			"UserID",
+			"Source"
+			,"Type"
+			,Round(SUM("Amount"), 2)	AS "Amount"
+			,COUNT("DateTime")		AS "Times"
+			,MAX("DateTime")			AS "Last"
+			,MIN("DateTime")			AS "First"
+			,ROUND(AVG("Amount"),2)	AS "Average"
+			,MIN("Amount")			AS "Minimum"
+			,MAX("Amount")			AS "Maximum"
+			FROM "Income"
+			GROUP BY "Source", "Type", "UserID"
+			ORDER BY "Times" DESC))
+	AS "Summary"
 ON  "Income"."Source"="Summary"."Source"
 AND "Income"."Type"="Summary"."Type"
 AND "Income"."UserID"="Summary"."UserID"
-GROUP BY "Income"."Source", "Income"."Type", "Income"."UserID"
+GROUP BY "Income"."Source"
+		 ,"Income"."Type"
+		 ,"Income"."UserID"
+		 ,"Summary"."Amount"
+		 ,"Summary"."Times"
+		 ,"Summary"."Minimum"
+		 ,"Summary"."Average"
+		 ,"Summary"."Maximum"
+		 ,"Summary"."First"
+		 ,"Summary"."Last"
+		 ,"Summary"."Common"
 ORDER BY "Amount" DESC;
+
+CREATE VIEW "Statistics" AS
+	--Create intermediary table
+	WITH "StatisticsBase" AS (
+		SELECT 
+			"UserID"
+			,'Average income year to date' AS "Statistic"
+			,ROUND(AVG("Amount"),2) AS "Value"
+			,'Financial' AS "Type"
+		FROM (
+			--only 12 months ago
+			SELECT 
+				*
+			FROM "MonthlyIncome"
+			--Only historical data, ignore data added in advance
+			WHERE "Month"<TO_CHAR(NOW(),'YYYY-MM')
+			ORDER BY "Month" DESC 
+			LIMIT 12
+		)
+		GROUP BY "UserID"
+		UNION SELECT 
+			"UserID"
+			,'Average bills year to date' AS "Statistic"
+			,ROUND(AVG("Amount"),2) AS "Value"
+			,'Financial' AS "Type"
+		FROM (
+			--only 12 months ago
+			SELECT 
+				*
+			FROM "MonthlyBills"
+			--Only historical data, ignore data added in advance
+			WHERE "Month"<TO_CHAR(NOW(),'YYYY-MM')
+			ORDER BY "Month" DESC 
+			LIMIT 12
+		)
+		GROUP BY "UserID"
+		UNION SELECT 
+			"UserID"
+			,'Average expenditures year to date' AS "Statistic"
+			,ROUND(AVG("Amount"),2) AS "Value"
+			,'Financial' AS "Type"
+		FROM (
+			--only 12 months ago
+			SELECT 
+				*
+			FROM "MonthlyExpenditures"
+			--Only historical data, ignore data added in advance
+			WHERE "Month"<TO_CHAR(NOW(),'YYYY-MM')
+			ORDER BY "Month" DESC 
+			LIMIT 12
+		)
+		GROUP BY "UserID"
+		UNION SELECT 
+			"UserID"
+			,'Average monthly bilance year to date' AS "Statistic"
+			,ROUND(AVG("Amount"),2) AS "Value"
+			,'Financial' AS "Type"
+		FROM (
+			--only 12 months ago
+			SELECT 
+				*
+			FROM "MonthlyBilanceSingle"
+			--Only historical data, ignore data added in advance
+			WHERE "Month"<TO_CHAR(NOW(),'YYYY-MM')
+			ORDER BY "Month" DESC 
+			LIMIT 12
+		)
+		GROUP BY "UserID"
+	)
+
+	--Get data from intermediary table and compute further data
+	SELECT
+		"UserID"
+		,"Statistic"
+		,"Value"
+		,"Type"
+	FROM "StatisticsBase"
+	GROUP BY "StatisticsBase"."UserID"
+			 ,"StatisticsBase"."Statistic"
+			 ,"StatisticsBase"."Value"
+			 ,"StatisticsBase"."Type"
+	UNION SELECT 
+		"UserID"
+		,'Average spending year to date' AS "Statistic"
+		,SUM("Value")  AS "Value"
+		,'Financial' AS "Type"
+	FROM "StatisticsBase"
+	WHERE "Statistic" IN (
+		'Average bills year to date'
+		,'Average expenditures year to date'
+		)
+	GROUP BY "StatisticsBase"."UserID"
+			 ,"StatisticsBase"."Statistic"
+			 ,"StatisticsBase"."Value"
+			 ,"StatisticsBase"."Type"
+	UNION SELECT
+		"UserID"
+		,'FIRE savings requirement' AS "Statistic"
+		,SUM("Value")*12*25  AS "Value"
+		,'Financial' AS "Type"	
+	FROM "StatisticsBase"
+	WHERE "Statistic" IN (
+		'Average bills year to date'
+		,'Average expenditures year to date'
+		)
+	GROUP BY "StatisticsBase"."UserID"
+			 ,"StatisticsBase"."Statistic"
+			 ,"StatisticsBase"."Value"
+			 ,"StatisticsBase"."Type"
+	UNION SELECT
+		"UserID"
+		,'Net Worth' as "Statistic"
+		,SUM("Amount") as "Value"
+		,'Financial' AS "Type"
+	FROM "MonthlyBilance"
+	GROUP BY "MonthlyBilance"."UserID"
+			 ,"Statistic"
+	UNION SELECT 
+		"UserID"
+		,'Average income type occurence'   AS "Statistic"
+		,AVG("Times")                      AS "Value"
+		,'Statistical'                     AS "Type"
+	FROM ( SELECT
+			"UserID"
+			,"Source"
+			,"Type"
+			,COUNT("DateTime")		AS "Times"
+			FROM "Income"
+			GROUP BY "Source", "Type", "UserID"
+			ORDER BY "Type" DESC)
+	GROUP BY "UserID"
+			,"Statistic"
+			,"Type";
 COMMIT;
