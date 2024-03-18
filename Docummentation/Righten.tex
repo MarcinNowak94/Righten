@@ -2385,7 +2385,101 @@ with app.app_context():
 %funkcjonalnych. Poglądowo, nie drobiazgowo ani nie samymi grafikami. 
 %rysunek/dwa +5-6 zdań
 \chapter{\customstylechapter{Przykładowy scenariusz wykorzystania systemu}}
-{}
+{Rozdział ten opisuje efekty pracy, ze szczególnym naciskiem na aspektach 
+użytkowych zrealizowanego rozwiązania. Jest to krótki opis przykładowej sesji 
+użytkownika aplikacji, w którym co ciekawsze fragmenty opatrzono zrzutami ekranu
+ prezentującymi omawianą funkcję aplikacji z punktu widzenia użytkownika.}
+
+\section{\customstylesection{Pierwszy kontakt z aplikacją}}
+{System Righten jest centralnie zarządzaną aplikacją przeglądarkową, dlatego też
+ podczas pierwszego kontaktu użytkownik ma dostęp do ograniczonego zakresu 
+funkcji które zebrano w górnym pasku menu pod opcją Righten. Do funkcji 
+udostępnianych bez potrzeby logowania należą zaprezentowane na rysunku 
+\ref{fig:usage_manual} wszelkie elementy edukacyjne zawarte w aplikacji, które 
+opisują podstawowe pojęcia z dziedziny finansów, a jednocześnie stanowią 
+instrukcję obsługi aplikacji. Dzięki temu nawet osoba odwiedzająca stronę 
+aplikacji gościnnie ma możliwość zyskać przydatną wiedzę oraz zapoznać się z 
+możliwościami aplikacji. Sekcja ta może być w przyszłości dowolnie rozwijana i 
+zmieniana tak, by dopasować się do potrzeb rynku i użytkowników.}
+
+{Drugą i ostatnią funkcją dostępną dla gości jest panel rejestracji dostępny pod
+ przyciskiem register, który pozwala założyć konto użytkownika w aplikacji. 
+Przycisk ten widoczny jest na rysunku \ref{fig:usage_manual} w prawym górnym 
+rogu.}
+
+{Wszelkie pozostałe panele są niedostępne dla użytkowników niezalogowanych.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_usage_example_manual.png}
+    \caption{Budgeting to jeden z ekranów informacyjnych dostępnych bez logowania}
+    \label{fig:usage_manual}
+\end{figure}
+
+\section{\customstylesection{Wprowadzanie danych}}
+{Użytkownik posiadający konto w aplikacji może się zalogować poprzez przycisk 
+login w prawym górnym rogu na rysunku \ref{fig:usage_data-management}, dzięki 
+czemu może wprowadzać swoje dane do aplikacji. Panele które do tego służą 
+zebrano w opcji Manage data w górnym pasku Menu.}
+
+{Jako że ważnym atutem aplikacji jest prostota interfejsu większość paneli do 
+wprowadzania danych jest bardzo podobna, dlatego przykład opisuje najbardziej 
+skomplikowany z nich - Expenditures w którym użytkownik dodaje swoje wydatki. Po
+ zdefiniowaniu typów produktów w panelu Product Types, oraz produktów 
+powiązanych z wybranymi typami w panelu Products, może przejść do dodawania 
+wydatków. W tym celu otwiera panel Expenditures który obrazuje rysunek 
+\ref{fig:usage_data-management}, na którym widać także efekt zaszytej w 
+formularzach walidacji danych, oraz wcześniej wprowadzone dane testowe.}
+
+{W panelu Settings użytkownik może zmienić swoje ustawienia, wartości 
+wprowadzone w tym panelu są następnie wykorzystywane w części wizualizacji. 
+Panel Settings widoczny na rysunku \ref{fig:usage_user-settings} pełni całkiem 
+inną funkcję niż pozostałe zatem znacznie się od nich różni.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_usage_example_data-management.png}
+    \caption{Expenditures to jeden z ekranów wprowadzania danych}
+    \label{fig:usage_data-management}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_usage_example_user-settings.png}
+    \caption{Settings to ekran zarządzania ustawieniami użytkownika}
+    \label{fig:usage_user-settings}
+\end{figure}
+
+\section{\customstylesection{Analiza finansowa i wizualizacje}}
+{Celem aplikacji jest dostarczenie użytkownikom szczegółowych informacji o ich 
+sytuacji finansowej na podstawie wprowadzonych danych. Wszystkie panele 
+zawierające wizualizacje oraz dane analityczne dostępne są w górnym pasku menu 
+pod opcją Summaries. To w nich użytkownik uzyskuje wartościowy wgląd w swój 
+budżet i realizację celów finansowych.}
+
+{Każdy panel jest unikatowym zestawem wizualizacji, jako w miarę różnorodny 
+przykład obrano panel Finances widoczny na rysunku 
+\ref{fig:usage_visualization_finances}. Prezentuje on bilans wprowadzonych 
+wydatków, rachunków oraz przychodów w formie różnorodnych wykresów. Pierwszy 
+wykres obrazuje ilość pozostałych środków na koniec miesiąca wzbogacony o linie 
+Breakeven pokazującą kiedy stan jest ujemny, oraz Savings target która 
+prezentuje określony przez użytkownika w ustawieniach cel oszczędności. Pozwala 
+to już na pierwszy rzut oka ocenić stan finansów w danym miesiącu. Użytkownik 
+może także podejrzeć dane statystyczne za ostatni rok, jak: sumaryczna wartość 
+netto, średni przychód, średnie wydatki czy średni bilans miesięczny co łatwo 
+obrazuje czy oszczędza czy może traci środki.}
+
+{Dostęp do takich danych zdecydowanie ułatwia zarządzanie finansami, pomagają 
+użytkownikowi podejmować decyzje jaki kolejny krok może podjąć aby poprawić 
+swoją sytuację finansową lub osiągnąć wybrany cel jak kupno nowego samochodu 
+czy wymarzone wakacje.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_usage_example_visualization_finances.png}
+    \caption{Finances to jeden z paneli wizualizacji danych użytkownika}
+    \label{fig:usage_visualization_finances}
+\end{figure}
 
 %3.9. Zakończenie (1-2str, najlepiej 1,5str)
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/zakonczenie/
