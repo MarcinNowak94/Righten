@@ -110,6 +110,28 @@
             caption=#1}}
   {\endminipage}
 
+  \definecolor{lightgray}{rgb}{.9,.9,.9}
+  \definecolor{darkgray}{rgb}{.4,.4,.4}
+  \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+
+% Modified from: https://tex.stackexchange.com/questions/89574/language-option-supported-in-listings
+\lstdefinelanguage{JavaScript}{
+    keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, 
+              % Additions
+              let, tojson, parse, document, Chart, type, data, datasets, label},
+    keywordstyle=\color{blue}\bfseries,
+    ndkeywords={class, export, boolean, throw, implements, import, this, JSON},
+    ndkeywordstyle=\color{darkgray}\bfseries,
+    identifierstyle=\color{black},
+    sensitive=false,
+    comment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{purple}\ttfamily,
+    stringstyle=\color{red}\ttfamily,
+    morestring=[b]',
+    morestring=[b]"
+}
+
 %as per https://tex.stackexchange.com/questions/152829/how-can-i-highlight-yaml-code-in-a-pretty-way-with-listings
 \newcommand\YAMLcolonstyle{\footnotesize\color{red}\mdseries}
 \newcommand\YAMLkeystyle{\footnotesize\color{black}\bfseries}
@@ -1391,6 +1413,15 @@ aplikacja co wymaga instrukcji with app.app\_context().}
         label={lst:formularze}]
 #Base class with common elements
 class CommonForm(FlaskForm):
+    """Base class with elements common to most Input forms
+    
+    Attributes:
+        :datetime: -- ISO 8601 Date default today
+        :amount: -- decimal value
+        :comment: -- free text
+        :submit: -- form submission button
+    """
+
     datetime = StringField("DateTime", 
         validators=[DataRequired(), Regexp("((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])", 
         message="Date must be in format: YYYY-MM-DD")],
@@ -1464,30 +1495,42 @@ format JSON \cite{JSON}.}
 @app.route("/incomesummary")
 @flask_login.login_required
 def incomesummary():
-    IncomeSummarydata=db.session.query(TotalIncomeByType).all()
-    incometypesummary=[]
-    incometypes=[]
-    Summary = db.session.query(IncomeSummary).all()
-    for sum, type in IncomeSummarydata:
-        incometypesummary.append(sum)
-        incometypes.append(type)
+    IncomeSummarydata = db.session.query(
+        IncomeSummaryByType.columns.Type,
+        IncomeSummaryByType.columns.Amount).\
+        filter_by(UserID=current_user.uuid).all()
+    summary = db.session.query(IncomeSummary).\
+        filter_by(UserID=current_user.uuid).all()
+    IncomeOverTime = db.session.query(
+        MonthlyIncome.columns.Month,
+        MonthlyIncome.columns.Amount).\
+        filter_by(UserID=current_user.uuid).all()
+    IncomeTypesByTime = db.session.query(
+        MonthlyIncomeByType.columns.Month,
+        MonthlyIncomeByType.columns.Amount,
+        MonthlyIncomeByType.columns.Type).\
+        filter_by(UserID=current_user.uuid).all()
+    
+    IncomeTypechart=createpiechartdataset(
+                        IncomeSummarydata, addperc=True)
+    IncomeTypesByTimeDataset=createchartdataset(
+        IncomeTypesByTime)
 
-    IncomeOverTime=db.session.query(MonthlyIncome).all()
-    monthlyincomedata=[]
-    for Month, Amount in IncomeOverTime:
-        monthlyincomedata.append({"x": Month, "y": Amount})
+    monthlyincomedata = []
+    for month, amount in IncomeOverTime:
+        monthlyincomedata.append({"x": month, "y": amount})
 
-    IncomeTypesByTime=db.session.query(MonthlyIncomeByType).all()
-    IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
-
+    log_site_opened()
     return render_template("incomesummary.html",
-                           title="Income",
-                           IncomeSummarydata=json.dumps(incometypesummary, cls=DecimalEncoder),
-                           IncomeSummarylabels=json.dumps(incometypes, cls=DecimalEncoder),
-                           MonthlyIncome=json.dumps(monthlyincomedata, cls=DecimalEncoder),
-                           IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset, cls=DecimalEncoder),
-                           Summary=Summary
-                           )\end{lstlisting}
+            title="Income",
+            IncomeTypechart=json.dumps(
+                IncomeTypechart, cls=DecimalEncoder),
+            MonthlyIncome=json.dumps(
+                monthlyincomedata, cls=DecimalEncoder),
+            IncomeTypesByTimeDataset=json.dumps(
+        IncomeTypesByTimeDataset, cls=DecimalEncoder),
+            Summary=summary
+            )\end{lstlisting}
 \end{minipage}
 
 \begin{minipage}{\textwidth}
@@ -1502,22 +1545,31 @@ def incomesummary():
         frame=tb,
         framerule=0pt,
         label={lst:strony-zarzadaniedanymi}]
-#Basic data display --------------------------------------------------
 @app.route("/income", methods=["GET", "POST"])
 @flask_login.login_required
 def income():
     form = IncomeInputForm()
-    entries = db.session.query(Income).order_by(Income.DateTime.desc(),Income.ID.desc()).all()
+    entries = db.session.query(Income).\
+                filter_by(UserID=current_user.uuid).\
+                order_by(Income.DateTime.desc(),Income.ID.desc()).\
+                all()
     if form.validate_on_submit():
-        entry = Income(DateTime=date.fromisoformat(form.datetime.data),
-                Amount=form.amount.data,
-                Type=form.type.data,
-                Source=form.source.data,
-                Comment=form.comment.data
-        )
-        addtodb(entry)
-        return redirect(redirect_url(url_for("income", next="income")))
-    return render_template("incometable.html", title="Income", entries=entries, form=form)\end{lstlisting}
+        entry = Income(
+           DateTime=date.fromisoformat(form.datetime.data),
+           Amount=form.amount.data,
+           Type=form.type.data,
+           Source=form.source.data,
+           Comment=form.comment.data,
+           UserID=current_user.uuid
+           )
+        addtodb(entry, notify=True)
+        return redirect(
+                redirect_url(
+                    url_for("income", next="income")))
+    log_site_opened()
+    return render_template(
+                "incometable.html", title="Income",
+                entries=entries, form=form)\end{lstlisting}
 \end{minipage}
 
 {Przykładowy szablon strony wymaga szerszego opisu ponieważ zależnie od jego 
@@ -1542,7 +1594,7 @@ jedną wspólną funkcję generyczną dla wszystkich tabel.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Przekazywanie danych do szablonu stron},
-        language=html,
+        language=JavaScript,
         deletekeywords={IDENTITY},
         deletekeywords={[2]INT},
         morekeywords={clustered},
@@ -1553,12 +1605,14 @@ jedną wspólną funkcję generyczną dla wszystkich tabel.}
         framerule=0pt,
         label={lst:szablony-dane}]
 {% block javascript %}
-    <script>
-        let IncomeSummarydata = JSON.parse({{ IncomeSummarydata | tojson }})
-        let IncomeSummarylabels = JSON.parse({{ IncomeSummarylabels | tojson }})
-        let MonthlyIncome = JSON.parse({{ MonthlyIncome | tojson }})
-        let IncomeTypesByTimeDataset = JSON.parse({{ IncomeTypesByTimeDataset | tojson }})
-    (...)\end{lstlisting}
+<script>
+  let IncomeTypechart = 
+        JSON.parse({{ IncomeTypechart | tojson }})
+  let MonthlyIncome = 
+        JSON.parse({{ MonthlyIncome | tojson }})
+  let IncomeTypesByTimeDataset = 
+        JSON.parse({{ IncomeTypesByTimeDataset | tojson }})
+  (...)\end{lstlisting}
 \end{minipage}
 {Początek bloku skryptowego JavaScript \cite{JavaScript} strony, frontend 
 odbiera dane wysłane z backendu i przetwarza (parsuje) dane z tekstu do obiektu 
@@ -1566,7 +1620,7 @@ w formacie JSON \cite{JSON}.}
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}[ caption={Tworzenie obiektów wizualizacji w szablonach stron},
-        language=html,
+        language=JavaScript,
         deletekeywords={IDENTITY},
         deletekeywords={[2]INT},
         morekeywords={clustered},
@@ -1576,22 +1630,26 @@ w formacie JSON \cite{JSON}.}
         frame=tb,
         framerule=0pt,
         label={lst:szablony-klasychartjs}]
-let IncomeOverTime = new Chart(document.getElementById("IncomeOverTime"), {
-    type: "line",
-    data: {
-        datasets: [{
-            label: "Income",
-            data: MonthlyIncome,
-        }]
-    }
-})
+let IncomeOverTime = new Chart(
+    document.getElementById("IncomeOverTime"),
+    {
+        type: "line",
+        data: {
+            datasets: [{
+                label: "Income",
+                data: MonthlyIncome,
+            }]
+        }
+    })
 
-let IncomeTypesOverTime = new Chart(document.getElementById("IncomeTypesOverTime"), {
-    type: "line",
-    data: {
-        datasets: IncomeTypesByTimeDataset
-    }
-})\end{lstlisting}
+let IncomeTypesOverTime = new Chart(
+    document.getElementById("IncomeTypesOverTime"),
+    {
+        type: "line",
+        data: {
+            datasets: IncomeTypesByTimeDataset
+        }
+    })\end{lstlisting}
 \end{minipage}
 {Tworzenie obiektów klas chart.js.}
 
@@ -1765,9 +1823,8 @@ CREATE TABLE [Expenditures] (
 );\end{lstlisting}
 \end{minipage}
 
-% #FIXME: Update to real final table definition
 \begin{minipage}{\textwidth}
-    \begin{lstlisting}[ caption={Tabela Expenditures - wersja wstępna},
+    \begin{lstlisting}[ caption={Tabela Expenditures - wersja finalna},
         language=SQL,
         deletekeywords={IDENTITY},
         deletekeywords={[2]INT},
@@ -1781,14 +1838,19 @@ CREATE TABLE [Expenditures] (
 CREATE TABLE IF NOT EXISTS public."Expenditures"
 (
     "ID" integer NOT NULL DEFAULT nextval('"Expenditures_ID_seq"'::regclass),
+    "UserID" uuid NOT NULL,
     "DateTime" date,
     "ProductID" bigint,
     "Amount" numeric(10,2),
     "Comment" text COLLATE pg_catalog."default",
     "isCash" boolean DEFAULT false,
     CONSTRAINT "Expenditures_pkey" PRIMARY KEY ("ID"),
-    CONSTRAINT "Expenditures_ProductID_fkey" FOREIGN KEY ("ProductID")
+    CONSTRAINT fk_typeid FOREIGN KEY ("ProductID")
         REFERENCES public."Products" ("ID") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_userid FOREIGN KEY ("UserID")
+        REFERENCES public."Users" ("ID") MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
@@ -1832,7 +1894,8 @@ stała się dzięki temu o wiele krótsza a więc i łatwiejsza w utrzymaniu.}
         label={lst:dbwidoki-productsummary}]
 CREATE VIEW "ProductSummary" AS
 SELECT
-  "Products"."ID"                        AS "ID"
+ "Products"."UserID"                     AS "UserID"
+ ,"Products"."ID"                        AS "ID"
  ,"Products"."Product"                   AS "Product"
  ,"ProductTypes"."Type"                  AS "Type"
  ,"Products"."Comment"                   AS "Comment"
@@ -1843,43 +1906,51 @@ SELECT
  ,"Summary"."Minimum"                    AS "Minimum"
  ,"Summary"."Average"                    AS "Average"
  ,"Summary"."Maximum"                    AS "Maximum"
- ,"Products"."Priority"               AS "ProductPriority"
+ ,ROUND("Summary"."Stddev"/
+        "Summary"."Average", 2)          AS "Variability"
+ ,"Products"."Priority"                AS "ProductPriority"
  ,"ProductTypes"."Priority"              AS "TypePriority"
  ,COALESCE("Summary"."Common", 'Absent') AS "Common"
 FROM "Products"
-LEFT JOIN (SELECT
-  *
+LEFT JOIN (SELECT 
+ *
  ,(CASE WHEN ("BoughtTimes">(
-    SELECT
-      AVG("BoughtTimes") AS "Average"
-    FROM (
-SELECT
- "Product"
- ,Round(SUM("Amount"), 2) AS "Amount"
- ,COUNT(TO_CHAR("DateTime", 'YYYY-MM-DD')) AS "BoughtTimes"
- ,MAX(TO_CHAR("DateTime", 'YYYY-MM-DD'))   AS "LastBought"
- ,MIN(TO_CHAR("DateTime", 'YYYY-MM-DD'))   AS "FirstBought"
-FROM "ExpendituresEnriched"
-GROUP BY "Product"
-ORDER BY "BoughtTimes" DESC)))
- THEN 'Common' ELSE 'Uncommon' end) AS "Common"
-FROM (
-SELECT
- "Product"
+    SELECT 
+    AVG("BoughtTimes") AS "Average" 
+     FROM ( SELECT
+      "UserID"
+      ,"Product"
+      ,Round(SUM("Amount"), 2) AS "Amount"
+      ,COUNT(TO_CHAR("DateTime", 'YYYY-MM-DD'))
+        AS "BoughtTimes"
+      ,MAX(TO_CHAR("DateTime", 'YYYY-MM-DD'))
+        AS "LastBought"
+      ,MIN(TO_CHAR("DateTime", 'YYYY-MM-DD'))
+        AS "FirstBought"
+      FROM "ExpendituresEnriched"
+      GROUP BY "Product", "UserID"
+      ORDER BY "BoughtTimes" DESC))) 
+ then 'Common' else 'Uncommon' end) AS "Common"
+FROM ( SELECT
+ "UserID"
+ ,"Product"
  ,Round(SUM("Amount"), 2)                  AS "Amount"
  ,COUNT(TO_CHAR("DateTime", 'YYYY-MM-DD')) AS "BoughtTimes"
- ,MAX("DateTime")                      AS "LastBought"
- ,MIN("DateTime")                     AS "FirstBought"
- ,ROUND(AVG("Amount"),2)                 AS "Average"
- ,MIN("Amount")                          AS "Minimum"
- ,MAX("Amount")                          AS "Maximum"
-FROM "ExpendituresEnriched"
-GROUP BY "Product"
-ORDER BY "BoughtTimes" DESC))
+ ,MAX("DateTime")                          AS "LastBought"
+ ,MIN("DateTime")                          AS "FirstBought"
+ ,ROUND(AVG("Amount"),2)                   AS "Average"
+ ,MIN("Amount")                            AS "Minimum"
+ ,MAX("Amount")                            AS "Maximum"
+ ,Round(STDDEV("Amount"), 2)               AS "Stddev"
+  FROM "ExpendituresEnriched"
+  GROUP BY "Product", "UserID"
+  ORDER BY "BoughtTimes" DESC))
 AS "Summary"
 ON "Products"."Product"="Summary"."Product"
-LEFT JOIN "ProductTypes" ON
-"Products"."TypeID"="ProductTypes"."ID";\end{lstlisting}
+AND "Products"."UserID"="Summary"."UserID"
+LEFT JOIN "ProductTypes" 
+ ON "Products"."TypeID"="ProductTypes"."ID"
+ AND "Products"."UserID"="ProductTypes"."UserID";\end{lstlisting}
 \end{minipage}
 
 {Widok ProductSummary zawiera podsumowanie o zakupionych przez użytkownika 
@@ -1898,23 +1969,25 @@ produktach w formie danych statystycznych.}
         framerule=0pt,
         label={lst:dbwidoki-expendituresenriched}]
 CREATE VIEW "ExpendituresEnriched" AS
-  SELECT
-   "Expenditures"."ID"        AS "ID",
-   "Expenditures"."DateTime"  AS "DateTime",
-   "Expenditures"."Amount"    AS "Amount",
-   "Products"."Product"       AS "Product",
-   "ProductTypes"."Type"      AS "Type",
-   (CASE WHEN 
-     ("Expenditures"."isCash"=FALSE)
-    THEN 'NO' ELSE 'YES' END) AS "Cash",
-    "Expenditures"."Comment"  AS "Comment",
-    "Products"."Priority" AS "ProductPriority", --Nowe pole
-    "ProductTypes"."Priority" AS "TypePriority" --Nowe pole
-  FROM "Expenditures"
-  LEFT JOIN "Products"
-   ON "Expenditures"."ProductID"="Products"."ID"
-  LEFT JOIN "ProductTypes"
-   ON "Products"."TypeID"="ProductTypes"."ID"
+  SELECT  "Expenditures"."UserID"  AS "UserID",
+      "Expenditures"."ID"          AS "ID",
+      "Expenditures"."DateTime"    AS "DateTime",
+      "Expenditures"."Amount"      AS "Amount",
+      "Products"."Product"         AS "Product",
+      "ProductTypes"."Type"        AS "Type",
+      (CASE WHEN 
+        ("Expenditures"."isCash"=FALSE)
+      THEN 'NO' ELSE 'YES' END)    AS "Cash",
+      "Expenditures"."Comment"     AS "Comment",
+      "Products"."Priority"        AS "ProductPriority",
+      "ProductTypes"."Priority"    AS "TypePriority"
+  FROM     "Expenditures"
+  LEFT JOIN  "Products"
+    ON  "Expenditures"."ProductID"="Products"."ID"
+    AND  "Expenditures"."UserID"="Products"."UserID"
+  LEFT JOIN   "ProductTypes"
+    ON  "Products"."TypeID"="ProductTypes"."ID"
+    AND  "Products"."UserID"="ProductTypes"."UserID"
   ORDER BY "DateTime";\end{lstlisting}
 \end{minipage}
 
@@ -1933,21 +2006,23 @@ CREATE VIEW "ExpendituresEnriched" AS
 CREATE VIEW "MonthlyProducts" AS
 SELECT *
 FROM (
-    SELECT  TO_CHAR("DateTime", 'YYYY-MM') AS "Month",
-            "Product",
-            COUNT("Product")               AS "Items", 
-            ROUND(SUM("Amount"),2)         AS "Amount"
-    FROM "ExpendituresEnriched"
-    GROUP BY "Product", "Month"
-    ORDER BY "Month" DESC, "Amount" DESC
+  SELECT 
+      "UserID"
+      ,TO_CHAR("DateTime", 'YYYY-MM') AS "Month"
+      ,"Product"
+      ,COUNT("Product")               AS "Items"
+      ,ROUND(SUM("Amount"),2)         AS "Amount"
+  FROM "ExpendituresEnriched"
+  GROUP BY "UserID", "Product", "Month"
+  ORDER BY "UserID", "Month" ASC, "Amount" DESC
 );
 
 CREATE VIEW "MonthlyCommonProducts" AS
-    SELECT *
-    FROM "MonthlyProducts" 
-    WHERE "Items">(
-        SELECT AVG("Items")
-        FROM "MonthlyProducts");\end{lstlisting}
+SELECT *
+FROM "MonthlyProducts" 
+WHERE "Items">(
+  SELECT AVG("Items")
+  FROM "MonthlyProducts");\end{lstlisting}
 \end{minipage}
 {Początkowo był to jeden widok jednak aby wyliczyć średnią ilość produktów 
 zapytanie wymagało powielenia logiki.}
@@ -2150,7 +2225,7 @@ miesięcznie zakupiono za gotówkę (0+100/2=50), podczas gdy faktycznie wartoś
  wynosiła 4\% (2/50).}
 
 \begin{minipage}{\textwidth}
-    \begin{lstlisting}[ caption={Widok MonthlySpending - poprawiona średnia średnich dziennych (dialekt PostgreSQL)},
+    \begin{lstlisting}[ caption={Widok MonthlySpending - poprawiona średnia średnich dziennych (dialekt PostgreSQL), przed dodaniem UserID},
         language=SQL,
         deletekeywords={IDENTITY},
         deletekeywords={[2]INT},
