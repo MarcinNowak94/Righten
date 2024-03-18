@@ -113,7 +113,13 @@
                 type: 'pie',
                 data: top_types_chart,
                 options: {
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Top and selected product types"
+                        }
+                    }
                 }
             })
             let TopProductsLine = new Chart(document.getElementById("TopTypesLine"), {

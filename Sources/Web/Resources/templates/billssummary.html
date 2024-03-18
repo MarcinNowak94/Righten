@@ -79,8 +79,16 @@
             let BillsTypesData = JSON.parse({{ BillsTypesData | tojson }})
             
             let BillsSummarychart = new Chart(document.getElementById("BillsSummary"), {
-                type: 'pie',
-                data: BillsTypechart
+                type: "pie",
+                data: BillsTypechart,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Bills summary"
+                        }
+                    }
+                }
             })
 
             let BillsOverTime = new Chart(document.getElementById("BillsOverTime"), {
@@ -93,6 +101,14 @@
                         borderColor: "rgb(75, 192, 192)",
                         lineTension: 0.1
                     }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Bills over time"
+                        }
+                    }
                 }
             })
 
@@ -100,6 +116,14 @@
                 type: "line",
                 data: {
                     datasets: BillsTypesData
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Bills types over time"
+                        }
+                    }
                 }
             })
 

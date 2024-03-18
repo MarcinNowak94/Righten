@@ -54,17 +54,7 @@
 
             <div class="col form-group">
                 {{ form.accountactive.label(class = "form-control-label") }}
-                
-                {% if form.accountactive.errors %}
-                    {{ form.accountactive(class = "form-control form-control-sm is-invalid") }}
-                    <div class="invalid-feedback">
-                    {% for error in form.accountactive.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.accountactive(class = "form-control form-control-sm") }}
-                {% endif %}
+                {{ form.accountactive }}
             </div>
 
             <div class="col">

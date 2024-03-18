@@ -122,7 +122,13 @@
                 type: 'pie',
                 data: top_products_chart,
                 options: {
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Top and selected products'
+                        }
+                    }
                 }
             })
             let TopProductsLine = new Chart(document.getElementById("TopProductsLine"), {

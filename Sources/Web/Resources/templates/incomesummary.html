@@ -37,7 +37,7 @@
 
     <div class="row">
         <div class="col-xs-10, col-sm-6">
-            <H2>Income Summary</H2>
+            <H3>Income Summary</H3>
             <table class="table">
                 <thead class="thead-dark">
                     <tr>
@@ -77,33 +77,57 @@
 </div>
 
     {% block javascript %}
-        <script>
-            let IncomeTypechart = JSON.parse({{ IncomeTypechart | tojson }})
-            let MonthlyIncome = JSON.parse({{ MonthlyIncome | tojson }})
-            let IncomeTypesByTimeDataset = JSON.parse({{ IncomeTypesByTimeDataset | tojson }})
+    <script>
+        let IncomeTypechart = JSON.parse({{ IncomeTypechart | tojson }})
+        let MonthlyIncome = JSON.parse({{ MonthlyIncome | tojson }})
+        let IncomeTypesByTimeDataset = JSON.parse({{ IncomeTypesByTimeDataset | tojson }})
 
-            let IncomeSummarychart = new Chart(document.getElementById("IncomeSummary"), {
-                    type: 'pie',
-                    data: IncomeTypechart
-                })
-
-            let IncomeOverTime = new Chart(document.getElementById("IncomeOverTime"), {
-                type: "line",
-                data: {
-                    datasets: [{
-                        label: "Income",
-                        data: MonthlyIncome,
-                    }]
+        let IncomeSummarychart = new Chart(document.getElementById("IncomeSummary"), {
+                type: 'pie',
+                data: IncomeTypechart,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Income summary"
+                        }
+                    }
                 }
             })
 
-            let IncomeTypesOverTime = new Chart(document.getElementById("IncomeTypesOverTime"), {
-                type: "line",
-                data: {
-                    datasets: IncomeTypesByTimeDataset
+        let IncomeOverTime = new Chart(document.getElementById("IncomeOverTime"), {
+            type: "line",
+            data: {
+                datasets: [{
+                    label: "Income",
+                    data: MonthlyIncome,
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Income over time"
+                    }
                 }
-            })
+            }
+        })
 
-        </script>
+        let IncomeTypesOverTime = new Chart(document.getElementById("IncomeTypesOverTime"), {
+            type: "line",
+            data: {
+                datasets: IncomeTypesByTimeDataset
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Income types over time"
+                    }
+                }
+            }
+        })
+
+    </script>
     {% endblock %}
 {% endblock %}

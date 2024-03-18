@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="col-xs-10, col-sm-6">
-            <H2>Statistics</H2>
+            <H3>Statistics</H3>
             <table class="table">
                 <thead class="thead-dark">
                     <tr>
@@ -55,30 +55,54 @@
 </div>
 
     {% block javascript %}
-        <script>
-            let BilanceTotalchart = JSON.parse({{ BilanceTotalchart | tojson }})
-            let BilanceData = JSON.parse({{ BilanceData | tojson }})
-            let BilanceSourcesData = JSON.parse({{ BilanceSourcesData | tojson }})
-            
-            
-            let BilanceTotal = new Chart(document.getElementById("BilanceTotalChart"), {
-                    type: 'pie',
-                    data: BilanceTotalchart
-                })
-
-            let BilanceOverTime = new Chart(document.getElementById("Bilance"), {
-                type: "line",
-                data: {
-                    datasets: BilanceData
+    <script>
+        let BilanceTotalchart = JSON.parse({{ BilanceTotalchart | tojson }})
+        let BilanceData = JSON.parse({{ BilanceData | tojson }})
+        let BilanceSourcesData = JSON.parse({{ BilanceSourcesData | tojson }})
+        
+        
+        let BilanceTotal = new Chart(document.getElementById("BilanceTotalChart"), {
+            type: "pie",
+            data: BilanceTotalchart,
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Bilance summary"
+                    }
                 }
-            })
+            }
+        })
 
-            let BilanceSetOverTime = new Chart(document.getElementById("BilanceSourcesOverTimechart"), {
-                type: "line",
-                data: {
-                    datasets: BilanceSourcesData
+        let BilanceOverTime = new Chart(document.getElementById("Bilance"), {
+            type: "line",
+            data: {
+                datasets: BilanceData
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Bilance"
+                    }
                 }
-            })
-        </script>
+            }
+        })
+
+        let BilanceSetOverTime = new Chart(document.getElementById("BilanceSourcesOverTimechart"), {
+            type: "line",
+            data: {
+                datasets: BilanceSourcesData
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Bilance sources over time"
+                    }
+                }
+            }
+        })
+    </script>
     {% endblock %}
 {% endblock %}

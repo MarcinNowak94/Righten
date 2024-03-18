@@ -54,38 +54,59 @@
             let TopProductsExpenditures = JSON.parse({{ TopProductsExpenditures | tojson }})
 
             let ExpendituresSummarychart = new Chart(document.getElementById("ExpendituresSummary"), {
-                type: 'pie',
-                data: ExpendituresSummaryChart
+                type: "pie",
+                data: ExpendituresSummaryChart,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Expenditures summary"
+                        }
+                    }
+                }
             })
 
             let ExpendituresOverTime = new Chart(document.getElementById("ExpendituresOverTime"), {
                 type: "line",
                 data: {
                     datasets: ExpendituresSet
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Expenditures over time"
+                        }
+                    }
                 }
             })
 
             let TopTypeExpenditureschart = new Chart(document.getElementById("TopTypeExpenditures"), {
                 type: "line",
-                title: {
-                        display: true,
-                        text: "Top 10 Types",
-                        fontSize: 20,
-                        },
                 data: {
                     datasets: TopTypeExpenditures
+                },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Tpo 10 expenditures by type"
+                    }
                 }
+            }
             })
 
             let TopProductsExpenditureschart = new Chart(document.getElementById("TopProductsSummary"), {
-                type: "line",
-                title: {
-                        display: true,
-                        text: "Top 10 Types",
-                        fontSize: 20,
-                        },
-                data: {
+                type: "line",data: {
                     datasets: TopProductsExpenditures
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Top 10 expenditures by product"
+                        }
+                    }
                 }
             })
         </script>
