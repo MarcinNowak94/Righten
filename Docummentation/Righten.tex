@@ -9,8 +9,8 @@
 %--------------------------------------------------------------------------------
 % add section about icon source https://www.iconpacks.net/free-icon/money-bag-6384.html
 
-
-\documentclass[a4paper,10pt, twoside]{report}
+% All chapters should begin at odd-numbered pages
+\documentclass[a4paper, 10pt, twoside, openright]{report}
 
 \usepackage{polski}         % Polish diacretic signs
 \usepackage[utf8]{inputenc} % required for international characters
@@ -2483,22 +2483,59 @@ czy wymarzone wakacje.}
 
 %3.9. Zakończenie (1-2str, najlepiej 1,5str)
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/zakonczenie/
-%Podsumowanie wyników pracy, potwierdzenie realizacji celu
-%Wady i zalety rozwiązania i możliwości jego rozwoju - nie dzielić na podpunkty
-%Komplementarne do wstępu - zarówno wstęp jak i zakończenie będą uważnie czytane
+% Podsumowanie wyników pracy, potwierdzenie realizacji celu
+% Wady i zalety rozwiązania i możliwości jego rozwoju - nie dzielić na podpunkty
+% Komplementarne do wstępu - zarówno wstęp jak i zakończenie będą uważnie czytane
 % przez recenzenta 
 % -"Celem pracy było..."
 % -0,3-0,5str Opis właściwości funkcjonalnych zaproponowanego rozwiązania
 % -0,3-0,5str Przypomnienie technologii, narzędzi, bibliotek
 % - Negatywne i pozytywne spostrzeżenia z realizacji pracy - ciekawe, zaskakujące, trudności.
-%   Jak rozwiązanie sprawdza się w praktyce (wdrożone - opinie użytkowników, niewdrożone - czy i kiedy)
+%   Jak rozwiązanie sprawdza się w praktyce (wdrożone - opinie użytkowników, 
+% niewdrożone - czy i kiedy)
 % pochwalić co dobrze wyszło, nie ukrywać wad - wymienić je i opisać jak je poprawić.
 % - Opis kierunkó rozwoju funkcjonalnego i technologicznego
 \chapter{\customstylechapter{Zakończenie}}
 {Celem pracy było zaprojektowanie i realizacja modułu analitycznego aplikacji 
-ułatwiającej jej użytkownikom zarządzanie budżetem domowym dostarczając 
+ułatwiającej jej użytkownikom zarządzanie budżetem domowym poprzez dostarczenie
 narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
 kategoryzującej wprowadzone dane.}
+
+{Przygotowane rozwiązanie spełnia powyższe założenia. Przyjęło formę 
+skonteneryzowanej z pomocą technologii Docker aplikacji przeglądarkowej 
+napisanej w języku Python, wykorzystującej framework Flask, Boootstrap i 
+przechowującej dane w bazie PostgreSQL o architekturze współdzielonej bazy i 
+schematu \cite{multitenant}. Wykorzystuje także wiele bibliotek zewnętrznych jak
+ jschart do generowania wykresów, czy WTForms do obsługi danych wprowadzanych 
+przez użytkownika. Aplikacja może obsługiwać wielu użytkowników jednocześnie, 
+oraz przechowywać ich dane we wspólnej bazie danych.}
+
+{Dzięki temu użytkownik może wprowadzić swoje dane finansowe jak zarobki, 
+wydatki, oszczędności czy progi wydatków, oszczędności i ustalać priorytety a 
+także w pełni zarządzać wszystkimi wymienionymi danymi. Aplikacja udostępnia 
+również przydatne wizualizacje które pozwalają użytkownikowi wyciągnąć wnioski 
+z wprowadzonych przez siebie danych. Dodatkowym atutem jest wbudowany poradnik 
+który wyjaśnia użytkownikom jak korzystać z aplikacji, a jednocześnie przekazuje
+ wiedzę z dziedziny finansów.}
+
+{Podczas testów użytkownika końcowego aplikację wypełniono rzeczywistymi danymi 
+z rachunków zgromadzonych z kilku miesięcy. wizualizacje w aplikacji 
+pomogły uwidocznić trendy w wydatkach, oraz kategorie i produkty które warto 
+pominąć podczas zakupów co w naturalny sposób skłania do oszczędności. Natomiast
+ główny problem stanowi wymóg wprowadzania danych pojedynczo co jest wskazówką 
+kierunku, w którym warto skupić się podczas rozwijania oprogramowania.}
+
+{Architektura aplikacji pozwala na w miarę łatwe rozszerzanie funkcji o kolejne 
+wizualizacje. W przyszłości można więc poszerzyć zakres dostępnych informacji 
+oraz wzbogacić o kolejne funkcje jak cele oszczędnościowe, które zaplanowano 
+jednak na chwilę obecną nie zostały zaimplementowane. W dłuższej perspektywie, 
+przy większych nakładach pracy możliwe jest także wyciąganie ogólnych trendów 
+statystycznych z danych wielu użytkowników co może posłużyć do większych analiz 
+ekonomicznych podobnych do badań prowadzonych przez Główny Urząd Statystyczny. 
+Tego typu dane mogą także posłużyć do wdrożenia mechanizmu gamifikacji (
+zwanej także grywalizacja) \cite{gamifikacja} przez porównanie danych 
+użytkowników do średniej i pozytywne wzmocnienie trendów wskazujących zdrowe 
+zarządzanie finansami poprzez zachęty i nagrody wewnątrz aplikacji.}
 
 % [#TODO]:
 % 3.13.Ewentualne załączniki
@@ -2544,6 +2581,8 @@ kategoryzującej wprowadzone dane.}
         https://mint.intuit.com/blog/category/budgeting/}
     \bibitem{pozytywnewzmocnienie} Simply Scholar, Ltd., Positive Reinforcement: What Is It and How Does It Work? \raggedright\url{
         https://www.simplypsychology.org/positive-reinforcement.html}
+        \bibitem{gamifikacja} Westhill Consulting, Gamifikacja – jak mechanizmy ze świata gier wspierają menedżerów i pracowników? \raggedright\url{
+            https://www.westhill.pl/gamifikacja/}
     \bibitem{multitenant} Frederick Chong, Gianpaolo Carraro, and Roger Wolter, Microsoft Corporation, Multi‐Tenant Data Architecture \raggedright\url{
         https://ramblingsofraju.com/wp-content/uploads/2016/08/Multi-Tenant-Data-Architecture.pdf}
 
