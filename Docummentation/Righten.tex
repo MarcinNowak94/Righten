@@ -32,6 +32,7 @@
 \usepackage{nameref}        % Reference chapter, section, etc. by name
 \usepackage{afterpage}
 \usepackage{tcolorbox}      % Colored boxes for inline Code
+\usepackage{emptypage}      % Empty pages have no headers, footers, numbering
 
 \makeindex
 \graphicspath{ {./} }       %Was ./figures/ changed so i can peek in VS Code
@@ -268,8 +269,6 @@
 	\end{center}
 \end{titlepage}
 
-\null\newpage % #TODO: fix, this moves formatting \addtocounter{page}{-1}
-
 % [REQUIREMENT] 2. Spis treści
 \renewcommand*\contentsname{Spis treści}
 \tableofcontents                    % prints automatical table of contents
@@ -308,8 +307,9 @@ kategoryzujące wprowadzone dane. W zamierzeniu aby ułatwić obsługę wymagać
 będzie minimalnej wiedzy i konfiguracji ze strony użytkownika, dostarczając mu 
 jednocześnie możliwie najlepsze narzędzia. Będzie to aplikacja przeglądarkowa 
 napisana w języku Python \cite{Python}\cite{pythonautomate}, wykorzystująca 
-frameworki: Bootstrap \cite{Bootstrap}, Flask \cite{Flask}, WTForms 
-\cite{WTForms}, jinja2 \cite{jinja}, oraz bibliotekę chart.js \cite{chart.js}.}
+pakiety (tzw.: frameworki): Bootstrap \cite{Bootstrap}, Flask \cite{Flask}, 
+WTForms \cite{WTForms}, jinja2 \cite{jinja}, oraz bibliotekę chart.js 
+\cite{chart.js}.}
 
 \medskip
 {Rozdział drugi zawiera rozwinięcie charakterystyki i motywacji problemu krótko 
@@ -960,19 +960,19 @@ narzędzi jest ze sobą ściśle połączona ponieważ wybór jednej technologii
 wpływa na kolejne, które z nią współpracują. W zamierzeniu poszczególne strony 
 generowane będą przez silnik szablonów jinja2 \cite{jinja} który pozwala 
 definiować część elementów strony dynamicznie, wybrano go z uwagi ponieważ jego 
-składnia podobna jest do języka Python. Framework Bootstrap \cite{Bootstrap} 
+składnia podobna jest do języka Python. Pakiet Bootstrap \cite{Bootstrap} 
 umożliwi wzbogacenie interfejsu o funkcje napisane w JavaScript 
 \cite{JavaScript} który posłuży także do wypełniania szablonów stron danymi, a 
 dzięki temu możliwe będzie także generowanie wizualizacji z pomocą biblioteki 
 chart.js \cite{chart.js}. Do obsługi formularzy wprowadzania danych posłuży 
-framework WTForms \cite{WTForms}.}
+biblioteka WTForms \cite{WTForms}.}
 
 {Ponieważ z projekt zakłada realizację w miarę prostej aplikacji, aby nie 
-serwer sieciowy (backend) obsługiwać będzie framework Flask \cite{Flask} wraz z 
+serwer sieciowy (backend) obsługiwać będzie pakiet Flask \cite{Flask} wraz z 
 dodatkowymi wtyczkami do obsługi poszczególnych funkcji (m.in.: Flask-Login 
 \cite{Flask-Login} do zarządzania dostępem do stron w ramach sesji użytkowników) 
 oraz określonymi w trakcie pisania aplikacji wymaganymi bibliotekami. 
-Jako alternatywę rozpatrywano framework Django \cite{Django} który udostępnia 
+Jako alternatywę rozpatrywano pakiet Django \cite{Django} który udostępnia 
 wiele dodatkowych mechanizmów zwiększajacych wydajność i bezpieczeństwo kosztem 
 bardziej złożonej konfiguracji. Po rozważeniu opcji stwierdzono jednak że w 
 chwili obecnej jest to projekt na małą skalę w którym liczy się przejrzystość 
@@ -1387,7 +1387,7 @@ tables={
 \end{minipage}
 
 {Formularze do wprowadzania danych przez użytkownika zdefiniowane w pliku 
-forms.py wykorzystują framework WTForms. Ponieważ część danych w tabelach 
+forms.py wykorzystują pakiet WTForms. Ponieważ część danych w tabelach 
 podstawowych się pokrywa, aby uprościć kod stworzono klasę bazową CommonForm 
 która definiuje wszystkie pola wspólne i skorzystano z dziedziczenia aby w 
 klasach pochodnych móc definiować wyłacznie pozostałe pola. Przykład tego 
@@ -2055,6 +2055,7 @@ najprostszą metodę testów którą są testy manualne. Testowaniu podlegały z
 całość, zależnie od etapu rozwoju aplikacji oraz typu implementowanej zmiany. 
 Przykłady wykrytych błędów zaprezentowano w kolejnej sekcji tego rozdziału.}
 
+\section{\customstylesection{Środowisko i sposób testowania}}
 {Po migracji aplikacji na środowisko uruchomieniowe Docker oraz zmianie 
 technologii bazy danych z SQLite na PostgreSQL testowanie a zarazem i rozwój 
 aplikacji stały się bardziej skomplikowane. Ponieważ kod uruchamiany na 
@@ -2392,20 +2393,20 @@ użytkownika aplikacji, w którym co ciekawsze fragmenty opatrzono zrzutami ekra
 
 \section{\customstylesection{Pierwszy kontakt z aplikacją}}
 {System Righten jest centralnie zarządzaną aplikacją przeglądarkową, dlatego też
- podczas pierwszego kontaktu użytkownik ma dostęp do ograniczonego zakresu 
-funkcji które zebrano w górnym pasku menu pod opcją Righten. Do funkcji 
-udostępnianych bez potrzeby logowania należą zaprezentowane na rysunku 
-\ref{fig:usage_manual} wszelkie elementy edukacyjne zawarte w aplikacji, które 
-opisują podstawowe pojęcia z dziedziny finansów, a jednocześnie stanowią 
-instrukcję obsługi aplikacji. Dzięki temu nawet osoba odwiedzająca stronę 
-aplikacji gościnnie ma możliwość zyskać przydatną wiedzę oraz zapoznać się z 
-możliwościami aplikacji. Sekcja ta może być w przyszłości dowolnie rozwijana i 
-zmieniana tak, by dopasować się do potrzeb rynku i użytkowników.}
+ podczas pierwszego kontaktu użytkownik ma wgląd jedynie do informacji zebranych
+ w górnym pasku menu pod opcją Righten oraz rejestracji. Do funkcji dostępnych 
+bez potrzeby logowania należą zaprezentowane na rysunku \ref{fig:usage_manual} 
+wszelkie elementy edukacyjne zawarte w aplikacji, które opisują podstawowe 
+pojęcia z dziedziny finansów, wplecione w instrukcję obsługi aplikacji. Dzięki 
+temu nawet osoba odwiedzająca witrynę gościnnie ma możliwość zyskać przydatną 
+wiedzę oraz zapoznać się z możliwościami aplikacji. Sekcja ta może być w 
+przyszłości dowolnie rozwijana i zmieniana tak, by dopasować się do potrzeb 
+rynku i użytkowników.}
 
-{Drugą i ostatnią funkcją dostępną dla gości jest panel rejestracji dostępny pod
- przyciskiem register, który pozwala założyć konto użytkownika w aplikacji. 
-Przycisk ten widoczny jest na rysunku \ref{fig:usage_manual} w prawym górnym 
-rogu.}
+{Panel rejestracji dostępny pod przyciskiem register pozwala użytkownikowi 
+założyć konto w aplikacji. Przycisk ten widoczny jest na rysunku 
+\ref{fig:usage_manual} w prawym górnym rogu, który prowadzi do prostego 
+formularza do wprowadzenia podstawowych danych jak nazwa i hasło.}
 
 {Wszelkie pozostałe panele są niedostępne dla użytkowników niezalogowanych.}
 
@@ -2417,24 +2418,24 @@ rogu.}
 \end{figure}
 
 \section{\customstylesection{Wprowadzanie danych}}
-{Użytkownik posiadający konto w aplikacji może się zalogować poprzez przycisk 
-login w prawym górnym rogu na rysunku \ref{fig:usage_data-management}, dzięki 
-czemu może wprowadzać swoje dane do aplikacji. Panele które do tego służą 
-zebrano w opcji Manage data w górnym pasku Menu.}
+{Użytkownik posiadający konto w aplikacji może się zalogować z pomocą przycisku 
+login widocznym w prawym górnym rogu na rysunku \ref{fig:usage_data-management}.
+ Logowanie umożliwia wprowadzanie prywatnych danych do aplikacji za pomocą 
+paneli które zebranych w opcji Manage data w górnym pasku Menu.}
 
-{Jako że ważnym atutem aplikacji jest prostota interfejsu większość paneli do 
-wprowadzania danych jest bardzo podobna, dlatego przykład opisuje najbardziej 
-skomplikowany z nich - Expenditures w którym użytkownik dodaje swoje wydatki. Po
- zdefiniowaniu typów produktów w panelu Product Types, oraz produktów 
-powiązanych z wybranymi typami w panelu Products, może przejść do dodawania 
-wydatków. W tym celu otwiera panel Expenditures który obrazuje rysunek 
+{Jako że ważnym atutem aplikacji jest prostota interfejsu, większość paneli do 
+wprowadzania danych jest bardzo podobna. Z tego powodu jako przykład opisano 
+najbardziej rozbudowany i zależny od innych widok Expenditures w którym 
+użytkownik dodaje swoje wydatki. Przedstawia go rysunek 
 \ref{fig:usage_data-management}, na którym widać także efekt zaszytej w 
-formularzach walidacji danych, oraz wcześniej wprowadzone dane testowe.}
+formularzach walidacji danych, oraz wcześniej wprowadzone dane testowe. Aby móc 
+z niego skorzystać użytkownik musi najpierw zdefiniowanć typy produktów w panelu
+ Product Types, oraz produkty z nimi powiązane w panelu Products.}
 
-{W panelu Settings użytkownik może zmienić swoje ustawienia, wartości 
-wprowadzone w tym panelu są następnie wykorzystywane w części wizualizacji. 
-Panel Settings widoczny na rysunku \ref{fig:usage_user-settings} pełni całkiem 
-inną funkcję niż pozostałe zatem znacznie się od nich różni.}
+{Zakładka Settings widoczny na rysunku \ref{fig:usage_user-settings} pozwala 
+użytkownikowi zmienić swoje ustawienia. Wprowadzone wartości są następnie 
+wykorzystywane w części wizualizacji. Ponieważ pełni całkiem inną funkcję niż 
+pozostałe, znacznie różni się od nich wyglądem.}
 
 \begin{figure}[H]           %requires float package
     \centering
@@ -2453,26 +2454,26 @@ inną funkcję niż pozostałe zatem znacznie się od nich różni.}
 \section{\customstylesection{Analiza finansowa i wizualizacje}}
 {Celem aplikacji jest dostarczenie użytkownikom szczegółowych informacji o ich 
 sytuacji finansowej na podstawie wprowadzonych danych. Wszystkie panele 
-zawierające wizualizacje oraz dane analityczne dostępne są w górnym pasku menu 
-pod opcją Summaries. To w nich użytkownik uzyskuje wartościowy wgląd w swój 
-budżet i realizację celów finansowych.}
+zawierające wizualizacje oraz statystyki dostępne są w górnym pasku menu pod 
+opcją Summaries. To w nich użytkownik uzyskuje wartościowy wgląd w swój budżet i
+ realizację celów finansowych.}
 
 {Każdy panel jest unikatowym zestawem wizualizacji, jako w miarę różnorodny 
 przykład obrano panel Finances widoczny na rysunku 
 \ref{fig:usage_visualization_finances}. Prezentuje on bilans wprowadzonych 
-wydatków, rachunków oraz przychodów w formie różnorodnych wykresów. Pierwszy 
-wykres obrazuje ilość pozostałych środków na koniec miesiąca wzbogacony o linie 
-Breakeven pokazującą kiedy stan jest ujemny, oraz Savings target która 
+wydatków, rachunków oraz przychodów w formie palety wykresów i podsumowania. 
+Pierwszy wykres obrazuje ilość pozostałych środków na koniec miesiąca wzbogacony
+ o linie Breakeven wskazującą kiedy stan jest ujemny, oraz Savings target która 
 prezentuje określony przez użytkownika w ustawieniach cel oszczędności. Pozwala 
-to już na pierwszy rzut oka ocenić stan finansów w danym miesiącu. Użytkownik 
-może także podejrzeć dane statystyczne za ostatni rok, jak: sumaryczna wartość 
-netto, średni przychód, średnie wydatki czy średni bilans miesięczny co łatwo 
-obrazuje czy oszczędza czy może traci środki.}
+to już na pierwszy rzut oka ocenić stan finansów w wybranym okresie. Użytkownik 
+ma także wgląd w dane statystyczne za ostatni rok, jak: sumaryczna wartość 
+netto, średni przychód, średnie wydatki czy średni bilans miesięczny co w prosty
+ sposób informuje czy oszczędza czy może traci środki finansowe.}
 
-{Dostęp do takich danych zdecydowanie ułatwia zarządzanie finansami, pomagają 
-użytkownikowi podejmować decyzje jaki kolejny krok może podjąć aby poprawić 
-swoją sytuację finansową lub osiągnąć wybrany cel jak kupno nowego samochodu 
-czy wymarzone wakacje.}
+{Dostęp do takich danych zdecydowanie ułatwia zarządzanie funduszami, pomagają 
+one użytkownikowi podejmować decyzje jaki powinien być kolejny krok aby poprawić
+ swoją sytuację finansową lub osiągnąć wybrany przez siebie cel pokroju kupna 
+nowego samochodu czy wymarzone wakacje.}
 
 \begin{figure}[H]           %requires float package
     \centering
@@ -2501,14 +2502,18 @@ ułatwiającej jej użytkownikom zarządzanie budżetem domowym poprzez dostarcz
 narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
 kategoryzującej wprowadzone dane.}
 
-{Przygotowane rozwiązanie spełnia powyższe założenia. Przyjęło formę 
-skonteneryzowanej z pomocą technologii Docker aplikacji przeglądarkowej 
-napisanej w języku Python, wykorzystującej framework Flask, Boootstrap i 
-przechowującej dane w bazie PostgreSQL o architekturze współdzielonej bazy i 
-schematu \cite{multitenant}. Wykorzystuje także wiele bibliotek zewnętrznych jak
- jschart do generowania wykresów, czy WTForms do obsługi danych wprowadzanych 
-przez użytkownika. Aplikacja może obsługiwać wielu użytkowników jednocześnie, 
-oraz przechowywać ich dane we wspólnej bazie danych.}
+{Przygotowane rozwiązanie spełnia powyższe założenia, jego pełen obecny kod 
+dostępny jest w publicznym repozytorium Git \cite{GITRighten} wraz z licencją 
+open source. Przyjęło formę aplikacji przeglądarkowej Righten skonteneryzowanej 
+na platformie Docker, napisanej w języku Python, wykorzystującej pakiety Flask 
+oraz Boootstrap. Dane przechowuje w bazie PostgreSQL o architekturze 
+współdzielonej bazy i schematu \cite{multitenant} ponieważ wstępnie założone 
+podejście shared database, separate schema okazało się zbyt skomplikowane, 
+podczas gdy zadowalający poziom zabezpieczeń osiągnieto separacją na poziomie 
+rekordu. Wykorzystuje także wiele bibliotek zewnętrznych jak jschart do 
+generowania wykresów, czy WTForms do obsługi danych wprowadzanych przez 
+użytkownika. Aplikacja jest w stanie obsługiwać wielu użytkowników jednocześnie,
+ oraz przechowywać ich dane we wspólnej bazie danych.}
 
 {Dzięki temu użytkownik może wprowadzić swoje dane finansowe jak zarobki, 
 wydatki, oszczędności czy progi wydatków, oszczędności i ustalać priorytety a 
@@ -2537,11 +2542,6 @@ zwanej także grywalizacja) \cite{gamifikacja} przez porównanie danych
 użytkowników do średniej i pozytywne wzmocnienie trendów wskazujących zdrowe 
 zarządzanie finansami poprzez zachęty i nagrody wewnątrz aplikacji.}
 
-% [#TODO]:
-% 3.13.Ewentualne załączniki
-
-
-% #TODO: Remove unused sources
 % 3.10.Bibliografia
 \begin{thebibliography} {books}
     %Books
@@ -2698,6 +2698,94 @@ zarządzanie finansami poprzez zachęty i nagrody wewnątrz aplikacji.}
 % 3.12.Spis tabel
 \listoftables
 \lstlistoflistings
+
+% 3.13.Ewentualne załączniki
+\newpage\null
+
+\newpage
+% https://www.wsti.pl/dla-studenta/ukonczenie-studiow/informatyka/zasady-skladania-prac-dyplomowych/
+% requirement 1: Oświadczenie o tym, że przedłożona praca została przygotowana samodzielnie
+\begin{flushright}
+    {Katowice, dnia ........................}
+\end{flushright}
+
+\smallskip
+
+\begin{flushleft}
+    {Imię, nazwisko: Nowak Marcin}\\
+    {Kierunek:       Informatyka}\\
+    {NR Albumu:      08255}\\
+\end{flushleft}
+
+
+\medskip
+\begin{center}
+    \begin{onehalfspace}
+        \textsc{\LARGE{OŚWIADCZENIE}}\\
+    \end{onehalfspace}
+\end{center}
+\medskip
+
+
+{Oświadczam, że przedłożoną inżynierską pracę dyplomową wykonaną w Wyższej 
+Szkole Technologii Informatycznych w Katowicach na kierunku Informatyka 
+opracowała(e)m samodzielnie i nienaruszyła(e)m praw autorskich innych osób, 
+które chronione są przepisami ustawy z dnia 4 lutego 1994 roku o prawie 
+autorskim i prawach pokrewnych. Jednocześnie oświadczam, że przedłożona praca 
+nie była nigdzie wcześniej publikowana i oceniana.}
+
+
+
+\bigskip
+\bigskip
+\begin{flushright}
+    {Podpis studenta}
+\end{flushright}
+
+\newpage\null
+
+\newpage
+% https://www.wsti.pl/dla-studenta/ukonczenie-studiow/informatyka/zasady-skladania-prac-dyplomowych/
+% requirement 2: oświadczenie, że treść zawarta na załączonym pendrive jest identyczna z egzemplarzem wydrukowanym
+\begin{flushright}
+    {Katowice, dnia ........................}
+\end{flushright}
+
+\smallskip
+
+\begin{flushleft}
+    {Imię, nazwisko: Nowak Marcin}\\
+    {Kierunek:       Informatyka}\\
+    {NR Albumu:      08255}\\
+\end{flushleft}
+
+
+\medskip
+\begin{center}
+    \begin{onehalfspace}
+        \textsc{\LARGE{OŚWIADCZENIE}}\\
+    \end{onehalfspace}
+\end{center}
+\medskip
+
+{Oświadczam, że praca inżynierska p.t.:}\\
+\begin{center}
+\textbf{Projekt i implementacja aplikacji wspomagającej zarządzanie budżetem domowym}\\
+\end{center}
+{zapisana na załączonym nośniku elektronicznym, jest zgodna z treścią zawartą w 
+wydrukowanej wersji pracy przedstawionej do oceny.}
+
+{Oświadczam, że przedłożona praca dyplomowa jest zatwierdzona 
+przez promotora.}
+
+
+
+\bigskip
+\bigskip
+\begin{flushright}
+    {Podpis studenta}
+\end{flushright}
+
 
 \end{large}
 \end{document}
