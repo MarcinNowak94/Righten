@@ -232,40 +232,46 @@
 \begin{titlepage}
 	%---Headings------------------------------------------	
 	\begin{center}
-    \begin{onehalfspace}
-    \textsc{\LARGE{WYŻSZA SZKOŁA TECHNOLOGII INFORMATYCZNYCH W KATOWICACH}}\\
-    \end{onehalfspace}
-    \textsc{\large{WYDZIAŁ INFORMATYKI}}\\
-	\textsc{\large{KIERUNEK: INFORMATYKA}}\\
+        \begin{onehalfspace}
+            \textsc{\large{WYŻSZA SZKOŁA TECHNOLOGII INFORMATYCZNYCH W KATOWICACH}}\\
+        \end{onehalfspace}
+        \textsc{WYDZIAŁ INFORMATYKI}\\
+        \textsc{KIERUNEK: INFORMATYKA}\\
     \end{center}
     
     %---Author--------------------------------------------
-	\begin{flushleft}
-    \textsc{Nowak Marcin}\\[0cm]
-    \textsc{Nr Albumu 08255}\\[0cm]
-    \textsc{Studia niestacjonarne}\\[0cm]
+	\bigskip
+    \begin{flushleft}
+        \textsc{Nowak Marcin}\\[0cm]
+        \textsc{Nr Albumu 08255}\\[0cm]
+        \textsc{Studia niestacjonarne}\\[0cm]
     \end{flushleft}
 	
+    \bigskip
+
     %---Title---------------------------------------------
 	\begin{center}
-    \HRule\\[0.4cm]
+    % \HRule\\[0.4cm] % Removed due to promoter remarks
 	{\customstyletitle{Projekt i implementacja aplikacji wspomagającej zarządzanie budżetem domowym}}\\[0.4cm] 
-    \HRule\\[1.5cm]
+    %\HRule\\[1.5cm] % Removed due to promoter remarks
     \end{center}
 	
     %---Description----------------------------------------
-	\begin{flushright}
-        \textsc{Przedmiot: Projekt Systemu Informatycznego}\\[0cm]
+	\bigskip
+    \begin{flushright}
+        \textsc{Praca dyplomowa zrealizowana}\\[0cm]
         \textsc{pod kierunkiem}\\[0cm]
-        \textsc{mgr. Jacek Żywczok}\\[0cm]
-        \textsc{W roku akademickim 2022/23}\\[0cm]
+        \textsc{dr. Roman Simiński}\\[0cm]
+        \textsc{W roku akademickim 2023/24}\\[0cm]
     \end{flushright}
  
 	%---Date & logo---------------------------------------
 	\vfill                  % Position the date lower
 	\begin{center}
-    {Katowice 2022}\\	    % \today
-	\includegraphics[width=0.2\textwidth]{figures/WSTI-logo.jpg}\\[1cm]
+    {Katowice 2024}\\	    % \today
+	% Removed due to promoter remarks
+    %\medskip
+    %\includegraphics[width=0.2\textwidth]{figures/WSTI-logo.jpg}\\[1cm]
 	\end{center}
 \end{titlepage}
 
@@ -2509,7 +2515,7 @@ na platformie Docker, napisanej w języku Python, wykorzystującej pakiety Flask
 oraz Boootstrap. Dane przechowuje w bazie PostgreSQL o architekturze 
 współdzielonej bazy i schematu \cite{multitenant} ponieważ wstępnie założone 
 podejście shared database, separate schema okazało się zbyt skomplikowane, 
-podczas gdy zadowalający poziom zabezpieczeń osiągnieto separacją na poziomie 
+podczas gdy zadowalający poziom zabezpieczeń osiągnięto separacją na poziomie 
 rekordu. Wykorzystuje także wiele bibliotek zewnętrznych jak jschart do 
 generowania wykresów, czy WTForms do obsługi danych wprowadzanych przez 
 użytkownika. Aplikacja jest w stanie obsługiwać wielu użytkowników jednocześnie,
