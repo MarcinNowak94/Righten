@@ -14016,7 +14016,7 @@ WHERE "Type" IN (
 	LIMIT 10
 )
 GROUP BY "UserID", "Type", "Month"
-ORDER BY "UserID", "Month" DESC, "Sum" DESC;
+ORDER BY "Month" ASC, "UserID", "Sum" DESC;
 CREATE VIEW "Top10ProductsMonthly" AS 
 SELECT	"UserID"
 		,TO_CHAR("DateTime", 'YYYY-MM') AS "Month"
@@ -14035,7 +14035,7 @@ WHERE "Product" IN (
 	LIMIT 10
 )
 GROUP BY "UserID", "Product", "Month"
-ORDER BY "UserID", "Month" DESC, "Sum" DESC;
+ORDER BY "Month" ASC, "UserID", "Sum" DESC;
 CREATE VIEW "ProductsToFix" AS
 SELECT *
 FROM "ExpendituresEnriched"
@@ -14256,6 +14256,35 @@ GROUP BY "Income"."Source"
 		 ,"Summary"."Last"
 		 ,"Summary"."Common"
 ORDER BY "Amount" DESC;
+
+CREATE VIEW "UnnecessaryProductsBought" AS
+SELECT
+	*
+FROM (
+	SELECT
+		"Enriched"."UserID" as "UserID"
+		,"DateTime"
+		,SUBSTRING(TO_CHAR("DateTime", 'YYYY-MM-DD'), 1, 7) AS "Month"
+		,"Amount"
+		,"Product"
+		,"Type"
+		,"Cash"
+		,"Comment"
+		,"ProductPriority"
+		,CAST("Value" AS NUMERIC)          AS "Target"
+	FROM "ExpendituresEnriched"
+	AS "Enriched"
+	JOIN (
+		SELECT
+			"Value"
+			,"UserID"
+		FROM "UserSettings"
+		WHERE "Setting"='ProductPriorityTarget'
+	) AS "Settings"
+	ON "Settings"."UserID"="Enriched"."UserID"
+	ORDER BY "Enriched"."DateTime"
+)
+WHERE "ProductPriority"<"Target";
 
 CREATE VIEW "Statistics" AS
 	--Create intermediary table

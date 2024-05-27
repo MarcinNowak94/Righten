@@ -44,8 +44,8 @@ with app.app_context():
     Top10ProductsMonthly = Table("Top10ProductsMonthly", db.metadata, autoload_with=db.engine)
     MonthlyBilanceSingle = Table("MonthlyBilanceSingle", db.metadata, autoload_with=db.engine)
     MonthlySpending = Table("MonthlySpending", db.metadata, autoload_with=db.engine)
+    UnnecessaryProductsBought = Table("UnnecessaryProductsBought", db.metadata, autoload_with=db.engine)
     Statistics = Table("Statistics", db.metadata, autoload_with=db.engine)
-    
 
 # Maps used to generalize functions - to refer to table by objectname alone
 tables = {
@@ -78,6 +78,7 @@ views = {
     "Top10ProductsMonthly" : Top10ProductsMonthly,
     "MonthlyBilanceSingle" : MonthlyBilanceSingle,
     "MonthlySpending" : MonthlySpending,
+    "UnnecessaryProductsBought" : UnnecessaryProductsBought,
     "Statistics" : Statistics
 }
 

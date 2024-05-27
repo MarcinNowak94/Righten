@@ -5,6 +5,7 @@ from datetime import date
 from Resources.models import *
 from Resources.logging_definition import logger
 
+# TODO: Make user setting or global application configuration
 MAX_VISUALIZATION_ITEMS=15
 
 def user_valid(form, field):
@@ -208,7 +209,10 @@ class RegisterForm(UserForm):
         :passwordrepeated: -- password validity check
     """
 
-    passwordrepeated=get_PasswordField_protytpe("Password repeated", "Repeat password")
+    passwordrepeated = get_PasswordField_protytpe(
+                            "Password repeated",
+                            "Repeat password"
+                            )
 
 class LoginForm(UserForm):
     """User login form, has all UserForm fields
@@ -226,11 +230,25 @@ class SettingsForm(FlaskForm):
         :FlaskForm: -- base class
     """
 
-    productprioritytarget=IntegerField(validators=[InputRequired(), NumberRange(min=1,max=100)],  default=33)
-    spendingtarget=DecimalField(validators=[InputRequired()],  default=1000)
-    savingstarget=DecimalField(validators=[InputRequired()],  default=1000)
-    accountactive=BooleanField(default=False)
-    submit=SubmitField("Submit")
+    productprioritytarget = IntegerField(
+                                label="Product priority target",
+                                validators=[
+                                    InputRequired(),
+                                    NumberRange(min = 1,max = 100)
+                                    ],
+                                default = 33)
+    spendingtarget = DecimalField(
+                        label = "Spending target",
+                        validators = [InputRequired()],
+                        default = 1000)
+    savingstarget = DecimalField(
+                        label = "Savings target",
+                        validators = [InputRequired()],
+                        default = 1000)
+    accountactive = BooleanField(
+                        label = "Account active",
+                        default = False)
+    submit = SubmitField(label = "Submit")
 
 class PasswordConfirmationForm(FlaskForm):
     """Base form for password changes operations, consists of two password fields
@@ -243,15 +261,18 @@ class PasswordConfirmationForm(FlaskForm):
         :passwordrepeated: -- new user password repeated for validation
     """
 
-    newpassword=get_PasswordField_protytpe("New password", "New password")
-    passwordrepeated=get_PasswordField_protytpe(
-        "Password repated",
-        "Repeat password", 
-        [EqualTo(
-            fieldname='newpassword', 
-            message="New password and repeated new password do not match!")]
+    newpassword = get_PasswordField_protytpe(
+        "New password",
+        "New password"
         )
-    submit=SubmitField("Submit")
+    passwordrepeated = get_PasswordField_protytpe(
+        "Password repated",
+        "Repeat password",
+        [EqualTo(
+            fieldname = "newpassword",
+            message = "New password and repeated new password do not match!")]
+        )
+    submit = SubmitField("Submit")
 
 class PasswordChangeForm(PasswordConfirmationForm):
     """Password change form, consists of three password fields
@@ -263,7 +284,10 @@ class PasswordChangeForm(PasswordConfirmationForm):
         :password: -- current user passowrd
     """
 
-    password=get_PasswordField_protytpe("Current password", "Current password")
+    password = get_PasswordField_protytpe(
+                    "Current password",
+                    "Current password"
+                    )
 
 class PasswordResetForm(PasswordConfirmationForm):
     """Password reset form, consists of two password fields
@@ -275,9 +299,11 @@ class PasswordResetForm(PasswordConfirmationForm):
         :password: -- current user passowrd
     """
 
-    resettoken=StringField("ResetToken", 
-                           validators=[DataRequired()],
-                           default="Reset token")
+    resettoken = StringField(
+                    "ResetToken", 
+                    validators=[DataRequired()],
+                    default="Reset token"
+                    )
 
 class PasswordResetGenerateTokenForm(FlaskForm):
     """Password reset form for first stage -token generation
@@ -289,9 +315,17 @@ class PasswordResetGenerateTokenForm(FlaskForm):
     TODO: Send token via email as per https://pythonbasics.org/flask-mail/
     """
 
-    username=StringField(validators=[InputRequired(), Length(min=4, max=20), user_valid], render_kw={"placeholder": "Username"})
-    submit=SubmitField("Submit")
+    username = StringField(
+        label = "Username",
+        validators=[
+            InputRequired(),
+            Length(min = 4, max = 20),
+            user_valid],
+            render_kw={"placeholder": "Username"}
+        )
+    submit = SubmitField("Submit")
 
+# FIXME: filter products by UserID
 class ProductVisualizationForm(FlaskForm):
     """Product summary visualization form, decides which products data are 
     selected from database to be visualized
@@ -310,7 +344,7 @@ class ProductVisualizationForm(FlaskForm):
         top10_user_products = db.session.query(ProductSummary.columns.Product).\
                                         order_by(ProductSummary.columns.Times).\
                                         limit(10)
-    choices=[]
+    choices = []
     for product in user_products:
         choices.append(product[0])
 
@@ -319,15 +353,19 @@ class ProductVisualizationForm(FlaskForm):
                     InputRequired(),
                     # Setting reasonable limit, otherwise graph gets too crowded 
                     NumberRange(
-                        min=1,
-                        max=MAX_VISUALIZATION_ITEMS if user_products_count>MAX_VISUALIZATION_ITEMS else user_products_count)
+                        min = 1,
+                        max = MAX_VISUALIZATION_ITEMS 
+                              if user_products_count > MAX_VISUALIZATION_ITEMS
+                              else user_products_count
+                        )
                     ],
-                default=10)
+                default = 10)
     products = SelectMultipleField(
-                    choices=choices,
-                    default=top10_user_products)
+                    choices = choices,
+                    default = top10_user_products)
     submit = SubmitField("Submit")
 
+# FIXME: filter types by UserID
 class TypeVisualizationForm(FlaskForm):
     """Type summary visualization form, decides which types data are 
     selected from database to be visualized
@@ -345,7 +383,7 @@ class TypeVisualizationForm(FlaskForm):
         top10_user_types = db.session.query(TypeSummary.columns.Type).\
                                         order_by(TypeSummary.columns.Times).\
                                         limit(10)
-    choices=[]
+    choices = []
     for type in user_types:
         choices.append(type[0])
 
@@ -354,11 +392,14 @@ class TypeVisualizationForm(FlaskForm):
                     InputRequired(),
                     # Setting reasonable limit, otherwise graph gets too crowded 
                     NumberRange(
-                        min=1,
-                        max=MAX_VISUALIZATION_ITEMS if user_types_count>MAX_VISUALIZATION_ITEMS else user_types_count)
+                        min = 1,
+                        max = MAX_VISUALIZATION_ITEMS
+                              if user_types_count > MAX_VISUALIZATION_ITEMS
+                              else user_types_count
+                        )
                     ],
-                default=10)
+                default = 10)
     types = SelectMultipleField(
-                    choices=choices,
-                    default=top10_user_types)
+                    choices = choices,
+                    default = top10_user_types)
     submit = SubmitField("Submit")
