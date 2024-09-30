@@ -29,6 +29,7 @@ with app.app_context():
     MonthlyBilance = Table("MonthlyBilance", db.metadata, autoload_with=db.engine)
     MonthlyBills = Table("MonthlyBills", db.metadata, autoload_with=db.engine)
     MonthlyExpenditures = Table("MonthlyExpenditures", db.metadata, autoload_with=db.engine)
+    MonthlyExpendituresbyType = Table("MonthlyExpendituresbyType", db.metadata, autoload_with=db.engine)
     MonthlyIncome = Table("MonthlyIncome", db.metadata, autoload_with=db.engine)
     MonthlyProducts = Table("MonthlyProducts", db.metadata, autoload_with=db.engine)
     MonthlyCommonProducts = Table("MonthlyCommonProducts", db.metadata, autoload_with=db.engine)
@@ -63,6 +64,7 @@ views = {
     "MonthlyBilance" : MonthlyBilance,
     "MonthlyBills" : MonthlyBills,
     "MonthlyExpenditures" : MonthlyExpenditures,
+    "MonthlyExpendituresbyType": MonthlyExpendituresbyType, 
     "MonthlyIncome" : MonthlyIncome,
     "MonthlyProducts" : MonthlyProducts,
     "MonthlyCommonProducts" : MonthlyCommonProducts,

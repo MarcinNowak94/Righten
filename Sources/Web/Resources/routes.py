@@ -1009,7 +1009,45 @@ def producttypessummary():
                         form=form
                         )
 
+#TODO: fill in
+@app.route("/month", methods=["GET", "POST"])
+@flask_login.login_required
+def month():
+    #Expenditures pie chart "SELECT * FROM Mont" 
+    #MonthlyBilance table
+    #Unnecessary productsBought(Group by Product)
+    #MonthlySpending
+    #IDEA: Add month picker based on data from BIlance
+    
+    form = MonthInputForm()
+    chosenmonth="2024-09" #TODO: Populate dynamically str(datetime.now().year+"-"+datetime.now().month)
 
+    if form.validate_on_submit():
+        chosenmonth = Type=form.months.data
+
+    typespendingdata = db.session.query(MonthlyExpendituresbyType.columns.Type,
+                                    MonthlyExpendituresbyType.columns.Amount).\
+                            filter_by(UserID=current_user.uuid).\
+                            filter_by(Month=chosenmonth)
+    # TODO: Add net result
+    # TODO: Add possiblesavings
+    bilancedata = db.session.query(MonthlyBilance.columns.Source,
+                                    MonthlyBilance.columns.Amount).\
+                            filter_by(UserID=current_user.uuid).\
+                            filter_by(Month=chosenmonth)
+    unnecessaryproducts = db.session.query(UnnecessaryProductsBought).\
+                            filter_by(UserID=current_user.uuid).\
+                            filter_by(Month=chosenmonth)
+    
+    typespendingchart=createpiechartdataset(typespendingdata, addperc=True)
+
+    log_site_opened()
+    return render_template("month.html",
+                           title="Month summary",
+                           typespending=json.dumps(typespendingchart, cls=DecimalEncoder),
+                           bilancedata=bilancedata,
+                           unnecessaryproducts=unnecessaryproducts,
+                           form=form)
 
 #Basic data display ------------------------------------------------------------
 #FIXME: As for now user cannot add new Income type or source

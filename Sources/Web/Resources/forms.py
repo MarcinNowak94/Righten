@@ -403,3 +403,25 @@ class TypeVisualizationForm(FlaskForm):
                     choices = choices,
                     default = top10_user_types)
     submit = SubmitField("Submit")
+
+# FIXME: filter types by UserID
+class MonthInputForm(FlaskForm):
+    """Month summary form, decides which month data is displayed
+
+    Arguments:
+        :FlaskForm: -- base class
+    """
+
+    with app.app_context():
+        db_months = db.session.query(MonthlyExpendituresbyType.columns.Month).\
+                                    order_by(MonthlyExpendituresbyType.columns.Month).\
+                                    distinct()
+                                        #filter_by(UserID=current_user.uuid)
+        last_month = "2024-09" #TODO: FIX
+        monthsoptions=[]
+        for Month in db_months:
+            monthsoptions.append(str(Month[0]))
+    months = SelectField("Month", validators=[DataRequired()],
+                    choices = monthsoptions,
+                    default = last_month)                   
+    submit = SubmitField("Submit")
