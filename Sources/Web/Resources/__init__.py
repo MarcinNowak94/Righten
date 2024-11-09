@@ -3,12 +3,16 @@ from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
+import secrets
 
 from Resources.logging_definition import logger, setup_logging
 from Resources.rightenlogger import RightenJSONFormatter
+
+# TODO: Unify configuration scheme
 #Secure config as per https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
 
 app=Flask(__name__)
+app.secret_key = secrets.token_hex()
 
 # As per https://www.youtube.com/watch?v=L1h5gRxh8w8
 basepath = os.path.abspath(os.path.dirname(__file__))
@@ -16,7 +20,7 @@ load_dotenv(os.path.join(basepath, ".env"))
 
 app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3"
+    "sqlite:///P:\\Johny\\Projects\\Budgeter_personal\\Finances.sqlite3"#"sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3"
     if app.config["ENV"] == "development"
     else "postgresql+psycopg2://postgres:postgres@rightendb:5432/RightenDB"
     )
@@ -35,13 +39,13 @@ if not app.config["SECRET_KEY"]:
     raise ValueError("No SECRET_KEY set for Flask application")
 
 app.config["CERT_FILE"] = (
-    "E:\\Projects\\Git\\Righten\\Sources\\Web\\cert.pem"
+    "E:\\Projects\\Git\\Righten\\Sources\\Web\\Secrets\\cert.pem"
     if app.config["ENV"] == "development"
-    else "/righten/cert.pem")
+    else "/righten/Secrets/cert.pem")
 app.config["KEY_FILE"] = (
-    "E:\\Projects\\Git\\Righten\\Sources\\Web\\key.pem"
+    "E:\\Projects\\Git\\Righten\\Sources\\Web\\Secrets\\key.pem"
     if app.config["ENV"] == "development"
-    else "/righten/key.pem")
+    else "/righten/Secrets/key.pem")
 
 app.config["LOG_FILE"] = (
     "E:\\Projects\\Git\\Righten\\Sources\\Logs\\rightenlog.jsonl"
