@@ -1,0 +1,108 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="Bilance"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="BilanceSourcesOverTimechart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="BilanceTotalChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-10, col-sm-6">
+            <H3>Statistics</H3>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Statistic</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in StatisticData %}
+                            <tr>
+                                <td>{{entry.Statistic}}</td>
+                                <td>{{entry.Value}}</td>
+                            </tr>
+                    {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    {% block javascript %}
+    <script>
+        let BilanceTotalchart = JSON.parse({{ BilanceTotalchart | tojson }})
+        let BilanceData = JSON.parse({{ BilanceData | tojson }})
+        let BilanceSourcesData = JSON.parse({{ BilanceSourcesData | tojson }})
+        
+        
+        let BilanceTotal = new Chart(document.getElementById("BilanceTotalChart"), {
+            type: "pie",
+            data: BilanceTotalchart,
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Bilance summary"
+                    }
+                }
+            }
+        })
+
+        let BilanceOverTime = new Chart(document.getElementById("Bilance"), {
+            type: "line",
+            data: {
+                datasets: BilanceData
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Bilance"
+                    }
+                }
+            }
+        })
+
+        let BilanceSetOverTime = new Chart(document.getElementById("BilanceSourcesOverTimechart"), {
+            type: "line",
+            data: {
+                datasets: BilanceSourcesData
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Bilance sources over time"
+                    }
+                }
+            }
+        })
+    </script>
+    {% endblock %}
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="col-sm-10 ml-auto mr-auto">
+    <form action="" method="POST">
+        {{ form.csrf_token() }}
+        <fieldset class="form-group">
+            <legend class="mb-4">My account Settings</legend>
+
+            <div class="col form-group">
+                {{ form.productprioritytarget.label(class = "form-control-label") }}
+                
+                {% if form.productprioritytarget.errors %}
+                    {{ form.productprioritytarget(class = "form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                    {% for error in form.productprioritytarget.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.productprioritytarget(class = "form-control form-control-sm") }}
+                {% endif %}
+            </div>
+
+            <div class="col form-group">
+                {{ form.spendingtarget.label(class = "form-control-label") }}
+                
+                {% if form.spendingtarget.errors %}
+                    {{ form.spendingtarget(class = "form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                    {% for error in form.spendingtarget.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.spendingtarget(class = "form-control form-control-sm") }}
+                {% endif %}
+            </div>
+            
+            <div class="col form-group">
+                {{ form.savingstarget.label(class = "form-control-label") }}
+                
+                {% if form.savingstarget.errors %}
+                    {{ form.savingstarget(class = "form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                    {% for error in form.savingstarget.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.savingstarget(class = "form-control form-control-sm") }}
+                {% endif %}
+            </div>
+
+            <div class="col form-group">
+                {{ form.accountactive.label(class = "form-control-label") }}
+                {{ form.accountactive }}
+            </div>
+
+            <div class="col">
+                {{ form.submit(class="btn btn-success", value="Submit")}}
+                <a href="{{ url_for('passwordchange') }}" class="btn btn-outline-danger btn-sm">Change Password</a>
+            </div>
+        </fieldset>
+    </form>
+</div>
+<br></br>
+
+{% endblock %}

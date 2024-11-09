@@ -1,0 +1,113 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <form action="" method="POST">
+            {{ form.csrf_token() }}
+            <fieldset class="form-group">
+                <div class="row form-group">
+                    {{ form.months.label(class="form-control-label") }}
+                    {% if form.months.errors %}
+                        {{ form.months(class="form-control form-control-sm is-invalid") }}
+                        {% for error in form.months.errors %}
+                            <div class="invalid-feedback">
+                                <span>{{error}}</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        {{ form.months(class="form-control form-control-sm") }}
+                    {% endif %}
+                
+                    {{ form.submit(class="btn btn-success", value="Submit")}}
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="TypeSpending"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-10, col-sm-6"></div>
+            <H3>Summary</H3>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Source</th>
+                        <th scope="col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in bilancedata %}
+                        <tr>
+                            <td>{{entry.Source}}</td>
+                            <td>{{entry.Amount}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <H2>Unncessary products bought</H2>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">DateTime</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Product</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Cash</th>
+                        <th scope="col">Comment</th>
+                        <th scope="col">ProductPriority</th>
+                        <th scope="col">Target</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in unnecessaryproducts %}
+                            <tr>
+                                <td>{{entry.DateTime}}</td>
+                                <td>{{entry.Amount}}</td>
+                                <td>{{entry.Product}}</td>
+                                <td>{{entry.Type}}</td>
+                                <td>{{entry.Cash}}</td>
+                                <td>{{entry.Comment}}</td>
+                                <td>{{entry.ProductPriority}}</td>
+                                <td>{{entry.Target}}</td>
+                            </tr>
+                    {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    {% block javascript %}
+        <script>
+            let typespending = JSON.parse({{ typespending | tojson }})
+            
+
+            let TypeSpending = new Chart(document.getElementById("TypeSpending"), {
+                type: "pie",
+                data: typespending,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Spending by type"
+                        }
+                    }
+                }
+            })
+        </script>
+    {% endblock %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "RightenDB": {
+            "Name": "RightenDB",
+            "Group": "Righten",
+            "Port": 5432,
+            "Username": "postgres",
+            "Host": "rightendb",
+            "SSLMode": "prefer",
+            "MaintenanceDB": "postgres"
+        }
+    }
+}

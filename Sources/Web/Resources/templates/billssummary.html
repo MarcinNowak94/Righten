@@ -1,0 +1,132 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="BillsOverTime"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="BillsTypesOverTime"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="BillsSummary"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <H2>Bills Summary</H2>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Medium</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Times</th>
+                        <th scope="col">First</th>
+                        <th scope="col">Last</th>
+                        <th scope="col">Minimum</th>
+                        <th scope="col">Average</th>
+                        <th scope="col">Maximum</th>
+                        <th scope="col">Common</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in Summary %}
+                            <tr>
+                                <td>{{entry.Medium}}</td>
+                                <td>{{entry.Amount}}</td>
+                                <td>{{entry.Times}}</td>
+                                <td>{{entry.First}}</td>
+                                <td>{{entry.Last}}</td>
+                                <td>{{entry.Minimum}}</td>
+                                <td>{{entry.Average}}</td>
+                                <td>{{entry.Maximum}}</td>
+                                <td>{{entry.Common}}</td>
+                            </tr>
+                    {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    {% block javascript %}
+        <script>
+            let BillsTypechart = JSON.parse({{ BillsTypechart | tojson }})
+            let MonthlyBillsData = JSON.parse({{ MonthlyBillsData | tojson }})
+            let BillsTypesData = JSON.parse({{ BillsTypesData | tojson }})
+            
+            let BillsSummarychart = new Chart(document.getElementById("BillsSummary"), {
+                type: "pie",
+                data: BillsTypechart,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Bills summary"
+                        }
+                    }
+                }
+            })
+
+            let BillsOverTime = new Chart(document.getElementById("BillsOverTime"), {
+                type: "line",
+                data: {
+                    datasets: [{
+                        label: "Bills",
+                        data: MonthlyBillsData,
+                        fill: false,
+                        borderColor: "rgb(75, 192, 192)",
+                        lineTension: 0.1
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Bills over time"
+                        }
+                    }
+                }
+            })
+
+            let BillsTypesOverTime = new Chart(document.getElementById("BillsTypesOverTime"), {
+                type: "line",
+                data: {
+                    datasets: BillsTypesData
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Bills types over time"
+                        }
+                    }
+                }
+            })
+
+        </script>
+    {% endblock %}
+{% endblock %}

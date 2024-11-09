@@ -1,0 +1,114 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="ExpendituresOverTime"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="TopTypeExpenditures"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="ExpendituresSummary"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="TopProductsSummary"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    {% block javascript %}
+        <script>
+            let ExpendituresSet = JSON.parse({{ ExpendituresSet | tojson }})
+            let ExpendituresSummaryChart = JSON.parse({{ ExpendituresSummaryChart | tojson }})
+            let TopTypeExpenditures = JSON.parse({{ TopTypeExpenditures | tojson }})
+            let TopProductsExpenditures = JSON.parse({{ TopProductsExpenditures | tojson }})
+
+            let ExpendituresSummarychart = new Chart(document.getElementById("ExpendituresSummary"), {
+                type: "pie",
+                data: ExpendituresSummaryChart,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Expenditures summary"
+                        }
+                    }
+                }
+            })
+
+            let ExpendituresOverTime = new Chart(document.getElementById("ExpendituresOverTime"), {
+                type: "line",
+                data: {
+                    datasets: ExpendituresSet
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Expenditures over time"
+                        }
+                    }
+                }
+            })
+
+            let TopTypeExpenditureschart = new Chart(document.getElementById("TopTypeExpenditures"), {
+                type: "line",
+                data: {
+                    datasets: TopTypeExpenditures
+                },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Top 10 expenditures by type"
+                    }
+                }
+            }
+            })
+
+            let TopProductsExpenditureschart = new Chart(document.getElementById("TopProductsSummary"), {
+                type: "line",data: {
+                    datasets: TopProductsExpenditures
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Top 10 expenditures by product"
+                        }
+                    }
+                }
+            })
+        </script>
+    {% endblock %}
+{% endblock %}

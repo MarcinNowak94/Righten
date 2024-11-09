@@ -1,0 +1,9 @@
+Flask
+flask-login
+flask_bcrypt
+flask_sqlalchemy
+Flask-WTF
+python-dotenv
+cryptography
+pyopenssl
+psycopg2_binary

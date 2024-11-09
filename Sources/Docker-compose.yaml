@@ -1,0 +1,47 @@
+#https://github.com/felipewom/docker-compose-postgres
+services:
+  righten:
+    image:                'righten:app'
+    build:                ./Web/
+    restart:              always #might be bad choice
+    command:              sh -c "sleep 10s ; python3 ./run.py" #Waiter script
+    ports:
+      - 443:443
+    stop_signal:          SIGINT     #flask requirement
+    environment:
+      FLASK_SERVER_PORT:  '443'
+    volumes:
+      - ./Logs:/logs
+    depends_on:
+      - rightendb
+    
+  
+  rightendb:
+    image:                'rightendb:db'
+    build:                ./Database/
+    restart:              always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER:      postgres # The PostgreSQL user (useful to connect to the database)
+      POSTGRES_PASSWORD:  postgres # The PostgreSQL password (useful to connect to the database)
+      POSTGRES_DB:        RightenDB # The PostgreSQL default database (automatically created at first launch
+    #Share catalog with container to persist data
+    volumes:
+      - ./Database/RightenDB/:/var/lib/postgresql/data/
+      #Initialize data first time container is run
+      - ./Database/Righten_mock-sqlite_dump_PostgreSQL-dialect.sql:/docker-entrypoint-initdb.d/init.sql
+    
+  pgadmin:
+    image:                dpage/pgadmin4
+    container_name:       pgadmin4_container
+    restart:              always
+    environment:
+      #Cardinal sin #1: Thou shall not devulge your password. Done for sake of clarity
+      PGADMIN_DEFAULT_EMAIL: admin@righten.com
+      PGADMIN_DEFAULT_PASSWORD: testpass
+    ports:
+      - "80:80"
+    #Persistent server configuration
+    volumes:
+      - ./Database/dbconnections.json:/pgadmin4/servers.json

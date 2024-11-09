@@ -1,0 +1,24 @@
+Keys created according to:
+https://stackoverflow.com/questions/29458548/can-you-add-https-functionality-to-a-python-flask-web-server
+
+Sources used in creating this app:
+https://www.youtube.com/watch?v=3vfum74ggHE - framework reconeissance
+https://www.youtube.com/watch?v=JgF6vaDYxzU&list=PLU7aW4OZeUzwn6L1txXQ9viaAIR2mDqbv
+https://stackoverflow.com/questions/39955521/sqlalchemy-existing-database-query
+https://www.youtube.com/watch?v=UK57IHzSh8I
+https://stackoverflow.com/questions/31444036/runtimeerror-working-outside-of-application-context
+https://www.chartjs.org/
+https://getbootstrap.com/docs/4.0/
+https://flask-wtf.readthedocs.io/en/1.0.x/
+https://www.youtube.com/watch?v=L1h5gRxh8w8
+https://www.youtube.com/watch?v=tqZxama6tiE
+
+TODO: Check materials
+https://pythonhosted.org/Flask-Security/
+https://www.youtube.com/watch?v=5aYpkLfkgRE
+https://realpython.com/getting-started-with-bootstrap-3/
+https://github.com/Princekrampah/FlaskExpenseTracker/tree/master
+https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
+
+#ARWES - react framework for UI 
+https://hackaday.com/2023/06/29/sci-fi-ui-made-easy-with-arwes/

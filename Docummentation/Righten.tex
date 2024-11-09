@@ -1,4 +1,4 @@
-% Docummentation:
+% Documentation:
 % - https://www.latex-project.org/help/documentation/
 % - https://docs.w3cub.com/latex/
 % - https://tex.stackexchange.com/questions/455993/formatting-sql-code
@@ -9,8 +9,8 @@
 %--------------------------------------------------------------------------------
 % add section about icon source https://www.iconpacks.net/free-icon/money-bag-6384.html
 
-
-\documentclass[a4paper,10pt, twoside]{report}
+% All chapters should begin at odd-numbered pages
+\documentclass[a4paper, 10pt, twoside, openright]{report}
 
 \usepackage{polski}         % Polish diacretic signs
 \usepackage[utf8]{inputenc} % required for international characters
@@ -24,6 +24,7 @@
 \usepackage{index}          % Create an index
 \usepackage{setspace}       % Spacing
 \usepackage{float}          % Forcing figure placement
+\usepackage{placeins}       % Barrier to floats so tables don't "sink
 \usepackage{tabularray}     % Tables with wrapping
 \usepackage{xcolor,listings}% Code listings
 \usepackage{textcomp}       % Code listings
@@ -31,11 +32,12 @@
 \usepackage{nameref}        % Reference chapter, section, etc. by name
 \usepackage{afterpage}
 \usepackage{tcolorbox}      % Colored boxes for inline Code
+\usepackage{emptypage}      % Empty pages have no headers, footers, numbering
 
 \makeindex
 \graphicspath{ {./} }       %Was ./figures/ changed so i can peek in VS Code
 %Widow and orphan control as per https://tex.stackexchange.com/questions/4152/how-do-i-prevent-widow-orphan-lines/4167#4167?newreg=87e476a8b11e44e2bd285df0190a69e0
-\widowpenalty10000          
+\widowpenalty10000
 \clubpenalty10000
 
 % Code listings
@@ -43,13 +45,13 @@
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{HTML}{C42043}
 \definecolor{backcolour}{HTML}{F2F2F2}
-\definecolor{bookColor}{cmyk}{0,0,0,0.90}  
+\definecolor{bookColor}{cmyk}{0,0,0,0.90}
 \color{bookColor}
 
 \lstset{upquote=true}
 
 \lstdefinestyle{mystyle}{
-    backgroundcolor=\color{backcolour},   
+    backgroundcolor=\color{backcolour},
     commentstyle=\color{codegreen},
     keywordstyle=\color{codepurple},
     numberstyle=\numberstyle,
@@ -68,11 +70,11 @@
 \lstset{style=mystyle}
 
 % Code listings
-\newcommand\numberstyle[1]{%
+\newcommand\numberstyle[1]{
     \footnotesize
-    \color{codegray}%
+    \color{codegray}
     \ttfamily
-    \ifnum#1<10 0\fi#1 |%
+    \ifnum#1<10 0\fi#1 |
 }
 
 \renewcommand{\lstlistlistingname}{Listingi}
@@ -109,15 +111,86 @@
             caption=#1}}
   {\endminipage}
 
+  \definecolor{lightgray}{rgb}{.9,.9,.9}
+  \definecolor{darkgray}{rgb}{.4,.4,.4}
+  \definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+
+% Modified from: https://tex.stackexchange.com/questions/89574/language-option-supported-in-listings
+\lstdefinelanguage{JavaScript}{
+    keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, 
+              % Additions
+              let, tojson, parse, document, Chart, type, data, datasets, label},
+    keywordstyle=\color{blue}\bfseries,
+    ndkeywords={class, export, boolean, throw, implements, import, this, JSON},
+    ndkeywordstyle=\color{darkgray}\bfseries,
+    identifierstyle=\color{black},
+    sensitive=false,
+    comment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{purple}\ttfamily,
+    stringstyle=\color{red}\ttfamily,
+    morestring=[b]',
+    morestring=[b]"
+}
+
+%as per https://tex.stackexchange.com/questions/152829/how-can-i-highlight-yaml-code-in-a-pretty-way-with-listings
+\newcommand\YAMLcolonstyle{\footnotesize\color{red}\mdseries}
+\newcommand\YAMLkeystyle{\footnotesize\color{black}\bfseries}
+\newcommand\YAMLvaluestyle{\footnotesize\color{blue}\mdseries}
+
+\makeatletter
+
+% here is a macro expanding to the name of the language
+% (handy if you decide to change it further down the road)
+\newcommand\language@yaml{yaml}
+
+\expandafter\expandafter\expandafter\lstdefinelanguage
+\expandafter{\language@yaml}
+{
+  keywords={true,false,null,y,n},
+  keywordstyle=\color{darkgray}\bfseries,
+  basicstyle=\YAMLkeystyle,                                 % assuming a key comes first
+  sensitive=false,
+  comment=[l]{\#},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\YAMLvaluestyle\ttfamily,
+  moredelim=[l][\color{orange}]{\&},
+  moredelim=[l][\color{magenta}]{*},
+  moredelim=**[il][\YAMLcolonstyle{:}\YAMLvaluestyle]{:},   % switch to value style at :
+  morestring=[b]',
+  morestring=[b]",
+  literate =    {---}{{\ProcessThreeDashes}}3
+                {>}{{\textcolor{red}\textgreater}}1     
+                {|}{{\textcolor{red}\textbar}}1 
+                {\ -\ }{{\mdseries\ -\ }}3,
+}
+
+% switch to key style at EOL
+\lst@AddToHook{EveryLine}{\ifx\lst@language\language@yaml\YAMLkeystyle\fi}
+\makeatother
+
   % spacer
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % horizontal lines
 
-\newtcbox{\inlinecode}{on line, boxrule=0pt, boxsep=0pt, top=2pt, left=2pt, bottom=2pt, right=2pt, colback=gray!15, colframe=white, fontupper={\ttfamily \footnotesize}}
+\newtcbox{\inlinecode}{
+    on line,
+    boxrule=0pt,
+    boxsep=0pt,
+    top=2pt,
+    left=2pt,
+    bottom=2pt,
+    right=2pt,
+    colback=gray!15,
+    colframe=white,
+    fontupper={\ttfamily \footnotesize}
+}
 
 % --------------------------- documment starts here ---------------------------
 
 % environment
 \begin{document}
+\begin{large}       %Remark 1: make size bigger by ~1,5p
 
 % Define pagestyle
 % [REQUIREMENT] 23. Przypisy dolne, stopki (nr stron), nagłówki...
@@ -159,44 +232,48 @@
 \begin{titlepage}
 	%---Headings------------------------------------------	
 	\begin{center}
-    \begin{onehalfspace}
-    \textsc{\LARGE{WYŻSZA SZKOŁA TECHNOLOGII INFORMATYCZNYCH W KATOWICACH}}\\
-    \end{onehalfspace}
-    \textsc{\large{WYDZIAŁ INFORMATYKI}}\\
-	\textsc{\large{KIERUNEK: INFORMATYKA}}\\
+        \begin{onehalfspace}
+            \textsc{\large{WYŻSZA SZKOŁA TECHNOLOGII INFORMATYCZNYCH W KATOWICACH}}\\
+        \end{onehalfspace}
+        \textsc{WYDZIAŁ INFORMATYKI}\\
+        \textsc{KIERUNEK: INFORMATYKA}\\
     \end{center}
     
     %---Author--------------------------------------------
-	\begin{flushleft}
-    \textsc{Nowak Marcin}\\[0cm]
-    \textsc{Nr Albumu 08255}\\[0cm]
-    \textsc{Studia niestacjonarne}\\[0cm]
+	\bigskip
+    \begin{flushleft}
+        \textsc{Nowak Marcin}\\[0cm]
+        \textsc{Nr Albumu 08255}\\[0cm]
+        \textsc{Studia niestacjonarne}\\[0cm]
     \end{flushleft}
 	
+    \bigskip
+
     %---Title---------------------------------------------
 	\begin{center}
-    \HRule\\[0.4cm]
-	{\customstyletitle{Projekt i implementacja aplikacji wspomagającej zarządzanie budżetem domowym}}\\[0.4cm] 
-    \HRule\\[1.5cm]
+    % \HRule\\[0.4cm] % Removed due to promoter remarks
+	{\customstyletitle{Projekt i implementacja modułu analitycznego aplikacji wspomagającej zarządzanie budżetem domowym}}\\[0.4cm] 
+    %\HRule\\[1.5cm] % Removed due to promoter remarks
     \end{center}
 	
     %---Description----------------------------------------
-	\begin{flushright}
-        \textsc{Przedmiot: Projekt Systemu Informatycznego}\\[0cm]
+	\bigskip
+    \begin{flushright}
+        \textsc{Praca dyplomowa zrealizowana}\\[0cm]
         \textsc{pod kierunkiem}\\[0cm]
-        \textsc{mgr. Jacek Żywczok}\\[0cm]
-        \textsc{W roku akademickim 2022/23}\\[0cm]
+        \textsc{dr. Roman Simiński}\\[0cm]
+        \textsc{W roku akademickim 2023/24}\\[0cm]
     \end{flushright}
  
 	%---Date & logo---------------------------------------
 	\vfill                  % Position the date lower
 	\begin{center}
-    {Katowice 2022}\\	    % \today
-	\includegraphics[width=0.2\textwidth]{figures/WSTI-logo.jpg}\\[1cm]
+    {Katowice 2024}\\	    % \today
+	% Removed due to promoter remarks
+    %\medskip
+    %\includegraphics[width=0.2\textwidth]{figures/WSTI-logo.jpg}\\[1cm]
 	\end{center}
 \end{titlepage}
-
-\null\newpage % #TODO: fix, this moves formatting \addtocounter{page}{-1}
 
 % [REQUIREMENT] 2. Spis treści
 \renewcommand*\contentsname{Spis treści}
@@ -207,307 +284,2419 @@
 
 % 3.1. Wstęp <-[Wprowadzenie do tematyki projektu, Zamierzony cel projektu]
 %http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/wstep/
-
 \chapter{\customstylechapter{Wstęp}}
-{Finanse są dziedziną nauki ekonomicznej któa zajmuje się rozporządzaniem 
+{Finanse są dziedziną nauki ekonomicznej która zajmuje się rozporządzaniem 
 pieniędzmi \cite{wiki_ekonomia}. Nauka ta w podobnym zakresie a różnej skali 
-dotyczy państw, przedsiębiorstw jak i zwykłych obywateli - w efekcie jest to 
-dziedzina o stosunkowo prostych podstawach jednak niesamowicie skomplikowana w 
-każdym zakresie w którym można ją zagłębić. Wiedza z zakresu finansów staje się 
-szczególnie przydatna gdy na rynku panuje trudna sytuacja ekonomiczna, w takich 
-warunkach nierzadko decyduje ona o jakości oraz stanie życia poszczególnych 
-osób fizycznych, rentowności przedsiębiorstw czy stabilności państw. W przypadku
- państw i firm przeważnie budżetem zarządzają dedykowane osoby lub też całe 
-zespoły, posiadające ekspercką wiedzę w tej dziedzinie. Jednak osoby 
-zarządzające budżetem domowym najczęściej dysponują wyłacznie nabytym 
-doświadczeniem i na ogół stosują podejście intuicyjne, rzadko jeśli wogóle 
-wspomagając się jakimikolwiek narzędziami które ułatwiałyby to zadanie. Wiele 
-osób sposzukuje pożytecznych treści o tematyce finansowej w Internecie, jednakże 
-rozpoczynając zaznajamianie się z tematyką mogą mieć spore trudność z 
-odnalezieniem treści dobrej jakości w natłoku materiałów błędnych, słabych 
-merytorycznie, niekatualnych czy też nastawionych na marketing ponad poprawność 
-oraz przystępnością treści źródeł dobrej jakości.}
+dotyczy państw, dużych przedsiębiorstw, małych działalności gospodarczych jak i 
+zwykłych obywateli - w efekcie jest to dziedzina o stosunkowo prostych 
+podstawach jednak niesamowicie skomplikowana w każdym aspekcie w którym można ją
+ zagłębić. Wiedza z tego zakresu staje się szczególnie przydatna w momencie 
+dynamicznych zmian sytuacji ekonomicznej, wtedy nierzadko decyduje ona o jakości
+ oraz stanie życia poszczególnych osób fizycznych, rentowności przedsiębiorstw 
+czy stabilności państw \cite{zapaśćekonomiczna}. W przypadku państw i firm 
+przeważnie do zarządznia budżetem oddelegowane są dedykowane całe zespoły lub 
+dedykowani eksperci z tej dziedziny. Jednak osoby zarządzające budżetem domowym 
+najczęściej dysponują wyłacznie nabytym doświadczeniem i na ogół stosują 
+podejście intuicyjne, rzadko jeśli wogóle wspomagając się jakimikolwiek 
+narzędziami które ułatwiałyby to zadanie. Część z nich może poszukiwać 
+pożytecznych treści o tematyce finansowej w Internecie, jednakże rozpoczynając 
+zaznajamianie się z tematyką mogą mieć spore trudność ich przystępnością oraz 
+wyłuskaniem źródeł dobrej jakości informacji w natłoku materiałów błędnych, 
+słabych merytorycznie, niekatualnych czy też nastawionych na marketing ponad 
+poprawność.}
 
 \medskip
 {Celem pracy jest zaprojektowanie i realizacja modułu analitycznego aplikacji 
-która ułatwi jej użytkownikom zarządzanie budżetem domowym dostarczając 
+która ułatwi jej użytkownikom zarządzanie budżetem domowym poprzez dostarczenie 
 narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
-kategoryzujące wpływy i wydatki. Będzie to aplikacja przeglądarkowa napisana w 
-języku Python, wykorzystująca frameworki: frontend Bootstrap\cite{Bootstrap}, 
-Flask\cite{Flask}, WTForms\cite{WTForms}, silnik szablonów jinja\cite{jinja}, 
-oraz bibliotekę chart.js\cite{chart.js} do generowania wizualizacji.}
+kategoryzujące wprowadzone dane. W zamierzeniu aby ułatwić obsługę wymagać 
+będzie minimalnej wiedzy i konfiguracji ze strony użytkownika, dostarczając mu 
+jednocześnie możliwie najlepsze narzędzia. Będzie to aplikacja przeglądarkowa 
+napisana w języku Python \cite{Python}\cite{pythonautomate}, wykorzystująca 
+pakiety (tzw.: frameworki): Bootstrap \cite{Bootstrap}, Flask \cite{Flask}, 
+WTForms \cite{WTForms}, jinja2 \cite{jinja}, oraz bibliotekę chart.js 
+\cite{chart.js}.}
 
 \medskip
-% #TODO: Uzupełniać w trakcie "Streszczenie zawartości kolejnych rozdziałów (...) Ten fragment to zakres pracy."
 {Rozdział drugi zawiera rozwinięcie charakterystyki i motywacji problemu krótko 
-zaznaczonej we wstępie pracy. Rozdział trzeci to analiza istniejących rozwiązań.}
+zaznaczonej we wstępie pracy. Rozdział trzeci to analiza istniejących rozwiązań.
+ Rozdział czwarty opisuje koncepcję własnego rozwiązania. Rozdział piąty to 
+ogólny zarys projektu. W rozdziale szóstym znajduje się dokumentacja techniczna.
+Rozdział siódmy to opis testów i weryfikacji systemu. Rozdział ósmy opisuje 
+przykładowy scenariusz wykorzystania systemu. Ostatecznie rozdział dziewiąty 
+jest zakończeniem pracy.}
 
 % 3.2. Charakterystyka/analiza problemu
 %http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/charakterystykaanaliza-problemu/
 \chapter{\customstylechapter{Charakterystyka i analiza problemu}}
 
 {Na dzień dzisiejszy wiedza z zakresu finansów oferowana w ramach systemu 
-edukacji publicznej jest znikoma\cite{edukacjafinansowawszkołach}. Sytuacja ta 
-ma miejsce od dawna, dlatego spora część obywateli Polski słabo orientuje się w 
-kwestii finansów osobistych, ekonomii i przedsiębiorczości. Istnieje wiele 
+edukacji publicznej jest znikoma \cite{edukacjafinansowawszkołach}. Sytuacja ta 
+utrzymuje się od dawna, dlatego spora część obywateli Polski słabo orientuje się
+ w kwestii finansów osobistych, ekonomii i przedsiębiorczości. Istnieje wiele 
 aktywnie działających programów które wprowadzają uczestników w świat finansów 
 poprzez przedstawienie podstawowych zagadnień z dziedziny ekonomii i podstaw 
-inwestowania\cite{edukacjafinansowawszkołach}. Działania te mają na celu 
-zbudować w nich świadomość ogólnej sytuacji ekonomicznej jednakże jak wynika z 
-badań Banku Pekao\cite{edukacjafinansowamlodziezy}, większość rodziców stwierdza
+inwestowania \cite{edukacjafinansowawszkołach}. Część działań ma na celu zbudować 
+w uczestnikach świadomość ogólnej sytuacji ekonomicznej jednakże jak wynika z 
+badań Banku Pekao \cite{edukacjafinansowamlodziezy}, większość rodziców stwierdza
  że nie posiada wystarczającej wiedzy o finansach żeby przekazać ją dzieciom, 
 co pozwala wysnuć wniosek iż sami zarządzają finansami rodzinnymi korzystając 
 raczej z intuicji i własnego doświadczenia aniżeli solidnych podstaw 
-teretycznych. Tego rodzaju podejście na wyczucie, przez większość czasu działa. 
-Wydaje się że nie ma większego wpływu na życie gdy sytuacja ekonomiczna jest 
+teoretycznych. Tego rodzaju podejście na wyczucie, działa przez większość czasu, 
+wydaje się że nie ma większego wpływu na życie gdy sytuacja ekonomiczna jest 
 spokojna - zmiana podejścia pozwala wtedy co prawda więcej zaoszczędzić, jednak 
 w zasadzie jest to opcjonalne. Kiedy jednak na rynku czy to lokalnym czy 
-globalnym pojawiają się zawirowania które powodują nagły wzrost inflacji 
-przeważnie koszta życia rosną niewspółmiernie do 
-zarobków\cite{gussytuacjabudzetowa}, a tym samym dopięcie finansów osobistych i 
-domowych tak, by bilans wyszedł dodatni wymaga więcej uwagi. W ostatnich latach 
-miało miejsce kilka tego typu zdarzeń któe dotknęły światową ekonomię. W 
-momencie pisania tej pracy takimi wydarzeniami są pandemia Covid 19 oraz agresja
- Rosji na Ukrainę. Zdarzenia te jak wynika z badań Krajowego Rejestru Długów 
+globalnym sytuacja staje się trudniejsza, co może powodować nagły wzrost 
+inflacji przeważnie koszta życia rosną niewspółmiernie do 
+zarobków \cite{gussytuacjabudzetowa}\cite{koszty2010-22}, a tym samym dopięcie 
+finansów osobistych i domowych tak, by bilans wyszedł dodatni wymaga więcej 
+uwagi i wiedzy. W ostatnich latach (2019-2023) miało miejsce kilka zdarzeń któe 
+dotknęły światową gospodarkę. W momencie pisania tej pracy takimi wydarzeniami 
+są pandemia Covid 19, działania zbrojne nw terenie Ukrainy oraz wojna na bliskim
+ wschodzie. Zdarzenia te jak wynika z badań Krajowego Rejestru Długów 
 \cite{portfelpolakawpandemii} u prawie połowy polaków wywołała poczucie 
 zagrożenia biedą, podczas gdy jedynie 22\% twierdzi że jest spokojna o swoją 
 sytuację finansową. Raport Warsaw Enterprise Institute \cite{weiinflacja} 
 wykazuje natomiast spadek realnych płac (uwzględniających zarobki oraz wydatki) 
-średnio o 2\%, a w niektórych grupach możliwe 5-11\% w latach 2020-2022.}
+średnio o 2\%, a w niektórych grupach możliwe 5-11\% w latach 2020-2022 co 
+wskazuje na wysokie zapotrzebowanie na narzędzia i edukację w zakresie 
+budżetowania.}
 
 \begin{figure}[H]           %requires float package
-    \caption{Główny Urząd Statystyczny, Dynamika realnych dochodów i wydatków na 1 osobę w gospodarstwach domowych
-    w latach 2010–2022\cite{gussytuacjabudzetowa}}
-    \label{fig:}
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/GUS_dynamikarealnychdochodowiwydatkow2010-2020.png}
+    \caption{Główny Urząd Statystyczny, Dynamika realnych dochodów i wydatków 
+    na 1 osobę w gospodarstwach domowych w latach 2010–2022 \cite{gussytuacjabudzetowa}}
+    \label{fig:gusbudzet10-22}
 \end{figure}
 
 \begin{figure}[H]           %requires float package
-    \caption{300gospodarka.p, Inflacja w Polsce w latach 1996-2023 dane GUS}
-    \label{fig:}
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/300gospodarka-pl_inflacjawpolsce.png}
+    \caption{300gospodarka.pl, Inflacja w Polsce w latach 1996-2023 dane GUS}
+    \label{fig:inflacja}
 \end{figure}
 
-{Podstawowym narzędziem które może pomóc utrzymać wydatki na odpowiednim 
-poziomie jest planowanie domowego budżetu. Wymaga to dwóch etapów - po pierwsze 
-metody lub narzędzia które ułatwią zarządzanie budżetem domowym oraz znajomości 
-podstaw zarządzania finansami. Dlatego dla osób rozpoczynających budżetowanie 
-ważne jest przedstawienie w możliwie prostej, zwięzłej i przystępnej formie już 
-gotowych opracowanych rozwiązań które można zastosować aby świadomie zarządzać 
-sytuacją finansową własnego domostwa. W najprostszym wariancie na 
-budżet\cite{o24_budzetowanie}\cite{budget}\cite{mintbudget} składają się: 
-wpływy czyli dochody ze wszystkich źródeł, zobowiązania czyli płatności stałe 
-jak rachunki czy raty kredytów oraz wydatki które są zróżnicowane. Skrupulatne 
-zbieranie danych z pewnego okresu pozwala dostrzec ogólną sytuację finansową, a 
-w miarę jak zakres czasu dostępnych danych się wydłuża a ich precyzja zwiększa 
-pojawia się także możliwość wysłuskania trendu przez co i prognozowania 
+{Planowanie domowego budżetu jest podstawowym narzędziem które pomaga utrzymać 
+wydatki w ryzach. Składa się z dwóch etapów - po pierwsze metody lub narzędzia 
+które ułatwią zarządzanie budżetem domowym oraz znajomości podstaw zarządzania 
+finansami. Dlatego dla osób rozpoczynających budżetowanie ważne jest 
+przedstawienie w możliwie prostej, zwięzłej i przystępnej formie już gotowych 
+opracowanych rozwiązań które można zastosować aby świadomie zarządzać sytuacją 
+finansową własnego domostwa. W najprostszym wariancie na 
+budżet 
+\cite{o24_budzetowanie}\cite{budget}\cite{iwućbudżet}\cite{mintbudget}\cite{ingbudżet}\cite{budzetdomowypodkontrola}
+ składają się: wpływy czyli dochody ze wszystkich źródeł, zobowiązania czyli 
+płatności stałe jak rachunki czy raty kredytów oraz wydatki które są 
+zróżnicowane. Skrupulatne zbieranie danych z pewnego okresu pozwala określić 
+ogólną sytuację, a w miarę wydłużania zakresu czasu dostępnych danych i 
+zwiększania ich precyzja wyłaniają się trendy co umożliwia prognozowanie 
 przyszłej sytuacji. Istnieje wiele różnych podejść do tworzenia budżetu - od 
 najbardziej ogólnych które skupiają się wyłącznie na określeniu bilansu wydatków
  oraz wpływów, po najbardziej szczegółowe analizy wydatków na poszczególne 
 kategorie czy nawet produkty. Każde z podejść ma swoje dobre strony, i w gruncie
- rzeczy każdy powinien wybrać podejście odpowiednie dla siebie.}
+ rzeczy wybór odpowiedniego podejścia jest wyłącznie kwestią preferencji.}
 
 \begin{figure}[H]           %requires float package
-    \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - przychody}
-    \label{fig:}
-    \centering  
-    \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_przychody.jpg}
-\end{figure}
-
-\begin{figure}[H]           %requires float package
-    \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - wydatki}
-    \label{fig:}
-    \centering  
+    \centering
     \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_wydatki.jpg}
+    \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - wydatki}
+    \label{fig:prostybudżetwydatki}
 \end{figure}
 
-{Poza ukazaniem ogólnego obrazu sytuacji budżetowej w budżecie uwzględnić można 
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/oszczedzaniepieniedzyblog-pl_przychody.jpg}
+    \caption{oszczedzaniepieniedzyblog.pl, Najprostszy budżet - przychody}
+    \label{fig:prostybudżetprzychody}
+\end{figure}
+
+{Poza ukazaniem ogólnego obrazu sytuacji finansowej w budżecie uwzględnić można 
 cele jak spłata zadłużenia, czy planowany znaczny wydatek, oraz limity 
 pomagające ograniczyć wydatki i cele przychodów zwiększające ilość dostępnych 
 środków finansowych. W literaturze przedmiotowej opisano także wiele przydatnych
  podejść oraz zasad jak wstępny podział wydatków na podstawie 
-priorytetów\cite{najbogatszyczlowiekwbabilonie} czy uwzględnienie oszczędzania 
-w formie najpierw zapłać sobie\cite{najbogatszyczlowiekwbabilonie}
-\cite{finansowaforteca} które można zastosować jako strategie zarządzania 
-finansami domowymi aby poprawić sytuację finansową lub osiągnąć zamierzony cel. 
-Jednak aby zastosować daną strategię trzeba ją najpierw znać, a jak opisano 
-wcześniej poziom wiedzy z zakresu finansó w Polsce jest słaby, dlatego narzędzia
- do zarządzania finansami powinny w najprostszej formie udostępniać takie 
-informacje w łatwo przystępnej formie, a idealnie posiadać zabudowane mechanizmy
- które pozwoliłyby użytkownikowi wybrać i zastosować strategię bez potrzeby jej 
-dogłębnej znajomości.}
+priorytetów \cite{najbogatszyczlowiekwbabilonie}\cite{budzetdomowypodkontrola} 
+czy uwzględnienie oszczędzania w formie podejścia najpierw zapłać sobie 
+\cite{najbogatszyczlowiekwbabilonie}\cite{finansowaforteca} które można 
+zastosować jako strategie zarządzania finansami domowymi aby usprawnić budżet 
+lub osiągnąć zamierzony cel. Jednak aby zastosować daną strategię trzeba ją 
+najpierw znać, a jak wynika z informacji opisanych wcześniej poziom wiedzy z 
+zakresu finansów w Polsce oceniany jest jako słaby, dlatego narzędzia do 
+zarządzania finansami powinny, w najprostszej formie udostępniać takie 
+informacje w łatwo przystępnej formie, lub przy bardziej zaawansowanym podejściu
+ posiadać wbudowane mechanizmy które pozwoliłyby użytkownikowi wybrać i 
+zastosować strategię bez potrzeby jej dogłębnej znajomości.}
 
-{Z uwagi na tematykę z zasady są to dane bardzo wrażliwe, zatem muszą być 
-odpowiednio zabezpieczone. Idealną opcją dla potencjalnych użytkowników byłoby 
-gdyby jako jedyni mieli dostęp do prywatnych danych, lub mogli je współdzielić 
-z wybranymi przez siebie osobami. Przy znaczącej statystycznie ilości 
-użytkowników dane zebrane w aplikacji po odpowiedniej anonimizacji i 
-uśrednieniu mogą posłużyć do modelowania wydatków obywateli danych regionów, 
-sektorów, segmentów gospodarki lub nawet ogólnie całego państwa, co z kolei 
-można wykorzystać zwrotnie w samej aplikacji aby porównać model wydatków 
-użytkownika do adekwatnej średniej i zwrócić uwagę na obszary w których 
-pozytywnie od niej odstaje co moze zaowocować pozytywnym wzmocnieniem dobrego 
-nawyku a nawet chęcią dalszej poprawy w innej kategorii wydatków. Tego typu 
-modelowanie jest już przeprowadzane przez Główny Urząd Statystyczny, którego 
-raporty publikowane są co roku, jest to więc potencjalne najlepsze źródło 
-najlepszych danych, które mogłoby zostać wykorzystane do porównań.}
+{Z uwagi na tematykę zwyczajowo są to dane bardzo wrażliwe, zatem wymagają 
+odpowiednich zabezpieczeń. Idealną opcją dla potencjalnych użytkowników byłoby 
+gdyby jako jedyni mieli dostęp do prywatnych danych, oraz mogli sami precyzyjnie
+ decydować komu je udostępniają. Przy znaczącej statystycznie liczbie 
+użytkowników dane zebrane w aplikacji po odpowiedniej pełnej nieodwracalnej 
+anonimizacji i uśrednieniu mogą posłużyć do modelowania wydatków obywateli 
+danych regionów, sektorów, segmentów gospodarki lub nawet ogólnie całego 
+państwa, co z kolei można wykorzystać zwrotnie w samej aplikacji aby porównać 
+model wydatków użytkownika do adekwatnej średniej i zwrócić uwagę na obszary w 
+których pozytywnie od niej odstaje działając jako pozytywne wzmocnienie 
+dobrego nawyku \cite{pozytywnewzmocnienie}. Tego typu modelowanie jest już 
+przeprowadzane przez Główny Urząd Statystyczny, którego raporty publikowane są 
+co roku, jest to więc potencjalne źródło najbardziej precyzyjnych danych, które 
+mogłoby zostać wykorzystane do porównań.}
 
 
-% #TODO: Continue from here
 % 3.3. Analiza istniejących rozwiązań
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/analiza-istniejacych-rozwiazan/
 % Pull from documment: https://docs.google.com/document/d/1cYnRqie6xpVnRh8HOuYQZlcuSP_wxj1rPUvHp9FGgDg/edit
 \chapter{\customstylechapter{Analiza istniejących rozwiązań}}
-{W tym rozdziale przedstawiona zostanie analiza obecnie dostępnych rozwiązań 
-opisanego problemu aby określić ich wady i zalety. Jako że budżetowanie jest 
-problemem tak starym jak sam wynalazek pieniądza, historycznie powstało wiele 
-różnych rozwiązań których celem jest je ułatwić.}
+{W tym rozdziale przedstawiona zostanie analiza wybranych, obecnie dostępnych
+rozwiązań rozważanego w pracy problemu, jej celem jest określenie wady i zalety 
+tych rozwiązań. Jako że budżetowanie jest problemem tak starym jak sam wynalazek
+ pieniądza, historycznie powstało wiele różnych rozwiązań których celem jest je 
+ułatwić.}
 
 {Podstawową i najprostszą formą budżetu jest zapis na papierze czy chociażby w 
-formie księgi zawierającej przychody i wydatki. Sposób ten zostanie 
+formie księgi zawierającej przychody i wydatki \cite{o24_budzetowanie}. Sposób ten zostanie 
 przeanalizowany ponieważ do niedawna była to główna metoda prowadzenia budżetu 
 i mimo postępu cyfryzacji i informatyzacji nadal jest szeroko stosowany. Po 
 części zastąpiły go rozwiązania komputerowe w formie różnych aplikacji które 
 wymagają mniejszych lub większych nakładów pracy od użytkownika. Okazjonalnie 
 tego typu zestawienia prowadzone są dziś także w arkuszach kalkulacyjnych.}
 
-{Podstawową opcją cyfrową są same witryny kont bankowych na których klient 
-często może kategoryzować poszczególne transakcje i wyświetlać podsumowania oraz
- określić zakładany budżet. Warto się im przyjrzeć ponieważ rozwiązania te są 
-dostępne dla każdego klienta danego banku.}
+{Pierwszą w pełni cyfrową opcją są same witryny kont bankowych \cite{ingbudżet} 
+na których klient często może kategoryzować poszczególne transakcje i wyświetlać
+ podsumowania oraz określić zakładany budżet. Rozwiązania te są dostępne dla 
+każdego klienta danego banku dlatego warto się im przyjrzeć, jako przykład 
+posłuży portal banku Santander - centrum24.pl \cite{santandercentrum24}.}
 
-{Kolejną kategorią rozwiązań są aplikacje dedykowane do zarządzania budżetem. 
-Tego typu aplikacje po wprowadzeniu danych udostępniają użytkownikowi cały 
-wachlarz dodatkowych specjalistycznych opcji i narzędzi. Omówione zostaną dwa 
-przykłady tego rodzaju aplikacji - Intuit mint\cite{mint} oraz 
-Goodbudget\cite{goodbudget}. Na rynku dostępnych jest wiele więcej rozwiązań 
-przez co użytkownik ma dowolny wybór, jednak świadomy wybór odpowiedniej opcji 
-wymaga od użytkownika dokładnego przeglądu i porównania kilku aplikacji.}
+{Na kolejną kategorię rozwiązań składają się aplikacje dedykowane do zarządzania
+ budżetem \cite{budget}. Systemy tego typu po wprowadzeniu danych udostępniają 
+użytkownikowi cały wachlarz dodatkowych specjalistycznych opcji i narzędzi. 
+Omówione zostaną dwa przykłady tego rodzaju aplikacji - Intuit mint \cite{mint} 
+oraz Goodbudget \cite{goodbudget}. Na rynku dostępnych jest wiele więcej 
+rozwiązań przez co użytkownik ma dowolny wybór, jednak świadomy wybór 
+odpowiedniej opcji wymaga od użytkownika dokładnego przeglądu i porównania kilku
+ aplikacji.}
 
-\section{\customstylesection{Rozwiązanie analogowe - budżet papierowy}}
-\section{\customstylesection{Systemy bankowe - przykład funkcja Budżet w ING Banku Śląskim}}
+%#TODO: Describe what criteria will be evaluated
+\section{\customstylesection{Budżet papierowy lub arkusz kalkulacyjny}}
+{Grupa ta obejmuje wiele różnorodnych narzędzi, nierzadko darmowych, lub takich, 
+które użytkownik posiada do innych celów. Przykładowe opcje obejmują proste 
+rozpiski i podsumowania na kartkach, arkusze kalkulacyjne jak Microsoft 
+Excel, Google Sheets, LibreOffice Calc - przykłady na rysunkach 
+\ref{fig:budzetprzykladowyexcel} oraz \ref{fig:budzetprzykladowypapier}. Największą 
+zaletą tych rozwiązań jest prostota dzięki której z tego typu rozwiązania jest 
+w stanie skorzystać w zasadzie każdy jednakże odpowiedzialność za manualne 
+utrzymanie i dbanie o jakość czy spójność danych spoczywa wyłącznie na 
+użytkowniku który jest jednocześnie autorem budżetu. Jedynie w podejściach 
+cyfrowych okazjonalnie znaleźć można dodatki służące do automatyzacji części 
+funkcji, niemniej jednak użytkownicy posiadający odpowiednią wiedzę i 
+umiejętności mogą przygotować tego typu mechanizmy osobiście - przykładowo w 
+arkuszach kalkulacyjnych jako formuły czy nawet skrypty (np. VBA w Excell) 
+jeżeli narzędzie ma taką funkcję. Udostępniają także każde możliwe podejście 
+znane użytkownikowi oraz całkowitą wolność wyboru chociażby kategoryzacji. Z 
+uwagi na niski próg wejścia w sieci dostępnych jest wiele poradników oraz 
+szablonów, choć paradoksalnie jednocześnie jest to wada ponieważ początkującemu 
+użytkownikowi trudno się odnaleźć w sporej ilości prezentowanych opcji. Zależnie
+ od wykorzystanej technologii (uwzględniając także budżet papierowy) mogą być 
+dostępne zarówno lokalnie jak i w przeglądarce.}
+
+{Na uwagę zasługuje również fakt iż podejście takie niejako mimochodem uczy 
+użytkownika podstaw finansów i zmusza do refleksji nad swoją sytuacją, co może 
+zaowocować wypracowaniem własnych spersonalizowanych systemów dostosowanych pod 
+swoje potrzeby i dopasowanych do preferowanych metod pracy lepiej niż pozostałe 
+dostępne rozwiązania.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/marciniwuc.com_Wydatki-nieregularne-plan-roczny.png}
+    \caption{https://marciniwuc.com/budzet-domowy-05-wydatki-nieregularne/ Przykładowy budżet w aplikacji Excel}
+    \label{fig:budzetprzykladowyexcel}
+\end{figure}
+
+{Co ciekawe, na tym podejściu zbudowana jest także aplikacja Tiller 
+\cite{tiller}, służy jako interfejs który pozwala użytkownikowi na migrację 
+danych bankowych do prywatnego arkusza kalkulacyjnego w Excel lub Google Sheets,
+ w którym tworzy predefiniowany szablon z wizualizacjami i podsumowaniami.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/jakoszczedzacpieniadze.pl_budzet-domowy-1.jpg}
+    \caption{https://jakoszczedzacpieniadze.pl/prosty-budzet-domowy Przykładowy budżet na papierze}
+    \label{fig:budzetprzykladowypapier}
+\end{figure}
+
+\section{\customstylesection{Systemy bankowe - Przegląd wydatków w Santander}}
+{Wraz z rozwojem technologii i cyfryzacji posiadanie konta bankowego stało się 
+praktyczne wymogiem. Na rynku istnieje szeroki ich wybór, dlatego jak każda 
+nowoczesna firma, także i banki starają się wyjść naprzeciw oczekiwaniom 
+klienta i zachęcić go dodatkowymi funkcjami. W efekcie, choć jest to jedynie 
+opcja dodatkowa, część z nich wdrożyło u siebie usługę pomagającą użytkownikowi 
+w analizie finansów i planowaniu budżetu.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_historia.png}
+    \caption{Centrum24.pl, Santander historia transakcji}
+    \label{fig:santanderhistoria}
+\end{figure}
+
+{Jako przykład posłuży system Przegląd wydatków na portalu centrum24.pl banku 
+Santander, zaprezentowany na rysunku \ref{fig:santanderprzeglad}. Usługa stara 
+się na bieżąco przypisywać transakcje dokonane na koncie klienta do dość 
+ogólnych kategorii, jednocześnie użytkownik może je dowolnie zmienić. Kategorie 
+mają dwa poziomy szczegółowości, dzięki czemu są grupowane jednak w pewnym 
+stopniu pozwalają ukazać szczegóły. Jak widać na rysunku 
+\ref{fig:santanderkategoryzacja} użytkownikowi prezentowany jest wykres słupkowy
+ pokazujący ilość wydanych pieniędzy na poszczególne kategorie lub grupy 
+kategorii, oraz wykres pokazujący sumę wydatków w danym okresie i wszystkie 
+transakcje które wchodzą w ich skład.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_przeglad_kategoria.png}
+    \caption{Centrum24.pl, Santander przegląd kategorii wydatków}
+    \label{fig:santanderprzegladkategoria}
+
+    \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_kategoryzacja.png}
+    \caption{Centrum24.pl, Santander kategoryzacja wydatków}
+    \label{fig:santanderkategoryzacja}
+\end{figure}
+
+{System ma także swoje ograniczenia. Niestety prezentuje wyłącznie wydatki, tym 
+samym jedyne miejsce w którym użytkownik może podejrzeć swoje przychody jest 
+historia konta, jednak jak widać na rysunku \ref{fig:santanderhistoria} jest to 
+jedynie suma w wybranym okresie, ewentualnie zestawienie transakcji wpływów 
+pozostawiając analizę w gestii użytkownika.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Santander_PrzegladWydatkow_przeglad.png}
+    \caption{Centrum24.pl, Santander przegląd wydatków}
+    \label{fig:santanderprzeglad}
+\end{figure}
+
 \section{\customstylesection{Aplikacje dedykowane - Intuit Mint}}
+{W trakcie pisania pracy dostawca aplikacji zdecydował się wycofać aplikacje z 
+początkiem roku 2024 i zachęcić użytkowników do migracji na swoją platformę 
+Credit Karma \cite{mintwycofanie}, która pozbawiona jest funkcji budżetowania. 
+Mimo to przykład pozostaje aktualny ponieważ aplikacja jest uznawana przez wielu
+ użytkowników i recenzentów za jedną z najlepszych w kategorii finansów, 
+dlatego warto zwrócić uwagę na jej zalety i wady, zwłaszcza że jej wycofanie 
+tworzy na rynku pewną niszę.}
+
+
+{Aplikacja Intuit Mint \cite{mint}\cite{mintrecenzja} dostępna jest w wersji 
+darmowej z reklamami lub płatnej, na systemy mobilne Android i iOS oraz 
+przeglądarki. Po uruchomieniu Mint prezentuje użytkownikowi ekran z 
+podsumowaniem finansów w obecnym miesiącu w postaci zakładek które grupują 
+informacje z kilku kategorii, m.in.: Wartość netto, Wydatki, Inwestycje. Aby 
+zasilić dane użytkownik musi dać aplikacji dostęp do swoich kont bankowych i 
+inwestycyjnych, co wiele recenzentów uznaje za niesamowicie wygodne jednak 
+jednocześnie przez to nie jest to aplikacja dla ludzi dbających o prywatność - 
+jest to także główny powód dlaczego przegląd tej aplikacji oparty jest na 
+recenzjach i poradnikach opublikowanych w internecie. W zakładce Transakcje 
+zgromadzone są także wszystkie płatności zarejestrowane na udostępnionych 
+aplikacji kontach, z opinii długotrwałych użytkowników wynika że jakość 
+automatycznej kategoryzacji jest słaba 
+\cite{porownanieaplikacji1}\cite{porownanieaplikacji2}\cite{porownanieaplikacji3}\cite{porownanieaplikacji4}\cite{porownanieaplikacji5}.
+ Użytkownik może je oznaczać etykietami (tag), dodawać do nich notatki czy 
+wykluczać z zestawień.}
+
+{W zakładce Miesiąc aplikacja generuje podsumowanie przychodów i wydatków, 
+pozwala utworzyć tygodniowe cele wydatków oraz budżet (a nawet kilka 
+jednocześnie) przy użyciu prostego kreatora.}
+
+{Kreator budżetu wydaje się bardzo prosty w obsłudze, samodzielnie szacuje 
+przychód na podstawie dostępnych danych który następnie użytkownik zatwierdza 
+lub nadpisuje dowolną wartością, w drugim kroku użytkownik definiuje 
+samodzielnie listę kategorii oraz podkategorii wydatków co niestety wymaga od 
+wcześniejszego przygotowania. Użytkownik może dodać cel finansowy podając nazwę,
+ wartość, oraz datę kiedy powinien być spełniony, następnie wybiera konto 
+bankowe które chce z nim powiązać - jego spełnienie śledzi porównując ilość 
+środków na koncie z wyznaczonym celem. Dodatkową opcją są przypomnienia o 
+opłacie nadchodzących rachunków w postaci powiadomień push, wiadomości e-mail 
+lub wydarzeń w kalendarzu.}
+
+{Wersja w przeglądarce pozwala dodać nieruchomości i pojazdy zaliczane do 
+całkowitej wartości netto, porady poprawy zdolności kredytowej i wartość 
+inwestycji na dodanych rachunkach inwestycyjnych. Zakładka Trends zawiera 
+kilka predefiniowanych wykresów wizualizujących dane, zawierających dość ogólne 
+dane.}
+
+{Mint integruje także dodatkowe usługi jak wyliczanie zdolności kredytowej przez 
+usługę firmy TransUnion, czy negocjację umów przez usługę firmy BillShark. 
+Aplikacja sama w sobie nie zawiera zintegrowanego samouczka bądź instrukcji, 
+informacje wymagane zdaniem twórców skrótowo prezentowane są kontekstowo w miejscu w 
+którym są wymagane.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/pcmag_mintmobile_05OMSsUmroXJ6F6sETKpH9R-50.fit_lim.size_1152x.jpg}
+    \caption{Mint w wersji mobilnej}
+    \label{mintmobile}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/pcmag_mintweb_05OMSsUmroXJ6F6sETKpH9R-51.fit_lim.size_1152x.jpg}
+    \caption{Mint w wersji na przeglądarki}
+    \label{fig:mintweb}
+\end{figure}
+
+{Podsumowując aplikacja Mint jest prostota w obsłudze, wymaga minimum dodatkowej
+ uwagi od użytkownika, jest bardzo przejrzysta, estetyczna i nowoczesna. Jednak 
+wstępna konfiguracja wymaga od użytkownika nadania jej dostępu do kont które 
+zawierają wiele wrażliwych danych co jest problemem z uwagi na prywatność, 
+ponadto użytkownik musi samodzielnie z góry określić wydatki na poszczególne 
+kategorie zanim aplikacja udostępni mu wartościowe informacje o budżecie.}
+
+%Trimmed content, leaving it here in case 3 examples are not enough 
+%\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
 %Worknotes
-{darmowa z reklamami lub płatna - ios, android, desktop, ciągłe reklamy, pozwala
- sprawdzić ocenę zdolności kredytowej (TransUnion), popularna 
-(25m użytkowników), śledzenie inwestycji, słaba kategoryzacja, powiadomienia i 
-przypomnienia (ręcznie), dobre wizualizacje, brak zintegrowanego 
-samouczka/instrukcji., Możliwość utworzenia wielu równoczesnych budżetów 
-jednocześnie, monitoring subskrybcji, alerty opłat bankowych. Rzekomo dobre 
-zabezpieczenia danych.}
+%{mobilna i desktopowa, darmowa (historia rok wstecz) i płatna 
+%(rozszerzona, historia 7 lat wstecz), system kopertowy (dzielenie przychodów na 
+%koszyki) z priorytetyzacją i monitoringiem, dobra do współdzielonego budżetu 
+%(synchronizacja między kontami wielu użytkowników), wskazuje źródła edukacyjne, 
+%dobre wsparcie i często rozszerzana, ręczne dodawanie wydatków, automatyczna i 
+%ręczna kategoryzacja, [ręczny?] import danych,}
 
-\section{\customstylesection{Aplikacje dedykowane - Goodbudget}}
-%Worknotes
-{mobilna i desktopowa, darmowa (historia rok wstecz) i płatna 
-(rozszerzona, historia 7 lat wstecz), system kopertowy (dzielenie przychodów na 
-koszyki) z priorytetyzacją i monitoringiem, dobra do współdzielonego budżetu 
-(synchronizacja między kontami wielu użytkowników), wskazuje źródła edukacyjne, 
-dobre wsparcie i często rozszerzana, ręczne dodawanie wydatków, automatyczna i 
-ręczna kategoryzacja, [ręczny?] import danych,}
+% 3.4. Koncepcja własnego rozwiązania (2-5 stron)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/koncepcja-wlasnego-rozwiazania/
+% Migrate and modernise previous description https://github.com/MarcinNowak94/Righten/commit/d8c84ff1961b77599568fe220021e3e78387e193 
+\chapter{\customstylechapter{Koncepcja własnego rozwiązania}}
+{Rozdział ten opisuje koncepcję rozwiązania problemów opisanych we wstępie na 
+podstawie wniosków wyciągniętych z analizy istniejących rozwiązań tak, by 
+proponowane rozwiązanie posiadało możliwie jak najwięcej zalet, a jednocześnie 
+nie posiadało wad a także uzupełniało braki w obecnie dostępnych na aplikacjach.}
 
-% [#TODO]:
-% 3.3. Analiza istniejących rozwiązań               #TODO: dodaj streszczenie do do 3.1.
-% 3.4. Koncepcja własnego rozwiązania               #TODO: dodaj streszczenie do do 3.1.
-% 3.5. Projekt ogólny                               #TODO: dodaj streszczenie do do 3.1.
-% 3.6. Dokumentacja techniczna                      #TODO: dodaj streszczenie do do 3.1.
-% 3.7. Testy i weryfikacja systemu                  #TODO: dodaj streszczenie do do 3.1.
-% 3.8. Przykładowy scenariusz wykorzystania systemu #TODO: dodaj streszczenie do do 3.1.
-% 3.9. Zakończenie                                  #TODO: dodaj streszczenie do do 3.1.
-% 3.13.Ewentualne załączniki
+%#NICE-TO-HAVE: Diagram ideowy działania aplikacji
+%m.in:
+% mile widziane schematy ideowe, graficzne ilustracje przedstawionych koncepcji
+% można wskazać zagadnienia możliwe do wykonania, choć wykraczające poza ramy prac
+% wskazać i uzasadnić wybór metod i narzędzi pracy
+% koncepcja licencjonowania, dystrybucji, jacy odbiorcy
+\section{\customstylesection{Koncepcja rozwiązania użytkowego}}
+{Projekt aplikacji zakłada realizacjęaplikacji internetowej która umożliwi 
+interakcję z wieloma użytkownikami jednocześnie. Aplikacja przechowywać będzie 
+dane finansowe, które są danymi wrażliwymi więc wymagają szczególnej ochrony, 
+dlatego dostęp do nich zostanie ograniczony do minimum - będzie wymagany w 
+krótkich okresach komunikacji aplikacji z bazą podczas zapisu danych z pamięci 
+podręcznej aplikacji oraz pobierania danych do wyświetlenia użytkownikowi. 
+Aplikacja udostępniać będzie użytkownikom interfejs do wprowadzania, edycji i 
+usuwania danych finansowych jak przychody, rachunki (płatności stałe), wydatki 
+oraz kategorie po których będą grupowane - typy produktów i produkty. 
+Użytkownikom udostępnione zostaną predefiniowane raporty złożone z wizualizacji,
+ statystyk i danych analitycznych oraz podane w przystępny sposób informacje o 
+podstawach zarządzania finansami i budżetem.}
+
+\medskip
+{Istnieje też pewna liczba mile widzianych funkcji, które z uwagi na poziom 
+złożoności systemu i stosunkowo krótki czas implementacji są obecnie poza 
+zakresem projektu, jednak mogą w przyszłości zostać zrealizowane. Są to między 
+innymi: modyfikacja interfejsu tak, by użytkownik mógł ocenić użyteczność 
+funkcji oraz panel zgłoszeń propozycji i problemów, co pozwoli ukierunkować 
+rozwój aplikacji w stronę najbardziej przydatnych i potrzebnych w danym momencie
+ rozwiązań. W dalszym etapie rozwoju aplikacji można także wdrożyć moduł 
+predykcji przyszłych wydatków w oparciu o dane historyczne. Kolejnym obszarem z 
+potencjałem rozwoju jest wzbogacenie wachlarza metod wprowadzania danych - aby 
+ułatwić użytkowanie aplikacji można utworzyć moduł importu danych z plików w 
+popularnym standardowym formacie jak CSV \cite{CSV}, a w dalszej perspektywie 
+nawet funkcje ekstrakcji danych z obrazów co umożliwi wprowadzanie danych 
+bezpośrednio z faktur, zdjęć, rachunków, paragonów, pasków wynagrodzenia. 
+Możliwość określenia własnych progów wydatków które będą uwzględniane na 
+wizualizacjach. Można także wdrożyć automatyczną kategoryzację wydatków na 
+proponowane w literaturze przedmiotowej zbiory wydatków niezbędnych, potrzebnych
+ i zachcianek \cite{budzetdomowypodkontrola}. Ostatnią przewidzianą na ten 
+moment funkcją dodatkową jest możliwość definiowania celi finansowych które 
+wpłyną na prezentację danych w raportach aby użytkownik mógł śledzić ich postępy
+ i realizację.}
+
+{W fazie rozwoju aplikacji na potrzeby pracy inżynierskiej projekt będzie 
+udostępniony publicznie na licencji open source, dlatego wstępny projekt 
+interfejsu będzie w języku angielskim aby poszerzyć grono potencjalnych 
+użytkowników, poprawić czytelność projektu i ułatwić współpracę podczas 
+rozwijania kodu w dalszych etapach. Nie jest to natomiast docelowa jedyna wersja
+ językowa - implementację wyboru wersji językowej, tłumaczenie interfejsu na 
+kilka popularnych języków (manualnie lub maszynowo) pozostawiono jako funkcję 
+dodatkową, opcjonalną.}
 
 
-% #TODO: Remove unused sources
+% postać aplikacji - www/mobilna/desktop/hybrydowa?
+% ogólny szkic architektury
+% krótko narzędzia realizacji
+% opcjonalne: dyskusja możliwych metod, technik i narzędzi realizacji pracy
+% Nie wchodzić głęboko w zagadnienia technologiczne
+\section{\customstylesection{Koncepcja rozwiązania technologicznego}}
+{Proponowane rozwiązanie powinno przyjąć formę trójwarstwowej aplikacji 
+przeglądarkowej jak zaprezentowano na rysunku \ref{fig:architeturatrojwarstwowa}.
+ Ponieważ z aplikacji ma korzystać wielu użytkowników jednocześnie rodzi to 
+wymóg wielodostępności o podejściu architektury multitenant \cite{multitenant}, 
+która pozwala korzystać wielu użytkownikom z tej samej bazy aplikacji o różnym 
+stopniu prywatności danych zależnym od zastosowanego poziomu separacji - osobne 
+bazy, wspólna baza i osobne schematy, wspólny schemat podział na poziomie 
+rekordu. Z uwagi na prywatność danych każdy z użytkowników docelowo będzie 
+korzystał z własnego schematu w bazie danych aplikacji przechowywanej na 
+serwerze co przedstawia rysunek \ref{fig:multitenant}, jest to jednak 
+rozwiązanie które trudno wdrożyć, dlatego w fazie projektowej, która jest 
+przedmiotem tej pracy, zastosowano uproszczenie w postaci pojedynczego 
+domyślnego schematu danych dla każdego użytkownika (słowem: wszyscy użytkownicy 
+mają dostęp do tych samych danych). Jest to jednak pierwsza poważna zmiana, 
+której wymaga system po udostępnieniu wszystkich funkcji które określono jako 
+krytyczne dla pełnego działania minimalnej wersji aplikacji.}
+
+ {Etap projektowania bazy danych wymagać będzie sporych nakładów pracy dlatego 
+ aby go uprościć, początkowo zastosowana zostanie technologia SQLite 
+ \cite{SQLite}. Jest to jednak technologia maksymalnie uproszczona, nie ma w 
+ niej funkcji tworzenia osobnych schematów ani zarządzania dostępem do danych, 
+ dlatego docelowo struktura bazy zostanie przeniesiona do PostgreSQL 
+ \cite{PostgreSQL}. Dopiero po migracji do nowej technologii możliwe będzie 
+ zastosowanie podejścia z osobnymi schematami jednak będzie to zmiana stosunkowo
+ pracochłonna.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/multitenant_4.png}
+    \caption{Microsoft, Architektura współdzielona baza, rozdzielne schematy}
+    \label{fig:multitenant}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/framwork-gigr-pl_architektura_www.jpg}
+    \caption{http://framework.gigr.pl/ Architektura Trójwarstwowa}
+    \label{fig:architeturatrojwarstwowa}
+\end{figure}
+
+%#NICE-TO-HAVE: page empty in ~70%, some more content will fit in nicely
+
+% 3.5. Projekt ogólny (10-25 stron.)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/projekt-ogolny/
+\chapter{\customstylechapter{Projekt ogólny}}
+{Rozdział ten opisuje ogólną koncepcję organizacji systemu, plan jego 
+architektury, przechowywanie danych, ogólny plan interfejsu użytkownika oraz 
+metody i narzędzia realizacji.}
+
+%#NICE-TO-HAVE: Diagram przypadków użycia
+%opis funkcji udostępnianych przez system
+% - mile widziany diagram przypadków użycia - Funkcje systemu odpowiadają 
+%   zazwyczaj przypadkom użycia
+% - można zaprezentować wymagania jako numerowaną listę, tabelę
+% - wymagania niefunkcjonalne - aspekty systemu które nie przekładają się 
+%   bezpośrednio na akcje wykonywane przez system (architektura, bezpieczeństwo,
+%   ergonomia, kolorystyka itd.)
+
+\section{\customstylesection{Specyfikacja wymagań funkcjonalnych i niefunkcjonalnych}}
+{Zestawienie funkcji które powinien spełniać program, wzbogacone o informacje 
+które z nich zostały spełnione. Podzielone na listy wymagań niefunkcjonalnych i 
+funkcjonalnych. Nagłówki z powodu objętości zostały skrócone, legenda:}
+
+{PRIO - Priorytet w kategorii MoSCoW \cite{MOSCOW}, rysunek \ref{fig:moscow}}
+
+{IMPL - Oznaczenie czy funkcję wdrożono (Implemented)}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/MoSCoW-01.png}
+    \caption{Pirorytetyzacja MoSCoW}
+    \label{fig:moscow}
+\end{figure}
+
+%#TODO: try tabularray as suggested
+% Wrapping as per: https://stackoverflow.com/questions/790932/how-to-wrap-text-in-latex-tables
+\begin{table}[H] %https://www.overleaf.com/learn/latex/Positioning_images_and_tables
+    \caption{Wymagania niefunkcjonalne}
+    \label{Wymagania niefunkcjonalne}
+    \footnotesize
+    \begin{tabular}{|p{0.2\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}|p{0.52\linewidth}|}  % | draws verical line
+    % \usepackage{booktabs} provides different line thicknesses
+    % \toprule, \midrule, \bottomrule
+    \hline                  % Draw horizontal line
+    % & Defines the breaks in the table 
+    \customstyletable{Funkcja} & \customstyletablecentered{PRIO} & \customstyletablecentered{IMPL}& \customstyletable{Opis} \\
+    \hline
+    {Prosty interfejs} & {M} & {TAK} & {Prosty, minimalistyczny interfejs}\\
+    \hline
+    {Plik konfiguracji} & {M} & {TAK} & {Konfiguracja ustawień użytkownika}\\
+    \hline
+    {Poradniki} & {M} & {TAK} & {Poradniki zarządzania finansami}\\
+    \hline
+    {Rejestr zdarzeń} & {S} & {TAK} & {Logi z działania aplikacji}\\
+    \hline
+    {Informacja zwrotna} & {S} & {NIE} & {Kontrolki informacji zwrotnej i opinii użytkownika}\\
+    \hline
+    {Lokalizacje} & {C} & {NIE} & {Wersje językowe interfejsu do wyboru}\\
+    \hline
+    {Personalizacja interfejsu} & {W} & {NIE} & {Personalizacja interfejsu użytkownika np. kolorystyka, układ}\\
+    \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H] %https://www.overleaf.com/learn/latex/Positioning_images_and_tables
+    \caption{Wymagania funkcjonalne}
+    \label{Wymagania funkcjonalne}
+    \footnotesize
+    \begin{tabular}{|p{0.2\linewidth}|p{0.07\linewidth}|p{0.07\linewidth}|p{0.52\linewidth}|}  % | draws verical line
+    % \usepackage{booktabs} provides different line thicknesses
+    % \toprule, \midrule, \bottomrule
+    \hline                  % Draw horizontal line
+    % & Defines the breaks in the table
+    \customstyletable{Funkcja} & \customstyletablecentered{PRIO} & \customstyletablecentered{IMPL}& \customstyletable{Opis} \\
+    \hline
+    {Aplikacja WEB} & {M} & {TAK} & {Dostęp do aplikacji z poziomu przeglądarki}\\
+    \hline
+    {Wiele użytkowników} & {M} & {TAK} & {Wsparcie dla wielu użytkowników jednocześnie}\\
+    \hline
+    {Dodawanie danych} & {M} & {TAK} & {Dodawanie danych}\\
+    \hline
+    {Podsumowanie wydatków} & {M} & {TAK} & {Okresowe podsumowanie wydatków}\\
+    \hline
+    {Podsumowanie przychodów} & {M} & {TAK} & {Okresowe podsumowanie przychodów}\\
+    \hline
+    {Bilans okresowy} & {M} & {TAK} & {Okresowy bilans zysków i strat}\\
+    \hline
+    {Definiowanie produktów} & {M} & {TAK} & {Definiowanie produktów}\\
+    \hline
+    {Definiowanie przychodów} & {M} & {TAK} & {Definiowanie przychodów}\\
+    \hline
+    {Definiowanie typów produktów} & {M} & {TAK} & {Definiowanie typów produktów}\\
+    \hline
+    {Walidacja danych} & {M} & {TAK} & {Potwierdzenie jakości danych}\\
+    \hline
+    {Panel konfiguracyjny} & {S} & {TAK} & {Osobny panel konfiguracyjny}\\
+    \hline
+    {Import danych} & {S} & {NIE} & {Import danych w standardowym formacie np.CSV}\\
+    \hline
+    {Konteneryzacja} & {S} & {TAK} & {Konteneryzacja aplikacji w środowisku Docker}\\
+    \hline
+    {Statystyki typów} & {C} & {TAK} & {Statystyki wydatków na dany typ produktu}\\
+    \hline
+    {Statystyki produktów} & {C} & {TAK} & {Statystyki wydatków na dany produkt}\\
+    \hline
+    {Zaawansowane wprowadzanie danych} & {C} & {NIE} & {Zaawansowane metody wprowadzania danych np.: zdjęcia, skany}\\
+    \hline
+    {Definiowanie typów przychodów} & {C} & {NIE} & {Definiowanie typów przychodów}\\
+    \hline
+    {Eksport danych} & {C} & {NIE} & {Eksport danych do standardowego formatu}\\
+    \hline
+    {Własne progi} & {C} & {TAK} & {Progi wydatków określane przez użytkownika w ustawieniach}\\
+    \hline
+    {Cele oszczędnościowe} & {C} & {TAK} & {Cele oszczędnościowe określane przez użytkownika w ustawieniach}\\
+    \hline
+    {Porady} & {C} & {TAK} & {Porady na podstawie danych wprowadzonych do aplikacji 
+    pomagające użytkownikom w poprawie usprawnień budżetu}\\
+    \hline
+    {Predykcja} & {W} & {NIE} & {Predykcja trendów na podstawie wprowadzonych danych}\\
+    \hline
+    {Autokategoryzacja} & {W} & {NIE} & {Automatyczna kategoryzacja wydatków na niezbędne, potrzebne i zachcianki}\\
+    \hline
+    \end{tabular}
+\end{table}
+
+%#TODO: Proofread from here
+%(system klasy desktop, mobilny, internetowy)
+%rysunki ideowe i poglądowe
+%Ogólny opis przeznaczenia i roli poszczególnych elementów i komunikacja między nimi
+\section{\customstylesection{Architektura systemu}}
+{Przedmiotem projektu będzie system klasy internetowej - monolityczna aplikacja 
+internetowa dostępna w przeglądarce o architekturze trójwarstwowej 
+\cite{wzorceprojektowe}, którą można będzie umieścić na dedykowanym serwerze lub
+ jeśli dodatkowy cel konteneryzacji zostanie zrealizowany - na dowolnej maszynie
+ na której udostępniony będzie kod źródłowy oraz zainstalowany Docker. Aplikacja
+ podzielona będzie na interfejs użytkownika (frontend) odpowiadający za 
+interakcję z użytkownikiem i walidację danych, kod na serwerze (backend) 
+zawierający logikę działania aplikacji i komunikację z warstwą dostępu do danych
+ którą będzie baza danych aplikacji i użytkowników. Warstwy aplikacji będą 
+komunikowały się między sobą zgodnie z obowiązującym standardem - frontend 
+będzie mieć dostęp wyłącznie do backendu, z kolei backend poza odpowiadaniem na 
+żądania frontendu komunikować się będzie z warstwą przechowywania danych którą 
+stanowi baza. Wszystkie komponenty aplikacji docelowo działać będą na 
+pojedynczej maszynie, jednak nic nie stoi na przeszkodzie aby w przyszłości 
+jeżeli zajdzie taka potrzeba wydzielić dla każdego z nich dedykowane maszyny, 
+natomiast konteneryzacja aplikacji umożliwi zmianę modelu z monolitycznego na 
+mikroserwisy i skalowanie horyzontalne.}
+
+{Aby uprościć logikę aplikacji i poprawić jej wydajność ciężar przetwarzania 
+danych zostanie przerzucony na warstwę bazy danych. Zadanie to przejmą widoki 
+napisane w języku SQL \cite{SQL} które odpytane przez aplikacje efektywnie 
+przetwarzają dane w locie.}
+
+%Przegląd możliwych metod i narzędzi realizacji
+%Wybrać jedno rozwiązanie i/lub uzasadnić wybór rozwiązania
+%Krótka charakterystyka narzędzi i określenie wersji
+%krótko i konkretnie, szczegóły tylko jeśli są istotne dla projektu
+\section{\customstylesection{Metody i narzędzia realizacji}}
+{Plan projektu zakłada podejście w metodyce LEAN Software Developpment 
+\cite{LEAN} któa umożliwia przyrostowe doskonalenie projektu 
+\cite{Model Przyrostowy}, z wykorzystaniem metody Kanban \cite{Kanban} za pomocą
+ usługi Trello \cite{Trello} widocznej na rysunku \ref*{fig:trello} do 
+rejestracji, planowania realizacji i śledzenia zadań. Zdaniem autora pracy 
+podejście takie umożliwia szybki rozwój ponieważ w miarę rozwoju projektu 
+możliwości aplikacji poszerzają się dzięki małym, ciągłym udoskonaleniom już 
+obecnych funkcji oraz stopniowym dodawaniu nowych.}
+
+{O kolejności realizacji prac zadecyduje priorytet określony w klasyfikacji 
+MoSCoW \cite{MOSCOW} poglądowo przedstawiony na rysunku \ref{fig:moscow}, 
+natomiast wymóg i czas rozpoczęcia prac wyznaczy podejście oparte o matrycę 
+Eisenhowera \cite{MatrycaEisenhowera}. Dzięki temu wszystkie funkcje które 
+pozwolą dostarczyć Minimalny Wystarczający Produkt (MVP, Minimal Viable Product)
+ \cite{MVP} będą na bieżąco widoczne jako zadania najpilniejsze a zatem prace 
+mające na celu ich wdrożenie realizowane niezwłocznie.}
+
+{Zgodnie z dobrymi praktykami inżynierii informatycznej kod  rozwijanej 
+aplikacji będzie przechowywany w systemie kontroli źródła git \cite{GIT}, i 
+opublikowany na portalu GitHub \cite{GitHub} w repozytorium Righten 
+\cite{GITRighten} - z poprzednimi wersjami projektu można się zapoznać w 
+repozytorium DatabaseShenanigans \cite{GITBudgeterApp} a jego dokumentacją w 
+Budgeter \cite{GITBudgeterDoc}. W projektowanym rozwiązaniu preferowane będą 
+technologie i rozwiązania darmowe oraz open source.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/trello_kanban.png}
+    \caption{Tablica zadań projektu w usłudze Trello}
+    \label{fig:trello}
+\end{figure}
+
+{Kod aplikacji napisany zostanie w język Python \cite{Python}, głównie przez 
+wzgląd na walory edukacyjne i prostej, ekspresywnej składni co zwiększy 
+czytelność kodu i zmniejszy poziom złożoności aplikacji.}
+
+{W warstwie interfejsu użytkownika (frontend) większość wykorzystywanych 
+narzędzi jest ze sobą ściśle połączona ponieważ wybór jednej technologii 
+wpływa na kolejne, które z nią współpracują. W zamierzeniu poszczególne strony 
+generowane będą przez silnik szablonów jinja2 \cite{jinja} który pozwala 
+definiować część elementów strony dynamicznie, wybrano go z uwagi ponieważ jego 
+składnia podobna jest do języka Python. Pakiet Bootstrap \cite{Bootstrap} 
+umożliwi wzbogacenie interfejsu o funkcje napisane w JavaScript 
+\cite{JavaScript} który posłuży także do wypełniania szablonów stron danymi, a 
+dzięki temu możliwe będzie także generowanie wizualizacji z pomocą biblioteki 
+chart.js \cite{chart.js}. Do obsługi formularzy wprowadzania danych posłuży 
+biblioteka WTForms \cite{WTForms}.}
+
+{Ponieważ z projekt zakłada realizację w miarę prostej aplikacji, aby nie 
+serwer sieciowy (backend) obsługiwać będzie pakiet Flask \cite{Flask} wraz z 
+dodatkowymi wtyczkami do obsługi poszczególnych funkcji (m.in.: Flask-Login 
+\cite{Flask-Login} do zarządzania dostępem do stron w ramach sesji użytkowników) 
+oraz określonymi w trakcie pisania aplikacji wymaganymi bibliotekami. 
+Jako alternatywę rozpatrywano pakiet Django \cite{Django} który udostępnia 
+wiele dodatkowych mechanizmów zwiększajacych wydajność i bezpieczeństwo kosztem 
+bardziej złożonej konfiguracji. Po rozważeniu opcji stwierdzono jednak że w 
+chwili obecnej jest to projekt na małą skalę w którym liczy się przejrzystość 
+kodu za czym wydają się przemawiać zalety prostszego z rozwiązań, pozostawiając 
+jednocześnie Django jako ewentualność na przyszłość jeżeli projektowana 
+aplikacja zostanie wykorzystana na większą skalę.}
+
+{Dla uproszczenia etapu projektowania wstępnie w warstwa bazy danych będzie 
+projektowana na lokalnej instancji SQLite3 \cite{SQLite}, w dalszej części 
+projektu zostanie zmigrowana do docelowej technologii jaką jest PostgreSQL 
+\cite{PostgreSQL}. Rozwiązanie takie przyjęto ponieważ instancja PostgreSQL do 
+działania wymaga serwera oraz osobnej aplikacji pgadmin \cite{pgAdmin} do 
+zarządzania nią co zwiększa nakłady pracy wymagane do wdrożenia funkcji 
+podstawowych aplikacji.}
+
+{Domyślnie rozwiązanie będzie działało natywnie na serwerze lub maszynie 
+wirtualnej, jednak opcjonalnie w ramach dalszego rozwoju przewidziano aby 
+środowisko aplikacji powoływać dynamicznie z wykorzystaniem platformy 
+uruchomieniowej Docker \cite{Docker}.}
+
+{Do tworzenia dokumentacji wykorzystany zostanie pakiet narzędzi open source, 
+między innymi będą to: StarUML \cite{StarUML} do tworzenia diagramów, pgAdmin 
+\cite{pgAdmin} do tworzenia diagramów na podstawie encji bazy danych. 
+Dokumentacja zostanie spisana w języku LaTex \cite{LaTeX} wraz z gamą 
+oficjalnych rozszerzeń dostępnych w sieci - zarówno kod jak i dokumentacja 
+spisana w środowisku VSCode \cite{VSCode}.}
+
+%jak będziemy zapisywać dane trwale
+%model bazy danych i jego szczegóły
+%dla baz relacyjnych - konceptualny, logiczny i fizyczny, jeśli dużo się nie różnią ten najbardziej pełny
+%ERD (Entity-Relationship Diagram) i opis przenzaczenia tabel, klucze główne i obce
+\section{\customstylesection{Koncepcja przechowywania danych}}
+{Podstawowy model schematu bazy danych przedstawia rysunek 
+\ref{fig:rightenerdtabele}, który prezentuje Diagram Związków Encji (ERD, 
+Entity-Relationship Diagram) tabel w szablonowym schemacie bazy danych 
+aplikacji. Widoki prezentuje rysunek \ref{fig:rightenerdwidoki}, przetwarzają 
+one dane które prezentowane są użytkownikowi w aplikacji. Z racji na przyjęty 
+model przyrostowy aplikacji liczba i logika widoków może ulec zmianie w toku 
+prac nad projektem.}
+
+%#FIXME: Pictures may be too tiny - may need to divide them
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/RightenDB_EntityRelationDiagram.png}
+    \caption{Diagram Związków Encji (ERD, Entity-Relationship Diagram)}
+    \label{fig:rightenerdtabele}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_Finances-db_Views.png}
+    \caption{Widoki w bazie danych aplikacji}
+    \label{fig:rightenerdwidoki}
+\end{figure}
+
+{Podstawowe tabele aplikacji: Tabela Income to zbiór przychodów, natomiast 
+tabela Bills to zbiór okresowych wydatków stałych. Tabela ProductTypes zawiera 
+dane o typach produktów, Tabela Products zawiera dane o Produktach które 
+powiązane są z typami. Tabela Expenditures przechowuje zbiór wydatków 
+okazjonalnych na określone produkty.}
+
+{Tabele dotyczące użytkownika: W tabeli Users przechowywane są dane o 
+użytkownikach aplikacji jak UUID, nazwa, hash hasła i ustawienia 
+administracyjne, ich identyfikatorem jest UUID. Tabela UserSettings zawiera 
+ustawienia prywatne użytkownika - jej struktura jest rozwijana wraz z rozwojem 
+funkcji projektu.}
+
+{Tabele pomocnicze i tymczasowe: są to tabele robocze do zarządzania danymi w 
+trakcie rozwoju, ich ilość, nazwy, struktura oraz przeznaczenie mogą się 
+zmieniać. Kiedy projektowana funkcja zostanie ukończona tabela wchodzi do użytku
+ w ramach którejś z wcześniej opisanych kategorii.}
+
+%Organizacja interfejsu użytkownika - rysunki z komentarzem
+%szkice(mockup) i projekty, nie gotowe zrzuty ekranu
+%dla aplikacji responsywnych przykłady na różnych urządzeniach 
+\section{\customstylesection{Projekt interfejsu użytkownika}}
+{Interfejs użytkownika będzie prosty, minimalistyczny aby ułatwić użytkownikowi 
+poruszanie się po aplikacji i zmniejszyć obciążenie poznawcze. Dzięki temu opcje
+ powinny być łatwo dostępne, a ryzyko że użytkownik się pogubi lub przeoczy 
+opcję której poszukuje minimalne.}
+
+{Pierwszym ekranem który napotka użytkownik jest tak zwany splash page którego 
+projekt prezentuje rysunek \ref*{fig:uiprojectsplash}, po wejściu w opcję login 
+użytkownik trafi na ekran startowy który prezentuje rysunek 
+\ref*{fig:uiprojectstart}. Rysunek \ref*{fig:uiprojectlogin} prezentuje ekran 
+logowania. Zalogowany użytkownik będzie mógł zmienić swoje ustawienia na ekranie
+ ustawień zobrazowanym przez rysunek \ref*{fig:uiprojectsettings} - funkcja ta 
+jest funkcją dodatkową, zostanie zrealizowana jeśli wszystkie funkcje 
+spełniające podstawowe założenia i wymagane do prawidłowego działania aplikacji 
+zostaną wdrożone. Dodatkowo w aplikacji powstaną ekranu poradnika na wzór 
+prezentowanego na rysunku \ref*{fig:uiprojectguide} z podstawowymi informacjami 
+o zarządzaniu finansami - we wstępnej fazie aby pokazać potencjał rozwiązania 
+ekran będzie tylko jeden, pozostałe pozostaną puste lub zostaną wypełnione 
+domyślnym tekstem, który w miarę rozwoju aplikacji zastąpią docelowe informacje 
+ze sprawdzonych źródeł o dobrej reputacji.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_splashscreen.png}
+    \caption{Projekt ekranu początkowego (splashscreen)}
+    \label{fig:uiprojectsplash}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_startscreen.png}
+    \caption{Projekt ekranu pierwszej interakcji}
+    \label{fig:uiprojectstart}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_loginscreen.png}
+    \caption{Projekt ekranu logowania}
+    \label{fig:uiprojectlogin}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_settings.png}
+    \caption{Projekt ekranu dodawania danych}
+    \label{fig:uiprojectsettings}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_guide.png}
+    \caption{Projekt ekranu poradnika}
+    \label{fig:uiprojectguide}
+\end{figure}
+
+{Ekran zarządzania danymi prezentuje rysunek \ref*{fig:uiprojectdatamanagement},
+jest to ekran który pozwala edytować dane dodane przez ekran dodawania danych 
+przedstawiony na rysunku \ref*{fig:uiprojectadddata}. W obu ekranach dane 
+wprowadzane do aplikacji będą walidowane po stronie klienta przez logikę zaszytą
+ w formularzach do wprowadzania danych dostarczoną przez wybrane rozwiązanie.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_datamanagement.png}
+    \caption{Projekt ekranu zarządzania danymi}
+    \label{fig:uiprojectdatamanagement}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_adddata.png}
+    \caption{Projekt ekranu dodawania danych}
+    \label{fig:uiprojectadddata}
+\end{figure}
+
+{Na pozostałe ekrany aplikacji składać się będą różnego typu wizualizacje, 
+poglądowo prezentowane przez projekt na rysunku 
+\ref*{fig:uiprojectvisualizations}. Liczba i złożoność wizualizacji zależeć 
+będzie od nakładów pracy wymaganych do ich wdrożenia. Na wstępie użytkownikom 
+udostępnione zostaną wyłącznie podstawowe wizualizacje, natomiast bardziej 
+złożone i nowe uzupełniane będą z czasem w trakcie rozwoju aplikacji, w oparciu 
+o uwagi użytkowników. Takie podejście zagwarantuje że aplikacja będzie 
+maksymalnie przydatna do celów do których została stworzona - pomocy 
+użytkownikom przy zarządzaniu budżetem.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_UI_sketch_viusalizations.png}
+    \caption{Projekt ekranu dodawania danych}
+    \label{fig:uiprojectvisualizations}
+\end{figure}
+
+%#TODO:
+%3.6. Dokumentacja techniczna
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/projekt-techniczny/
+%struktura zależna od wybranych rozwiązań, metod i architektury
+%diagramy projektowe - np.: diagram hierarchii klas, diagramy sekwencji, kolaboracji
+%opisy metod i stosowane algorytmy
+\chapter{\customstylechapter{Dokumentacja techniczna}}
+{Rozdział ten zawiera dokumentację techniczną projektu. Dokumentacja zawiera 
+diagramy projektowe, nakreśla strukturę projektu wraz z ogólnym opisem przepływu
+ wykonania kodu oraz logiki aplikacji. Znajdują się tu także opisy wybranych 
+fragmentów kodu jak klasy, metody i funkcje oraz algorytmy.}
+
+
+%zaprezentować: pakiety, moduły, biblioteki, klasy
+%składowe omówić, jej: nazwa, rola w projekcie, przeznaczenie, struktura wewnętrzna, opis
+%przedstawić wybrane (istotne, ciekawe, nietypowe) fragmenty kodu, pomijać trywialne
+%listingi wstawić jako sformatowany tekst
+%nie zamieszczać długich listingów - kilka linijek, opis, kilka linijek, opis
+
+\section{\customstylesection{Schemat rzeczywistej struktury systemu}}
+{Struktura projektu w repozytorium Righten \cite{GITRighten} prezentuje rysunek 
+\ref*{fig:projectdirectorytop}. Zgodnie z obowiązującymi dobrymi praktykami dla 
+poprawy czytelności projekt podzielono na katalogi zależenie od ich funkcji. W 
+głównym katalogu znajdują się katalogi Docummentation który zawiera niniejszą 
+dokumentację, Sources zawierający kod źródłowy aplikacji oraz plik licencji 
+LICENSE.md który określa że obecnie oprogramowanie udostępniane jest na licencji
+ GNU GENERAL PUBLIC LICENSE Version 2, June 1991 (może to jednak ulec zmianie w 
+przyszłości).}
+
+{Zawartość katalogu Sources to katalog Desktop z poprzednią wersją projektu w 
+formie aplikacji Budgeter na komputery osobiste - z jej kodem zapoznać się można w 
+repozytorium DatabaseShenanigans \cite{GITBudgeterApp} - nie jest to część 
+aplikacji a osobny projekt, dlatego zostanie pominięta w dalszej części 
+dokumentacji. Katalog Database zawiera wszystkie pliki bazy danych projektu, 
+Logs przeznaczono na logi aplikacyjne do wykorzystania pod przyszłą funkcję 
+rejestrowania zdarzeń, Web zawiera kod przeglądarkowej wersji aplikacji która 
+jest głównym celem niniejszego projektu. Plik Docker-Compose.yaml zostanie 
+omówiony później.}
+
+{W skład zawartości katalogu Database przedstawionego na rysunku 
+\ref*{fig:projectdirectorydb}  wchodzą wstępna struktura bazy Righten.sqlite, 
+jej wersję Righten\_mock.sqlite3 wypełnioną danymi na potrzeby testów i rozwoju 
+aplikacji, plik Righten\_mock-sqlite\_dump\_PostgreSQL-dialect.sql wykorzystany 
+jako skrypt inicjalizacyjny bazy PostgreSQL zawartej w katalogu RightenDB, 
+którym zmigrowano strukturę między technologiami oraz plik Dockerfile który 
+zostanie omówiony w dalszej części dokumentacji.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_project_directory_top.png}
+    \caption{Struktura katalogu projektu}
+    \label{fig:projectdirectorytop}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_project_directory_sources_Database.png}
+    \caption{Struktura katalogu projektu - katalog Database}
+    \label{fig:projectdirectorydb}
+\end{figure}
+
+{Katalog Web przedstawiony na rysunku \ref*{fig:projectdirectoryweb} zawiera 
+pełny kod aplikacji przeglądarkowej. Komunikacja zabezpieczona jest 
+wygenerowanym na potrzeby projektu certyfikatem OpenSSL - plik cert.pem zawiera 
+klucz publiczny (certyfikat), natomiast key.pem klucz prywatny którym aplikacja 
+szyfruje ruch, dzięki czemu aplikacja do komunikacji wykorzystuje protokół 
+HTTPS. Plik run.py służy do uruchamienia aplikacji, a wszystkie jej zasoby 
+ładowane są z katalogu Resources. Pliki Dockerfile oraz requirements.txt 
+omówione zostaną w dalszej części dokumentacji.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_project_directory_web.png}
+    \caption{Struktura katalogu projektu - katalog Web}
+    \label{fig:projectdirectoryweb}
+\end{figure}
+
+{Katalog Resources także widoczny na rysunku \ref*{fig:projectdirectoryweb} 
+zawiera pliki ważne dla działania aplikacji, przedstawione w kolejności 
+wywoływania. Plik .env zawiera zmienne środowiskowe aplikacji, \_\_init\_\_.py 
+to tak zwana fabryka aplikacji - inicjalizuje wymagane zmienne oraz konfigurację
+ aplikacji, na końcu wczytując plik routes.py który definiuje ścieżki dostępne 
+w przeglądarce i całą logikę któa kryje się pod nimi. Ścieżki aplikacji dla 
+użytkownika rozumiane jako strony w przeglądarce wykorzystują szablony 
+zdefiniowane w katalogu templates, ponadto mogą wykorzystywać modele i formy. 
+Modele danych definiuje plik models.py w którym na podstawie obiektów w bazie 
+danych stworzono klasy które używane są w aplikacji zarówno do odpytywania bazy 
+jak i przechowania w niej informacji. Plik forms.py natomiast przechowuje 
+definicje i logikę form do wprowadzania danych wyświetlanych użytkownikowi na 
+poszczególnych stronach. W katalogu static znajdują się statyczne elementy stron
+ - obecnie jest to jedynie ikona aplikacji w formie pliku favicon.ico.}
+
+\medskip
+{Napotkane po drodze pliki Docker-compose.yaml którego zawartość zawiera listing
+ \ref*{lst:dockercompose} oraz Dockerfile służą do powoływania środowiska 
+aplikacji w formie kontenerów na platformie uruchomieniowej Docker. 
+Infrastruktura aplikacji składa się z trzech komponentów powoływanych i 
+konfigurowanych w pliku Docker-compose.yaml. Pierwszym komponentem jest baza 
+danych PostgreSQL której konfigurację opisuje plik Sources\textbackslash
+Database\textbackslash Dockerfile, drugim jest system zarządzania bazą danych 
+pgAdmin opisany w samym Docker-compose.yaml, ostatnim i najważniejszym sama 
+aplikacja zdefiniowana w pliku Sources\textbackslash Web\textbackslash
+Dockerfile. Ponieważ katalog w którym kontener bazy przechowuje bazę danych oraz
+ kontener aplikacji przechowuje logi mapowane są w ich definicjach do ścieżek na
+ maszynie gospodarza dane te są przechowywane na stałe i nie są gubione podczas 
+usunięcia, awarii kontenerów. Gotowe środowisko aplikacji uruchomione w Docker 
+przedstawia rysunek \ref*{fig:rightenenvironmentdocker}.}
+
+{Podczas uruchomienia kontenera aplikacji na systemie instalowane są wszystkie 
+wymagane paczki bibliotek systemowych, wymienione są w pliku Sources
+\textbackslash Web\textbackslash requiremets.txt. Są to paczki Flask, 
+flask-login, flask\_bcrypt, flask\_sqlalchemy, Flask-WTF, python-dotenv, 
+cryptography, pyopenssl oraz psycopg2\_binary.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Definicja infrastruktury aplikacji w Docker-compose.yaml},
+        language=yaml,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dockercompose}]
+#https://github.com/felipewom/docker-compose-postgres
+services:
+  righten:
+    image:                'righten:app'
+    build:                ./Web/
+    restart:              always
+    command:              sh -c "sleep 10s ; python3 ./run.py" #Waiter script
+    ports:
+        - 443:443
+    stop_signal:          SIGINT #flask requirement
+    environment:
+        FLASK_SERVER_PORT:  '443'
+    volumes:
+        - ./Logs:/logs
+    depends_on:
+        - rightendb
+    
+  rightendb:
+    image:                'rightendb:db'
+    build:                ./Database/
+    restart:              always
+    ports:
+        - 5432:5432
+    environment:
+        POSTGRES_USER:      postgres
+        POSTGRES_PASSWORD:  postgres
+        POSTGRES_DB:        RightenDB #DB created at initialization
+    #Share catalog with container to persist data
+    volumes:
+        - ./Database/RightenDB/:/var/lib/postgresql/data/
+        #Initialize data at first startup
+        - ./Database/Righten_mock-sqlite_dump_PostgreSQL-dialect.sql:/docker-entrypoint-initdb.d/init.sql
+    
+  pgadmin:
+    image:                dpage/pgadmin4
+    container_name:       pgadmin4_container
+    restart:              always
+    environment:
+        #Cardinal sin #1: Thou shall not devulge your password. Done for sake of clarity
+        PGADMIN_DEFAULT_EMAIL: admin@righten.com
+        PGADMIN_DEFAULT_PASSWORD: testpass
+    ports:
+        - "80:80"
+    #Persistent server configuration
+    volumes:
+        - ./Database/dbconnections.json:/pgadmin4/servers.json\end{lstlisting}
+\end{minipage}
+{Definicja infrastruktury aplikacji w Docker-compose.yaml na podstawie 
+której powoływane jest całe środowisko aplikacji.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_environment_docker.png}
+    \caption{infrastruktura aplikacji Righten uruchomiona w Docker}
+    \label{fig:rightenenvironmentdocker}
+\end{figure}
+
+\section{\customstylesection{Wybrane fragmenty kodu aplikacji}}
+{W sekcji tej opisano po jednym przykładzie każdej z głównych funkcji programu.}
+
+{Podczas projektowania aplikacji wielowarstowywch odwiecznym problemem jest 
+utrzymanie spójnego modelu danych pomiędzy warstwami. Wraz z rozwojem projektu i
+ pojawianiem się nowych potrzeb format oraz zakres danych wymaganych w 
+interfejsie użytkownika mogą się zmieniać, jednocześnie niezależnie zmianom 
+podlegają także struktury w bazie danych. W efekcie zmiany wprowadzane z czasem 
+w modelu danych w obu warstwach wymagają coraz większych nakładów pracy po 
+stronie logiki serwera aplikacji aby usługa działała poprawnie. W projekcie 
+Righten zastosowano mechanizm refleksji \cite{refleksja} zaprezentowany na 
+listingu \ref*{lst:refleksja} który ma za zadanie utrzymać spójność modelu 
+danych między warstwami, przy czym mechanizmy wczytywania tabel oraz widoków są 
+różne. Ponadto zmapowane obiekty klas przechowuje tabela pomocnicza tables 
+używana w funkcjach których działanie jest niezależne od struktury wewnętrznej 
+tabeli.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Refleksja obiektów bazy},
+        language=Python,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:refleksja}]
+with app.app_context():
+    Base = automap_base() 
+    Base.prepare(autoload_with=db.engine, reflect=True)
+    #Tables
+    Income=Base.classes.Income
+    Bills=Base.classes.Bills
+    ProductTypes=Base.classes.ProductTypes
+    Products=Base.classes.Products
+    Expenditures=Base.classes.Expenditures
+    #(...)
+
+    #Views
+    ExpendituresEnriched=Table("ExpendituresEnriched", db.metadata, autoload_with=db.engine)
+    MonthlyBilance=Table("MonthlyBilance", db.metadata, autoload_with=db.engine)
+    MonthlyBills=Table("MonthlyBills", db.metadata, autoload_with=db.engine)
+    #(...)
+
+#Map used to generalize functions - to refer to table by objectname alone
+tables={
+    "Income": Income,
+    "Bills" : Bills,
+    "ProductTypes": ProductTypes,
+    "Products" : Products,
+    "Expenditures" : Expenditures,
+    #(...)
+
+    "ExpendituresEnriched" : ExpendituresEnriched,
+    "MonthlyBilance" : MonthlyBilance,
+    "MonthlyBills" : MonthlyBills
+    #(...)
+}\end{lstlisting}
+\end{minipage}
+
+{Formularze do wprowadzania danych przez użytkownika zdefiniowane w pliku 
+forms.py wykorzystują pakiet WTForms. Ponieważ część danych w tabelach 
+podstawowych się pokrywa, aby uprościć kod stworzono klasę bazową CommonForm 
+która definiuje wszystkie pola wspólne i skorzystano z dziedziczenia aby w 
+klasach pochodnych móc definiować wyłacznie pozostałe pola. Przykład tego 
+mechanizmu prezentuje listing \ref*{lst:formularze}. Przedstawia on klasę bazową
+ CommonForm która zawiera pola wspólne dla wszystkich tabel oraz przykład klasy 
+pochodnej IncomeInputForm która definiuje pola szczegółowe dla danej tabeli. 
+Każde z pól określa klasa w któej zdefiniowano jego nazwę, walidatory oraz dane 
+źródłowe do uzupełnienia list rozwijanych jeśli są wymagane. Ponieważ 
+komunikacja w aplikacji jest zabezpieczona zapytania do bazy musi wykonać sama 
+aplikacja co wymaga instrukcji with app.app\_context().}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Formularze do wprowadzania danych przez użytkownika},
+        language=Python,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:formularze}]
+#Base class with common elements
+class CommonForm(FlaskForm):
+    """Base class with elements common to most Input forms
+    
+    Attributes:
+        :datetime: -- ISO 8601 Date default today
+        :amount: -- decimal value
+        :comment: -- free text
+        :submit: -- form submission button
+    """
+
+    datetime = StringField("DateTime", 
+        validators=[DataRequired(), Regexp("((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])", 
+        message="Date must be in format: YYYY-MM-DD")],
+        default=date.today().isoformat())
+    amount = DecimalField("Amount", 
+                          validators=[DataRequired()])
+    comment = StringField("Comment", validators=[])
+    submit = SubmitField("SubmitField")
+
+class IncomeInputForm(CommonForm):
+    with app.app_context():
+      types=[]
+      sources=[]
+      for type in db.session.query(Income.Type).distinct():
+          types.append(type[0])
+      for source in 
+            db.session.query(Income.Source).distinct():
+          sources.append(source[0])
+
+    type = SelectField("Type", validators=[DataRequired()],
+                          choices=types)
+    
+    source = SelectField("Source", 
+                         validators=[DataRequired()],
+                         choices=sources)\end{lstlisting}
+\end{minipage}
+
+{Strony zdefiniowano w pliku routes.py, wśród nich na wyróżnienie zasługują dwa 
+główne typy: strony do zarządzania danymi widoczne na listingu 
+\ref*{lst:strony-zarzadaniedanymi} przez które użytkownik wprowadza, modyfikuje 
+i usuwa swoje dane w aplikacji oraz strony z podsumowaniami jak zaprezentowana 
+na listingu \ref*{lst:strony-podsumowania} które prezentują użytkownikowi dane w
+ formie różnorodnych wizualizacji.}
+
+{Aplikacja udostępnia użytkownikowi wprowadzanie danych przez dedykowany 
+formularz (przykład opisano w listingu \ref*{lst:formularze}), oraz wyświetla 
+dane już wprowadzone przez użytkownika wraz z opcjami usunięcia i edycji każdego
+z rekordów. Aplikacja sprawdza poprawność danych wprowadzonych przez 
+użytkownika i wysyła je do bazy.}
+
+{Każda strona prezentacji danych ma odmienny układ projektowany z myślą o 
+funkcji jakąbędzie pełnić dla użytkownika tak, aby przedstawiać dane w sposób 
+prosty, jasny i nie zaciemniać obrazu nadmiarem informacji. Każda z nich 
+podobnie do przykładowej pobiera dane z bazy, przetwarza je do formatu kolekcji 
+prezentowanych na grafach (osie x i y), lub w formie zestawów etykiet i wartości
+do prezentacji w formie tabel lub wykresów kołowych. Następnie warstwa 
+serwera przetwarza dane do formatu json \cite{JSON} którym wysyłane są do 
+szablonów i prezentowane użytkownikowi przez frontend.}
+
+{Znaczniki czasu w aplikacjie przechowywane są w formacie zgodnym ze standardem 
+ISO 8601 \cite{ISO 8601} ponieważ jednolity format ułatwia obsługę i 
+przetwarzanie danych.}
+
+{Dane między warstwami backend i frontend muszą być przesyłane w standardowym 
+formacie aby zapewnić współpracę z dostępnymi na rynku bibliotekami i uprościć 
+implementacje funkcji które będą je obsługiwać. Na potrzeby aplikacji wybrano 
+format JSON \cite{JSON}.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Strony podsumowań na przykładzie /incomesummary},
+        language=Python,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:strony-podsumowania}]
+@app.route("/incomesummary")
+@flask_login.login_required
+def incomesummary():
+    IncomeSummarydata = db.session.query(
+        IncomeSummaryByType.columns.Type,
+        IncomeSummaryByType.columns.Amount).\
+        filter_by(UserID=current_user.uuid).all()
+    summary = db.session.query(IncomeSummary).\
+        filter_by(UserID=current_user.uuid).all()
+    IncomeOverTime = db.session.query(
+        MonthlyIncome.columns.Month,
+        MonthlyIncome.columns.Amount).\
+        filter_by(UserID=current_user.uuid).all()
+    IncomeTypesByTime = db.session.query(
+        MonthlyIncomeByType.columns.Month,
+        MonthlyIncomeByType.columns.Amount,
+        MonthlyIncomeByType.columns.Type).\
+        filter_by(UserID=current_user.uuid).all()
+    
+    IncomeTypechart=createpiechartdataset(
+                        IncomeSummarydata, addperc=True)
+    IncomeTypesByTimeDataset=createchartdataset(
+        IncomeTypesByTime)
+
+    monthlyincomedata = []
+    for month, amount in IncomeOverTime:
+        monthlyincomedata.append({"x": month, "y": amount})
+
+    log_site_opened()
+    return render_template("incomesummary.html",
+            title="Income",
+            IncomeTypechart=json.dumps(
+                IncomeTypechart, cls=DecimalEncoder),
+            MonthlyIncome=json.dumps(
+                monthlyincomedata, cls=DecimalEncoder),
+            IncomeTypesByTimeDataset=json.dumps(
+        IncomeTypesByTimeDataset, cls=DecimalEncoder),
+            Summary=summary
+            )\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Strony zarządzania danymi na przykładzie /income},
+        language=Python,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:strony-zarzadaniedanymi}]
+@app.route("/income", methods=["GET", "POST"])
+@flask_login.login_required
+def income():
+    form = IncomeInputForm()
+    entries = db.session.query(Income).\
+                filter_by(UserID=current_user.uuid).\
+                order_by(Income.DateTime.desc(),Income.ID.desc()).\
+                all()
+    if form.validate_on_submit():
+        entry = Income(
+           DateTime=date.fromisoformat(form.datetime.data),
+           Amount=form.amount.data,
+           Type=form.type.data,
+           Source=form.source.data,
+           Comment=form.comment.data,
+           UserID=current_user.uuid
+           )
+        addtodb(entry, notify=True)
+        return redirect(
+                redirect_url(
+                    url_for("income", next="income")))
+    log_site_opened()
+    return render_template(
+                "incometable.html", title="Income",
+                entries=entries, form=form)\end{lstlisting}
+\end{minipage}
+
+{Przykładowy szablon strony wymaga szerszego opisu ponieważ zależnie od jego 
+przeznaczenia, składać się może z kilku różnych sekcji. Punktem wyjścia jest 
+szablon layout.html, który decyduje o ogólnym wyglądzie aplikacji - to w nim 
+osadzone są elementy głównego paska nawigacyjnego menu i najważniejsze funkcje 
+które powinny być dostępne wszędzie. Szablon ten rozszerzają szablony 
+poszczególnych stron. Większość stron podobnie jak na przyładowym listingu 
+\ref*{lst:szablony-dane} w pewien sposób wyświetla dane przekazane tekstowo w 
+formacie JSON \cite{JSON}. Następnie w bloku skryptowym powstają z nich obiekty 
+klas z biblioteki Chart.js \cite{chart.js} co prezentuje listing 
+\ref*{lst:szablony-klasychartjs} które wyświetlane są w ramach wizualizacji 
+zdefiniowanych w szablonie jak na przykładzie listingu 
+\ref*{lst:szablony-wizualizacje}. Na części stron występują także formularze do 
+wprowadzania danych \ref*{lst:strony-formularzewprowadzania} oraz zestawienia 
+danych podstawowych użytkownika przechowywane w bazie przedstawione na listingu 
+\ref*{lst:szablony-zestawieniadanych} dzięki którym użytkownik może wyświetlić, 
+edytować oraz usunąć wcześniej wprowadzone dane. Ponieważ każda tabela 
+podstawowa w bazie danych aplikacji ma inny zestaw pól, powstały oddzielne 
+strony edycji danych dla każdej z tabel, natomiast dla usunięcia utworzono 
+jedną wspólną funkcję generyczną dla wszystkich tabel.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Przekazywanie danych do szablonu stron},
+        language=JavaScript,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:szablony-dane}]
+{% block javascript %}
+<script>
+  let IncomeTypechart = 
+        JSON.parse({{ IncomeTypechart | tojson }})
+  let MonthlyIncome = 
+        JSON.parse({{ MonthlyIncome | tojson }})
+  let IncomeTypesByTimeDataset = 
+        JSON.parse({{ IncomeTypesByTimeDataset | tojson }})
+  (...)\end{lstlisting}
+\end{minipage}
+{Początek bloku skryptowego JavaScript \cite{JavaScript} strony, frontend 
+odbiera dane wysłane z backendu i przetwarza (parsuje) dane z tekstu do obiektu 
+w formacie JSON \cite{JSON}.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Tworzenie obiektów wizualizacji w szablonach stron},
+        language=JavaScript,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:szablony-klasychartjs}]
+let IncomeOverTime = new Chart(
+    document.getElementById("IncomeOverTime"),
+    {
+        type: "line",
+        data: {
+            datasets: [{
+                label: "Income",
+                data: MonthlyIncome,
+            }]
+        }
+    })
+
+let IncomeTypesOverTime = new Chart(
+    document.getElementById("IncomeTypesOverTime"),
+    {
+        type: "line",
+        data: {
+            datasets: IncomeTypesByTimeDataset
+        }
+    })\end{lstlisting}
+\end{minipage}
+{Tworzenie obiektów klas chart.js.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Panale wizualizacji w szablonach stron},
+        language=html,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:szablony-wizualizacje}]
+<div class="col-xs-10, col-sm-6">
+    <div class="card card-style mb-2">
+        <div class="card-body">
+            <div class="chart-container" style="position: relative;">
+                <canvas id="IncomeOverTime"></canvas>
+            </div>
+        </div>
+    </div>
+</div>\end{lstlisting}
+\end{minipage}
+{Komponenty które służą do prezentacji przygotowanych wizualizacji 
+użytkownikowi.}
+
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Formularze wprowadzania w szablonach stron},
+        language=html,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:strony-formularzewprowadzania}]
+<div class="col-sm-10 ml-auto mr-auto">
+    <form action="" method="POST">
+        {{ form.csrf_token() }}
+        <fieldset class="form-group">
+            <legend class="mb-4">Add Income</legend>
+            <div class="row form-group">
+            <div class="col form-group">
+                {{ form.datetime.label(class="form-control-label") }}
+                {% if form.datetime.errors %}
+                {{ form.datetime(class="form-control form-control-sm is-invalid") }}
+                {% for error in form.datetime.errors %}
+                <div class="invalid-feedback">
+                    <span>{{error}}</span>
+                </div>
+                {% endfor %}
+                {% else %}
+                {{ form.datetime(class="form-control form-control-sm") }}
+                {% endif %}
+            </div>
+<!--(...)-->
+
+            <div class="col form-group">
+                {{ form.source.label(class = "form-control-label") }}
+                {{ form.source(class = "form-control form-control-sm") }}
+            </div>
+
+            <div class="col form-group">
+                {{ form.comment.label(class = "form-control-label") }}
+                {{ form.comment(class = "form-control form-control-sm") }}
+            </div>
+
+            <div class="col">
+                {{ form.submit(class="btn btn-success", value="Add record")}}
+            </div>
+        </div>
+        </fieldset>
+    </form>
+</div>
+<br></br>\end{lstlisting}
+\end{minipage}
+{Formularze wprowadzania danych występują na stronach zarządzania danymi. Każde 
+pole formularza ma odpowiednią kontrolkę z walidacją danych i obsługę błędów 
+oraz przycisk do zatwierdzenia formularza który wysyła wprowadzone przez 
+użytkownika dane do aplikacij. Komunikację zabezpiecza token CSRF (Cross-Site 
+Request Forgery) \cite{CSRF}, dzięki czemu aplikacja nie przyjmuje żądań HTTP 
+wysłanych z zewnątz aplikacji.}
+
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Zestawienia danych w szablonach stron},
+        language=html,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:szablony-zestawieniadanych}]
+<div class="col-sm-10 ml-auto mr-auto">
+    <H2>Incomes</H2>
+    <table class="table" >
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">DateTime</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Type</th>
+                <th scope="col">Source</th>
+                <th scope="col">Comment</th>
+                <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+                <tr>
+                    <td>{{entry.ID}}</td>
+                    <td>{{entry.DateTime.strftime("%Y-%m-%d")}}</td>
+                    <td>{{entry.Amount}}</td>
+                    <td>{{entry.Type}}</td>
+                    <td>{{entry.Source}}</td>
+                    <td>{{entry.Comment}}</td>
+                    <td><a href="{{ url_for('incomeedit', table='Income', entry_id = entry.ID) }}" class="btn btn-outline-warning btn-sm" id="EditButton">Edit</a></td>
+                    <td><a href="{{ url_for('delete', table='Income', entry_id = entry.ID) }}" class="btn btn-outline-danger btn-sm" id="DeleteButton">Delete</a></td>
+                </tr>
+            {% endfor %}
+    </tbody>
+    </table>
+</div>\end{lstlisting}
+\end{minipage}
+{Aplikacja na podstawie dostarczonego w postaci JSON obierktu z rekordami w 
+locie tworzy tabelę z wszystkimi danymi a także linkami do edycji oraz usunięcia
+ dla każdego z rekordów.}
+
+\section{\customstylesection{Wybrane fragmenty kodu bazy danych}}
+{Baza danych aplikacji stworzona została na podstawie wymagań, następnie była 
+stopniowo rozszerzana, modyfikowana i usprawniana w trakcie rozwoju projektu - 
+zarówno kodu aplikacji, kolejnych iteracyjnych usprawnień wprowadzanych do 
+samych założeń funkcji oraz w odpowiedzi na wykryte błędy i nowe wymogi danych 
+powstałe w trakcie implementacji. W toku prac tabele podstawowe rozszerzono 
+o dodatkowe pola jak isCash w tabeli Expenditures której definicję prezentuje 
+listing \ref*{lst:dbexpenditures-finalna} (przed zmianami 
+\ref*{lst:dbexpenditures-wstępna}), oraz większość widoków. Tabela Expenditures 
+zawiera wydatki wprowadzone przez użytkownika, wersję wstępną zaimplementowano 
+w technologii SQLite3 \cite{SQLite}, nmatomiast wersję finalną w technologii 
+PostgreSQL \cite{PostgreSQL}.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Tabela Expenditures - wersja wstępna},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbexpenditures-wstępna}]
+CREATE TABLE [Expenditures] (
+    [ID]	INTEGER,
+    [DateTime]	DATETIME,
+    [ProductID]	INTEGER UNSIGNED,
+    [Amount]	DOUBLE,
+    [Comment]	TEXT DEFAULT NULL,
+    PRIMARY KEY([ID] AUTOINCREMENT),
+    FOREIGN KEY([ProductID]) REFERENCES [Products]([ID])
+);\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Tabela Expenditures - wersja finalna},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbexpenditures-finalna}]
+CREATE TABLE IF NOT EXISTS public."Expenditures"
+(
+    "ID" integer NOT NULL DEFAULT nextval('"Expenditures_ID_seq"'::regclass),
+    "UserID" uuid NOT NULL,
+    "DateTime" date,
+    "ProductID" bigint,
+    "Amount" numeric(10,2),
+    "Comment" text COLLATE pg_catalog."default",
+    "isCash" boolean DEFAULT false,
+    CONSTRAINT "Expenditures_pkey" PRIMARY KEY ("ID"),
+    CONSTRAINT fk_typeid FOREIGN KEY ("ProductID")
+        REFERENCES public."Products" ("ID") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_userid FOREIGN KEY ("UserID")
+        REFERENCES public."Users" ("ID") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public."Expenditures"
+    OWNER to postgres;\end{lstlisting}
+\end{minipage}
+
+{Zgodnie z założeniami projektu widoki przejęły ciężar przetwarzania danych. W 
+trakcie rozwoju projektu ulegały szeregowi zmian. Uzupełniano je, 
+czego przykładem może być pola Cash, ProductPriority i TypePriority w widoku 
+ExpendituresEnriched wymienionym na listingu 
+\ref*{lst:dbwidoki-expendituresenriched} - we wstępnej wersji projektu pola te 
+nie występowały ponieważ funkcje które je wykorzystuja powstałyna późniejszym 
+etapie. Widok ExpendituresEnriched prezentuje dane o wydatkach użytkownika w 
+czytelny sposób, wzbogacone o dodatkowe pola któe nie występują w tabeli 
+podstawowej. Powstały także zupełnie nowe widoki jak ProductSummary widoczny na 
+listingu \ref*{lst:dbwidoki-productsummary} który oblicza przydatne dane 
+statystyczne prezentowane później użytkownikowi zamiast surowych danych z tabeli
+ podstawowej o produktach. Wstępnie zaprojektowane skomplikowane widoki 
+podzielono także na mniejsze aby uprościć zapytania jeśli logika przetwarzania 
+kilku widoków zawierała części wspólne - między innymi MonthlyCommonProducts 
+który podzielono na podstawowy MonthlyProducts oraz MonthlyCommonProducts 
+widoczne na listingu \ref*{lst:dbwidoki-monthycommonproduct} którego logika 
+stała się dzięki temu o wiele krótsza a więc i łatwiejsza w utrzymaniu.}
+
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Widok nowy - ProductSummary},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbwidoki-productsummary}]
+CREATE VIEW "ProductSummary" AS
+SELECT
+ "Products"."UserID"                     AS "UserID"
+ ,"Products"."ID"                        AS "ID"
+ ,"Products"."Product"                   AS "Product"
+ ,"ProductTypes"."Type"                  AS "Type"
+ ,"Products"."Comment"                   AS "Comment"
+ ,COALESCE("Summary"."Amount", 0)        AS "Amount"
+ ,COALESCE("Summary"."BoughtTimes", 0)   AS "Times"
+ ,"Summary"."FirstBought"                AS "First"
+ ,"Summary"."LastBought"                 AS "Last"
+ ,"Summary"."Minimum"                    AS "Minimum"
+ ,"Summary"."Average"                    AS "Average"
+ ,"Summary"."Maximum"                    AS "Maximum"
+ ,ROUND("Summary"."Stddev"/
+        "Summary"."Average", 2)          AS "Variability"
+ ,"Products"."Priority"                AS "ProductPriority"
+ ,"ProductTypes"."Priority"              AS "TypePriority"
+ ,COALESCE("Summary"."Common", 'Absent') AS "Common"
+FROM "Products"
+LEFT JOIN (SELECT 
+ *
+ ,(CASE WHEN ("BoughtTimes">(
+    SELECT 
+    AVG("BoughtTimes") AS "Average" 
+     FROM ( SELECT
+      "UserID"
+      ,"Product"
+      ,Round(SUM("Amount"), 2) AS "Amount"
+      ,COUNT(TO_CHAR("DateTime", 'YYYY-MM-DD'))
+        AS "BoughtTimes"
+      ,MAX(TO_CHAR("DateTime", 'YYYY-MM-DD'))
+        AS "LastBought"
+      ,MIN(TO_CHAR("DateTime", 'YYYY-MM-DD'))
+        AS "FirstBought"
+      FROM "ExpendituresEnriched"
+      GROUP BY "Product", "UserID"
+      ORDER BY "BoughtTimes" DESC))) 
+ then 'Common' else 'Uncommon' end) AS "Common"
+FROM ( SELECT
+ "UserID"
+ ,"Product"
+ ,Round(SUM("Amount"), 2)                  AS "Amount"
+ ,COUNT(TO_CHAR("DateTime", 'YYYY-MM-DD')) AS "BoughtTimes"
+ ,MAX("DateTime")                          AS "LastBought"
+ ,MIN("DateTime")                          AS "FirstBought"
+ ,ROUND(AVG("Amount"),2)                   AS "Average"
+ ,MIN("Amount")                            AS "Minimum"
+ ,MAX("Amount")                            AS "Maximum"
+ ,Round(STDDEV("Amount"), 2)               AS "Stddev"
+  FROM "ExpendituresEnriched"
+  GROUP BY "Product", "UserID"
+  ORDER BY "BoughtTimes" DESC))
+AS "Summary"
+ON "Products"."Product"="Summary"."Product"
+AND "Products"."UserID"="Summary"."UserID"
+LEFT JOIN "ProductTypes" 
+ ON "Products"."TypeID"="ProductTypes"."ID"
+ AND "Products"."UserID"="ProductTypes"."UserID";\end{lstlisting}
+\end{minipage}
+
+{Widok ProductSummary zawiera podsumowanie o zakupionych przez użytkownika 
+produktach w formie danych statystycznych.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Widok rozwinięty w toku projektu - ExpendituresEnriched},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbwidoki-expendituresenriched}]
+CREATE VIEW "ExpendituresEnriched" AS
+  SELECT  "Expenditures"."UserID"  AS "UserID",
+      "Expenditures"."ID"          AS "ID",
+      "Expenditures"."DateTime"    AS "DateTime",
+      "Expenditures"."Amount"      AS "Amount",
+      "Products"."Product"         AS "Product",
+      "ProductTypes"."Type"        AS "Type",
+      (CASE WHEN 
+        ("Expenditures"."isCash"=FALSE)
+      THEN 'NO' ELSE 'YES' END)    AS "Cash",
+      "Expenditures"."Comment"     AS "Comment",
+      "Products"."Priority"        AS "ProductPriority",
+      "ProductTypes"."Priority"    AS "TypePriority"
+  FROM     "Expenditures"
+  LEFT JOIN  "Products"
+    ON  "Expenditures"."ProductID"="Products"."ID"
+    AND  "Expenditures"."UserID"="Products"."UserID"
+  LEFT JOIN   "ProductTypes"
+    ON  "Products"."TypeID"="ProductTypes"."ID"
+    AND  "Products"."UserID"="ProductTypes"."UserID"
+  ORDER BY "DateTime";\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Widok podzielony - MonthlyCommonProducts},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbwidoki-monthycommonproduct}]
+CREATE VIEW "MonthlyProducts" AS
+SELECT *
+FROM (
+  SELECT 
+      "UserID"
+      ,TO_CHAR("DateTime", 'YYYY-MM') AS "Month"
+      ,"Product"
+      ,COUNT("Product")               AS "Items"
+      ,ROUND(SUM("Amount"),2)         AS "Amount"
+  FROM "ExpendituresEnriched"
+  GROUP BY "UserID", "Product", "Month"
+  ORDER BY "UserID", "Month" ASC, "Amount" DESC
+);
+
+CREATE VIEW "MonthlyCommonProducts" AS
+SELECT *
+FROM "MonthlyProducts" 
+WHERE "Items">(
+  SELECT AVG("Items")
+  FROM "MonthlyProducts");\end{lstlisting}
+\end{minipage}
+{Początkowo był to jeden widok jednak aby wyliczyć średnią ilość produktów 
+zapytanie wymagało powielenia logiki.}
+
+{Ponadto część przetwarzania z samej aplikacji stopniowo przeniesiona zostaje do
+ widoku Statistics, którego wynik prezentowany jest użytkownikowi w jednym z 
+paneli. Widok ten zawiera w sobie niezwiązane ze sobą zapytania które 
+dostarczają jednak przydatnych z punktu widzenia użytkownika informacji - 
+wyniki z przykładowych danych testowej wersji aplikacji obrazuje rysunek 
+\ref*{fig:dbwidoki-statistics}.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/RightenDB_views_statistics.png}
+    \caption{infrastruktura aplikacji Righten uruchomiona w Docker}
+    \label{fig:dbwidoki-statistics}
+\end{figure}
+
+%3.7. Testy i weryfikacja systemu (2-5str)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/testy/
+%brak tego rozdziału jest istotnym mankamentem pracy co obniży jej ocenę
+%Jakie testy zaplanowano i przygotowano, jak je zrealizowano i jakie były rezultaty
+%Jednostkowe, integracyjne, akceptacyjne i responsywności - jeśli TDD tylko wybrane testy
+%Tylko wybrane testy, zwłąszcza tam gdzie pojawiły się błędy, ich przyczyna i usunięcie
+%forma: tekst i tabelki przypadków testowych
+\chapter{\customstylechapter{Testy i weryfikacja systemu}}
+{Niniejszy rozdział opisuje proces testowania oraz weryfikacji systemu. Aby 
+zapewnić możliwie szybką implementację zaprojektowanych funkcji zastosowano 
+najprostszą metodę testów którą są testy manualne. Testowaniu podlegały zarówno pojedyncze funkcje, moduły jak i aplikacja jako 
+całość, zależnie od etapu rozwoju aplikacji oraz typu implementowanej zmiany. 
+Przykłady wykrytych błędów zaprezentowano w kolejnej sekcji tego rozdziału.}
+
+\section{\customstylesection{Środowisko i sposób testowania}}
+{Po migracji aplikacji na środowisko uruchomieniowe Docker oraz zmianie 
+technologii bazy danych z SQLite na PostgreSQL testowanie a zarazem i rozwój 
+aplikacji stały się bardziej skomplikowane. Ponieważ kod uruchamiany na 
+platformie Docker jest niejako gotowym środowiskiem wdrożonej aplikacji, 
+standardowe funkcje środowiska programistycznego jak możliwość zatrzymania 
+wykonywanego kodu czy inspekcji wartości zmiennych są niedostępne. Z tego powodu
+ w konfiguracji zaszyto przełącznik w formie zmiennej debug\_version, cały kod 
+z nim związany rozsiany jest po kilku plikach - ich wycinki prezentuje listing 
+\ref{lst:debugversion}. Mechanizm ten decyduje o wartości zmiennych 
+środowiskowych wskazujących ważne pliki wymagane do uruchomienia aplikacji. W 
+efekcie zmieniając wartość w jednym miejscu można przełączyć aplikację w tryb 
+testowania lub wdrożenia wykorzystujące rozbieżne technologie.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Fragmenty kodu prezentujące mechanizm debug\_version},
+        language=html,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:debugversion}]
+#Zawartosc .env
+FLASK_SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://postgres:postgres@rightendb:5432/RightenDB
+
+
+#zawartosc __init__.py
+import os
+from dotenv import load_dotenv
+basepath = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basepath, '.env'))
+
+app=Flask(__name__)
+app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
+
+version="debug_local"   #Decyduje o technologiach
+
+#Nadpisanie polaczenia do bazy danych aplikacji w trakcie rozwoju 
+if version=="debug_local":
+    app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3' #Local SQLite3
+
+db=SQLAlchemy(app)\end{lstlisting}
+\end{minipage}
+
+
+\medskip
+{Ponieważ ciężar przetwarzania danych aplikacji położono na warstwie bazy 
+danych, to logika zawarta zapytaniach, z których złożone są obiekty bazy danych 
+jak widoki podlegała najbardziej rygorystycznym testom. Po utworzeniu zapytania 
+do bazy danych aplikacji wprowadzano zestaw danych testowych, dla których wyniki
+ przetwarzania przygotowano ręcznie oraz z wykorzystaniem narzędzi z pakietu 
+Google Docs \cite{googledocs}. Wyniki uzyskane ręcznie porównywano następnie z 
+danymi wynikowymi przygotowanej funkcji, co pozwalało na bieżąco eliminować 
+błędy w najbardziej istotnej logice aplikacji. Na etapie testów jako bazę danych
+ aplikacji wykorzystano manualnie utworzoną instancję SQLite3 \cite{SQLite}, 
+oraz narzędzie DB Browser for SQLite \cite{DBBrowser} do interakcji z bazą 
+danych. Baza ta na dalszym etapie projektu zmigrowana została do technologii 
+PostgreSQL \cite{PostgreSQL} i narzędzia pgAdmin \cite{pgAdmin}. Finalnie bazę 
+danych wypełniono danymi testowymi które służą jako przykład informacji 
+wprowadzonych przez użytkownika z pomocą specjalnie napisanego w tym celu 
+skryptu. Skrypt ten powielał wybraną losowo część rekordów zmieniając wskazane 
+dane w określonym zakresie - przykładowo cena*liczbaLosowaWZakresie(0.8,1.2).}
+
+\medskip
+{W warstwie serwerowej przeprowadzano głównie manualne testy akceptacyjne dla 
+każdej implementowanej funkcji aby określić czy działa zgodnie z założeniami 
+wstępnymi projektu. Test każdej wdrożonej funkcji wymagał uruchomienia 
+aplikacj i potwierdzenia jej prawidłowego działania. Część funkcji wymagała 
+zmiany w interfejsie, w takich prypadkach test sprowadzał się do wykonania 
+określonej akcji i potwierdzenia że jej efekt jest zgodny z założonym. 
+Weryfikacja zależała od wdrażanej funkcji, kilka z wybranych przykładów opisano 
+poniżej.}
+
+{Sprawdzenie czy dane wprowadzone przez interfejs trafiły do bazy aplikacji.}
+
+{Po dodaniu panelu logowania weryfikacja obejmowała próbę wejścia do panelu 
+wizualizacji bez logowania, próby wprowadzenia błędnych poświadczeń (tak nazwy 
+użytkownika jak i hasła) i weryfikację czy zalogowany użytkownik może prawidłowo
+ poruszać się po aplikacji.}
+{Test po dodaniu zabezpieczenia sesji użytkownika opisano w kolejnej sekcji jako
+ ciekawy przypadek.}
+
+\medskip
+{Warstwa interfejsu użytkownika podlegała głównie manualnych testach 
+integracyjnych, testach nawigacji między elementami aplikacji, wizualnej 
+inspekcji dodanych elementów oraz interakcji poszczególnych kontrolek w 
+przeglądarce. Wykryte błędy sprowadzały się głównie do sytuacji w których 
+ułożenie elementów odbiega od założeń projektowych, wybrane elementy 
+interfejsu były nieczytelne lub interakcja z nimi nie działała prawidłowo. Testy
+ obejmowały także określenie jak bardzo czytelny, intuicyjny i prosty w obsłudze
+ jest interfejs aplikacji, jednakże ponieważ jest to kwestia subiektywna, 
+zarówno oceny jak i zmian dokonywano arbitralnie. Wśród wykrytych błędów 
+najczęstszym były błędy formatowania tekstu, czy elementy które wstępnie nie 
+mieściły się w wyznaczonym obszarze. Ich naprawa natomiast sprowadzała się do 
+zmiany odpowiedzialnego atrybutu w szablonie HTML i ponownej weryfikacji.}
+
+\section{\customstylesection{Najciekawsze wykryte błędy}}
+{W miarę rozwoju projektu podczas implementacji poszczególnych funkcji wykryto i
+ wyeliminowano wiele błędów, niektóre jednak wyróżniają się od reszty na kilka 
+ciekawych sposobów a zatem zasługują na szczególną.}
+
+{Pierwszą kategorią tego typu błędów wykrytych w aplikacji były błędy logiki 
+widoczne dopiero po dokładnej analizie wyniku algorytmu. Za przykład posłuży 
+obliczanie miesięcznej średniej dziennych wydatków. Ponieważ zapytanie budowane 
+było etapami w których stopniowo rozbudowano je o dodatkowe informacje, jego 
+logika była dość zawiła. Na kolejnych fazach projektu podczas usprawnień warstwy
+ bazy danych zapytanie zostało zoptymalizowane - części wspólne przeniesiono do 
+osobnego podzapytania zbierającego dane dzienne, z którego następnie obliczano 
+dane miesięczne. Efektem prac był kod widoczny na listingu 
+\ref{lst:dbmonthlyspending-errror}, który mimo iż na pierwszy rzut oka wygląda 
+prawidłowo oblicza nie średnie miesięczne a średnie ze średnich dziennych. Błąd 
+logiki wykryto podczas ręcznej weryfikacji danych testowych, a logika po 
+naprawie błędu (i zmianie dialektu SQL) widoczna jest na listingu 
+\ref{lst:dbmonthlyspending-fixed}.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Widok MonthlySpending - średnia średnich dziennych (dialekt SQLite)},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbmonthlyspending-errror}]
+SELECT
+  strftime('%Y-%m',[Day])              AS [Month]
+  ,ROUND(AVG([DailyAmount]))           AS [AverageDaily]
+  ,ROUND(SUM([DailyAmount]))           AS [Total]
+  ,ROUND(AVG([DailyCashPercentage]))   AS [CashPercentage]
+  ,ROUND(AVG([AverageDailyProductPriority]))
+    AS [AverageProductPriority]
+  ,ROUND(AVG([AverageDailyTypePriority]))
+    AS [AverageTypePriority]
+  ,ROUND(SUM([PossibleSavings]),2)     AS [PossibleSavings]
+FROM (
+  SELECT 
+    strftime('%Y-%m-%d',[DateTime])    AS [Day]
+    ,SUM([Amount])                     AS [DailyAmount]
+    ,SUM([Amount]*[ProductPriority])/SUM([Amount])
+      AS [AverageDailyProductPriority]
+    ,SUM([Amount]*[TypePriority])/SUM([Amount])
+      AS [AverageDailyTypePriority]
+    ,SUM((CASE WHEN ([ProductPriority]<(
+            SELECT [Value]
+            FROM [UserSettings]
+            WHERE [Setting]="ProductPriorityTarget"))
+          THEN [Amount] ELSE 0 END))   AS [PossibleSavings]
+    ,AVG((CASE WHEN [Cash]=='YES'
+          THEN 100 ELSE 0 END))    AS [DailyCashPercentage]
+  FROM [ExpendituresEnriched]
+  WHERE [Amount]>0
+  GROUP BY [DateTime]
+)
+GROUP BY [Month]
+ORDER BY [Month] ASC;\end{lstlisting}
+\end{minipage}
+{Zapytanie SQL w dialekcie SQLite sprzed migracji bazy na technologię 
+PostgreSQL. Przykładowo: jeśli w miesiącu zakupiono 50 produktów, jednego dnia 2
+ za gotówkę (DailyCashPercentage 100\%), w drugim dniu 48 kartą 
+(DailyCashPercentage 0\%), widok prezentował informację że 50\% produktów 
+miesięcznie zakupiono za gotówkę (0+100/2=50), podczas gdy faktycznie wartość ta
+ wynosiła 4\% (2/50).}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Widok MonthlySpending - poprawiona średnia średnich dziennych (dialekt PostgreSQL), przed dodaniem UserID},
+        language=SQL,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:dbmonthlyspending-fixed}]
+--Create intermediary table
+WITH "Daily" AS (
+  --Average daily data by month
+  SELECT
+    TO_CHAR("DateTime", 'YYYY-MM')  AS "Month"
+    ,ROUND(AVG("DailyAmount"),2)    AS "AverageDaily"
+  FROM (
+    --Get daily amounts
+    SELECT 
+      "DateTime", 
+       SUM("Amount") AS "DailyAmount"
+    FROM "ExpendituresEnriched"
+    GROUP BY "DateTime"
+  )
+  GROUP BY "Month"
+)
+
+--Necessary for Alias
+SELECT 
+  "Monthly".*, 
+  "Daily"."AverageDaily"
+FROM (
+  SELECT
+    TO_CHAR("DateTime", 'YYYY-MM')      AS "Month"
+    ,ROUND(SUM("Amount"),2)             AS "Total"
+    ,ROUND(AVG(CASE WHEN "Cash"='YES'
+            THEN 100 ELSE 0 END))       AS "CashPercentage"
+    ,ROUND(AVG("ProductPriority"))
+      AS "AverageProductPriority"
+    ,ROUND(AVG("TypePriority"))
+      AS "AverageTypePriority"
+    ,ROUND(SUM(CASE WHEN ("ProductPriority"<CAST((
+                SELECT "Value"
+                FROM "UserSettings"
+                WHERE "Setting"='ProductPriorityTarget')
+                  AS NUMERIC))
+            THEN "Amount" ELSE 0 END),2)
+      AS "PossibleSavings"
+  FROM "ExpendituresEnriched" 
+  GROUP BY "Month"
+  ORDER BY "Month" ASC
+) AS "Monthly"
+LEFT JOIN "Daily" ON "Monthly"."Month"="Daily"."Month";\end{lstlisting}
+\end{minipage}
+{Zapytanie SQL w dialekcie PostgreSQL po migracji bazy. Zapytanie oblicza osobno
+ średnie miesięczne oraz dodaje średnie dzienne.}
+
+{Z ciekawszych problemów które wykryto w warstwie serwerowej na uwagę zasługuje 
+problem z przechowywaniem haseł użytkowników. W trakcie implementacji panelu 
+logowania użytkownika we wstępnej wersji dane wprowadzone przez użytkownika 
+były szyfrowane funkcją bcrypt, a następnie porównywano skrót (hash) hasła 
+wprowadzonego z przechowywanym w bazie danych. Mimo wpisywania prawidłowego 
+hasła uwierzytelnianie za każdym razem kończyło się niepowodzeniem, ponieważ 
+funkcja bcrypt automatycznie generuje także sól - generowany pseudolosowo 
+fragment danych dodawany do hasła przed zaszyfrowaniem aby zwiększyć entropię 
+(losowość danych) - więc w efekcie porównywane hasła zawsze były różne. Po 
+wgłębieniu się w dokumentację biblioteki zmieniono kod aplikacji tak, by 
+wykorzystać funkcję bcrypt.check\_password\_hash która porównuje zapisany skrót 
+hasła z danymi w formie jawnej. Poprawiony fragment kodu prezentuje listing 
+\ref{lst:login-hash}. Funkcja ta wykorzystuje sól zapisaną na początku 
+docelowego skrótu, dodając go do testowanego hasła, hashując je i porównując 
+ciągi - w wyniku zwraca jedynie informajcę czy hash jest prawidłowy.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Panel logowania - weryfikacja zgodności hasła},
+        language=html,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:login-hash}]
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form=LoginForm()
+    if request.method == "POST" and form.validate_on_submit():
+        username=form.username.data
+        usr=db.session.query(Users).filter_by(Username=username).first()
+        #if user does not exist password is not checked
+        if usr and bcrypt.check_password_hash(usr.Password, form.password.data.encode('utf-8')):
+            user = User()
+            user.id = username
+            flask_login.login_user(user)
+            flash("User logged in", "success")
+            return redirect(redirect_url(url_for("index", next="index")))
+
+        flash("Failed to log in", "danger")
+        return redirect(redirect_url(url_for("login", next="index")))
+    return render_template("login.html", title="Login", form=form)\end{lstlisting}
+\end{minipage}
+
+%gets mushed with listing
+\bigskip
+{W warstwie prezentacji danych natomiast ciekawy problem wystąpił podczas 
+poprawy zabezpieczeń. Dodanie tokenu CSRF (Cross-site Request Forgery) pozbawiło
+ aplikację dostępu do bazy danych - sytuacja była o tyle ciekawa, że rozwiązanie 
+ problemu wymagało modyfikacji kodu w zupełnie innym miejscu niż zmiana, która go 
+spowodowała. Wstępna konfiguracja aplikacji zawiera instancję silnika, który 
+utrzymuje połączenie z bazą danych i obsługuje wszelkie zapytania, oraz dane 
+niezbędne do połączenia. Spójność modelu danych aplikacji zapewnia funkcja 
+zawarta w osobnym module models.py mapująca model bazy danych na obiekty 
+wykorzystywane dalej w logice. Po zabezpieczeniu sesji w ramach aplikacji 
+kluczem szyfrowania (token CSRF), funkcja ta utraciła dostęp do bazy ponieważ 
+nawiązywała połaczenia niezależnie więc były odrzucane. Rozwiązaniem okazał się 
+import obiektu app reprezentującego aplikację w pamięci we wskazanym module i 
+dodanie polecenia with app.context, które wykorzystuje już zestawioną sesję 
+aplikacji do wykonania kodu, co nie narusza dodanych reguł zabezpieczeń 
+połączenia. Problematyczny fragment modułu wraz z opisanymi zmianami 
+zaprezentowano na listingu \ref{lst:models-kontekstapplikacji}. Wprowadzenie 
+zabezpieczenia CSRF wymagało zmiany sposobu mapowania obiektów bazy danych na 
+obiekty aplikacji.}
+
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}[ caption={Fragment modułu models.py - kouminkacja z bazą z wykorzystaniem kontekstu aplikacji},
+        language=html,
+        deletekeywords={IDENTITY},
+        deletekeywords={[2]INT},
+        morekeywords={clustered},
+        framesep=8pt,
+        xleftmargin=40pt,
+        framexleftmargin=40pt,
+        frame=tb,
+        framerule=0pt,
+        label={lst:models-kontekstapplikacji}]
+from Resources import db, app
+#(...)
+with app.app_context():
+    Base = automap_base() 
+    Base.prepare(autoload_with=db.engine, reflect=True)
+    #Tables
+    Income=Base.classes.Income
+    Bills=Base.classes.Bills
+    ProductTypes=Base.classes.ProductTypes
+    #(...)\end{lstlisting}
+\end{minipage}
+
+
+%3.8. Przykładowy scenariusz wykorzystania systemu (4-10str)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/scenariusz/
+%efekty pracy, skoncentrować się na użytkowych aspektach rozwiązania
+%przedstawienie typowego wykorzystania systemu, krok po kroku z czytelnymi 
+%grafikami wybrać elementy najciekawsze, nietypowe, ważne, zrealizować przypadki
+%użycia Jeśli opisano w Koncepcji własnego rozwiązania lub opisie wymagań 
+%funkcjonalnych. Poglądowo, nie drobiazgowo ani nie samymi grafikami. 
+%rysunek/dwa +5-6 zdań
+\chapter{\customstylechapter{Przykładowy scenariusz wykorzystania systemu}}
+{Rozdział ten opisuje efekty pracy, ze szczególnym naciskiem na aspektach 
+użytkowych zrealizowanego rozwiązania. Jest to krótki opis przykładowej sesji 
+użytkownika aplikacji, w którym co ciekawsze fragmenty opatrzono zrzutami ekranu
+ prezentującymi omawianą funkcję aplikacji z punktu widzenia użytkownika.}
+
+\section{\customstylesection{Pierwszy kontakt z aplikacją}}
+{System Righten jest centralnie zarządzaną aplikacją przeglądarkową, dlatego też
+ podczas pierwszego kontaktu użytkownik ma wgląd jedynie do informacji zebranych
+ w górnym pasku menu pod opcją Righten oraz rejestracji. Do funkcji dostępnych 
+bez potrzeby logowania należą zaprezentowane na rysunku \ref{fig:usage_manual} 
+wszelkie elementy edukacyjne zawarte w aplikacji, które opisują podstawowe 
+pojęcia z dziedziny finansów, wplecione w instrukcję obsługi aplikacji. Dzięki 
+temu nawet osoba odwiedzająca witrynę gościnnie ma możliwość zyskać przydatną 
+wiedzę oraz zapoznać się z możliwościami aplikacji. Sekcja ta może być w 
+przyszłości dowolnie rozwijana i zmieniana tak, by dopasować się do potrzeb 
+rynku i użytkowników.}
+
+{Panel rejestracji dostępny pod przyciskiem register pozwala użytkownikowi 
+założyć konto w aplikacji. Przycisk ten widoczny jest na rysunku 
+\ref{fig:usage_manual} w prawym górnym rogu, który prowadzi do prostego 
+formularza do wprowadzenia podstawowych danych jak nazwa i hasło.}
+
+{Wszelkie pozostałe panele są niedostępne dla użytkowników niezalogowanych.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_usage_example_manual.png}
+    \caption{Budgeting to jeden z ekranów informacyjnych dostępnych bez logowania}
+    \label{fig:usage_manual}
+\end{figure}
+
+\section{\customstylesection{Wprowadzanie danych}}
+{Użytkownik posiadający konto w aplikacji może się zalogować z pomocą przycisku 
+login widocznym w prawym górnym rogu na rysunku \ref{fig:usage_data-management}.
+ Logowanie umożliwia wprowadzanie prywatnych danych do aplikacji za pomocą 
+paneli które zebranych w opcji Manage data w górnym pasku Menu.}
+
+{Jako że ważnym atutem aplikacji jest prostota interfejsu, większość paneli do 
+wprowadzania danych jest bardzo podobna. Z tego powodu jako przykład opisano 
+najbardziej rozbudowany i zależny od innych widok Expenditures w którym 
+użytkownik dodaje swoje wydatki. Przedstawia go rysunek 
+\ref{fig:usage_data-management}, na którym widać także efekt zaszytej w 
+formularzach walidacji danych, oraz wcześniej wprowadzone dane testowe. Aby móc 
+z niego skorzystać użytkownik musi najpierw zdefiniowanć typy produktów w panelu
+ Product Types, oraz produkty z nimi powiązane w panelu Products.}
+
+{Zakładka Settings widoczny na rysunku \ref{fig:usage_user-settings} pozwala 
+użytkownikowi zmienić swoje ustawienia. Wprowadzone wartości są następnie 
+wykorzystywane w części wizualizacji. Ponieważ pełni całkiem inną funkcję niż 
+pozostałe, znacznie różni się od nich wyglądem.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_usage_example_data-management.png}
+    \caption{Expenditures to jeden z ekranów wprowadzania danych}
+    \label{fig:usage_data-management}
+\end{figure}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_usage_example_user-settings.png}
+    \caption{Settings to ekran zarządzania ustawieniami użytkownika}
+    \label{fig:usage_user-settings}
+\end{figure}
+
+\section{\customstylesection{Analiza finansowa i wizualizacje}}
+{Celem aplikacji jest dostarczenie użytkownikom szczegółowych informacji o ich 
+sytuacji finansowej na podstawie wprowadzonych danych. Wszystkie panele 
+zawierające wizualizacje oraz statystyki dostępne są w górnym pasku menu pod 
+opcją Summaries. To w nich użytkownik uzyskuje wartościowy wgląd w swój budżet i
+ realizację celów finansowych.}
+
+{Każdy panel jest unikatowym zestawem wizualizacji, jako w miarę różnorodny 
+przykład obrano panel Finances widoczny na rysunku 
+\ref{fig:usage_visualization_finances}. Prezentuje on bilans wprowadzonych 
+wydatków, rachunków oraz przychodów w formie palety wykresów i podsumowania. 
+Pierwszy wykres obrazuje ilość pozostałych środków na koniec miesiąca wzbogacony
+ o linie Breakeven wskazującą kiedy stan jest ujemny, oraz Savings target która 
+prezentuje określony przez użytkownika w ustawieniach cel oszczędności. Pozwala 
+to już na pierwszy rzut oka ocenić stan finansów w wybranym okresie. Użytkownik 
+ma także wgląd w dane statystyczne za ostatni rok, jak: sumaryczna wartość 
+netto, średni przychód, średnie wydatki czy średni bilans miesięczny co w prosty
+ sposób informuje czy oszczędza czy może traci środki finansowe.}
+
+{Dostęp do takich danych zdecydowanie ułatwia zarządzanie funduszami, pomagają 
+one użytkownikowi podejmować decyzje jaki powinien być kolejny krok aby poprawić
+ swoją sytuację finansową lub osiągnąć wybrany przez siebie cel pokroju kupna 
+nowego samochodu czy wymarzone wakacje.}
+
+\begin{figure}[H]           %requires float package
+    \centering
+    \includegraphics[width=12cm]{figures/Righten_usage_example_visualization_finances.png}
+    \caption{Finances to jeden z paneli wizualizacji danych użytkownika}
+    \label{fig:usage_visualization_finances}
+\end{figure}
+
+%3.9. Zakończenie (1-2str, najlepiej 1,5str)
+% http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/zakonczenie/
+% Podsumowanie wyników pracy, potwierdzenie realizacji celu
+% Wady i zalety rozwiązania i możliwości jego rozwoju - nie dzielić na podpunkty
+% Komplementarne do wstępu - zarówno wstęp jak i zakończenie będą uważnie czytane
+% przez recenzenta 
+% -"Celem pracy było..."
+% -0,3-0,5str Opis właściwości funkcjonalnych zaproponowanego rozwiązania
+% -0,3-0,5str Przypomnienie technologii, narzędzi, bibliotek
+% - Negatywne i pozytywne spostrzeżenia z realizacji pracy - ciekawe, zaskakujące, trudności.
+%   Jak rozwiązanie sprawdza się w praktyce (wdrożone - opinie użytkowników, 
+% niewdrożone - czy i kiedy)
+% pochwalić co dobrze wyszło, nie ukrywać wad - wymienić je i opisać jak je poprawić.
+% - Opis kierunkó rozwoju funkcjonalnego i technologicznego
+\chapter{\customstylechapter{Zakończenie}}
+{Celem pracy było zaprojektowanie i realizacja modułu analitycznego aplikacji 
+ułatwiającej jej użytkownikom zarządzanie budżetem domowym poprzez dostarczenie
+narzędzia do analizy wpływów i wydatków, wizualizacji trendów oraz automatycznie 
+kategoryzującej wprowadzone dane.}
+
+{Przygotowane rozwiązanie spełnia powyższe założenia, jego pełen obecny kod 
+dostępny jest w publicznym repozytorium Git \cite{GITRighten} wraz z licencją 
+open source. Przyjęło formę aplikacji przeglądarkowej Righten skonteneryzowanej 
+na platformie Docker, napisanej w języku Python, wykorzystującej pakiety Flask 
+oraz Boootstrap. Dane przechowuje w bazie PostgreSQL o architekturze 
+współdzielonej bazy i schematu \cite{multitenant} ponieważ wstępnie założone 
+podejście shared database, separate schema okazało się zbyt skomplikowane, 
+podczas gdy zadowalający poziom zabezpieczeń osiągnięto separacją na poziomie 
+rekordu. Wykorzystuje także wiele bibliotek zewnętrznych jak jschart do 
+generowania wykresów, czy WTForms do obsługi danych wprowadzanych przez 
+użytkownika. Aplikacja jest w stanie obsługiwać wielu użytkowników jednocześnie,
+ oraz przechowywać ich dane we wspólnej bazie danych.}
+
+{Dzięki temu użytkownik może wprowadzić swoje dane finansowe jak zarobki, 
+wydatki, oszczędności czy progi wydatków, oszczędności i ustalać priorytety a 
+także w pełni zarządzać wszystkimi wymienionymi danymi. Aplikacja udostępnia 
+również przydatne wizualizacje które pozwalają użytkownikowi wyciągnąć wnioski 
+z wprowadzonych przez siebie danych. Dodatkowym atutem jest wbudowany poradnik 
+który wyjaśnia użytkownikom jak korzystać z aplikacji, a jednocześnie przekazuje
+ wiedzę z dziedziny finansów.}
+
+{Podczas testów użytkownika końcowego aplikację wypełniono rzeczywistymi danymi 
+z rachunków zgromadzonych z kilku miesięcy. wizualizacje w aplikacji 
+pomogły uwidocznić trendy w wydatkach, oraz kategorie i produkty które warto 
+pominąć podczas zakupów co w naturalny sposób skłania do oszczędności. Natomiast
+ główny problem stanowi wymóg wprowadzania danych pojedynczo co jest wskazówką 
+kierunku, w którym warto skupić się podczas rozwijania oprogramowania.}
+
+{Architektura aplikacji pozwala na w miarę łatwe rozszerzanie funkcji o kolejne 
+wizualizacje. W przyszłości można więc poszerzyć zakres dostępnych informacji 
+oraz wzbogacić o kolejne funkcje jak cele oszczędnościowe, które zaplanowano 
+jednak na chwilę obecną nie zostały zaimplementowane. W dłuższej perspektywie, 
+przy większych nakładach pracy możliwe jest także wyciąganie ogólnych trendów 
+statystycznych z danych wielu użytkowników co może posłużyć do większych analiz 
+ekonomicznych podobnych do badań prowadzonych przez Główny Urząd Statystyczny. 
+Tego typu dane mogą także posłużyć do wdrożenia mechanizmu gamifikacji (
+zwanej także grywalizacja) \cite{gamifikacja} przez porównanie danych 
+użytkowników do średniej i pozytywne wzmocnienie trendów wskazujących zdrowe 
+zarządzanie finansami poprzez zachęty i nagrody wewnątrz aplikacji.}
+
 % 3.10.Bibliografia
 \begin{thebibliography} {books}
+    %Books
     \bibitem{najbogatszyczlowiekwbabilonie} George S. Clason, (2021) Najbogatszy człowiek w Babilonie, ISBN: 978-83-67060-04-2
     \bibitem{finansowaforteca} Marcin Iwuć, (2020) Finansowa Forteca, ISBN: 978-83-958468-0-9
+    \bibitem{budzetdomowypodkontrola} Krzysztof Piotr Łabenda, (2011) Budżet domowy pod kontrolą. Jak rozsądnie wydawać, oszczędzać i inwestować pieniądze, ISBN: 978-83-246-3626-6
+    \bibitem{wzorceprojektowe} Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides, (2010) Wzorce projektowe. Elementy oprogramowania obiektowego wielokrotnego użytku 
+
+    %Network resources
+    \bibitem{pythonautomate} Al Sweigart, Automate the Boring Stuff with Python \raggedright\url{
+        https://automatetheboringstuff.com/#toc}
     \bibitem{wiki_ekonomia} Wikipedia, Nauki Ekonomiczne \raggedright\url{
         https://pl.wikipedia.org/wiki/Nauki_ekonomiczne}
+    \bibitem{zapaśćekonomiczna} Wikipedia, Economic collapse \raggedright\url{
+        https://en.wikipedia.org/wiki/Economic_collapse}
     \bibitem{gussytuacjabudzetowa} Główny Urząd Statystyczny, Budżety gospodarstw domowych w 2022 roku \raggedright\url{
         https://stat.gov.pl/obszary-tematyczne/warunki-zycia/dochody-wydatki-i-warunki-zycia-ludnosci/budzety-gospodarstw-domowych-w-2022-roku,9,21.html}
-    \bibitem{o24_budzetowanie} Opcje24, Budzetowanie \raggedright\url{
-        https://www.opcje24h.pl/budzetowanie-przewodnik-planowanie-budzetu/}
-    \bibitem{MOSCOW} Product Plan, MOSCOW Prioritetization \raggedright\url{
-        https://www.productplan.com/glossary/moscow-prioritization/}
-    \bibitem{MatrycaEisenhowera}Praca.pl, Matryca Eisenhowera - czym jest, zasada, prioryteryzacja zadań \raggedright\url{
-        https://www.praca.pl/poradniki/rynek-pracy/matryca-eisenhowera-czym-jest,zasada,prioryteryzacja-zadan_pr-2012.html}
-    \bibitem{MVP} Wikipedia, Minimal Viable Product \raggedright\url{
-        https://en.wikipedia.org/wiki/Minimum_viable_product}
-    \bibitem{ISO 8601} NASA.gov, A summary of the international standard date and time notation \raggedright\url{
-        https://fits.gsfc.nasa.gov/iso-time.html}
-    \bibitem{CSV} Y. Shafranovich, SolidMatrix Technologies, Inc., Common Format and MIME Type for Comma-Separated Values (CSV) Files \raggedright\url{
-        https://www.rfc-editor.org/rfc/rfc4180}
-    \bibitem{SQLite} sqlite.org, SQLite \raggedright\url{
-        https://www.sqlite.org/index.html}
-    \bibitem{SQL} wikipedia.org, SQL - Structured Query Language \raggedright\url{
-        https://en.wikipedia.org/wiki/SQL}
-    \bibitem{Python} python.org, Python \raggedright\url{
-        https://www.python.org/}
-    \bibitem{JSON} json.org, Introducing JSON \raggedright\url{
-        https://www.json.org/json-en.html}
-    \bibitem{Python_read-file} pythonspot.com, Python tutorials, How to Read a File in Python \raggedright\url{
-        https://pythonspot.com/read-file/}
-    \bibitem{Trello} Atlassian, Trello.com \raggedright\url{
-        https://trello.com/}
-    \bibitem{StarUML} MKLabs Co.,Ltd, StarUML \raggedright\url{
-        https://staruml.io/}
-    \bibitem{LaTeX} The LaTeX Project \raggedright\url{
-        https://www.latex-project.org/}
-    \bibitem{VSCode} Microsoft, Visual Studio Code \raggedright\url{
-        https://code.visualstudio.com/}
-    \bibitem{DataGrid} JetBrains, DataGrid \raggedright\url{
-        https://www.jetbrains.com/datagrip/}
-    \bibitem{Kanban} Lean Action Plan, Kanban – układ nerwowy sterowania produkcją w koncepcji Lean Manufacturing \raggedright\url{
-        https://leanactionplan.pl/kanban/}
-    \bibitem{LEAN} Wikipedia, Lean software development \raggedright\url{
-        https://pl.wikipedia.org/wiki/Lean_software_development}
-    \bibitem{GIT} git-scm.com, git \raggedright\url{
-        https://git-scm.com/}
-    \bibitem{GitHub} https://github.com/ \raggedright\url{
-        https://github.com/}
-    \bibitem{Model Przyrostowy} Wikipedia, Model Przyrostowy \raggedright\url{
-        https://pl.wikipedia.org/wiki/Model_przyrostowy}
-    \bibitem{EdittableTable} YouTube The CS Classroom, PySimpleGUI - Excel-style Editable Table \raggedright\url{
-        https://www.youtube.com/watch?v=ETHtvd-_FJg}
-    \bibitem{GITBudgeterApp} github.com MarcinNowak94, DatabaseShenanigans \raggedright\url{
-        https://github.com/MarcinNowak94/DatabaseShenanigans}
-    \bibitem{GITBudgeterDoc} github.com MarcinNowak94, budgeter \raggedright\url{
-        https://github.com/MarcinNowak94/budgeter}
-    \bibitem{GITRighten} github.com MarcinNowak94, Righten \raggedright\url{
-        https://github.com/MarcinNowak94/Righten}
-    \bibitem{Bootstrap} getbootstrap.com, Bootstrap \raggedright\url{
-        https://getbootstrap.com/}
-    \bibitem{Flask} flask.palletsprojects.com, Flask \raggedright\url{
-        https://flask.palletsprojects.com/en/3.0.x/}
-    \bibitem{WTForms} wtforms.readthedocs.io, WTForms \raggedright\url{
-        https://wtforms.readthedocs.io/en/3.1.x/}
-    \bibitem{jinja} jinja.palletsprojects.com, Jinja \raggedright\url{
-        https://jinja.palletsprojects.com/en/3.1.x/}
-    \bibitem{chart.js} www.chartjs.org, Chart.js \raggedright\url{
-        https://www.chartjs.org/}
     \bibitem{edukacjafinansowawszkołach} Łukasz Grygiel, Jak wygląda edukacja finansowa dzieci i młodzieży w Polsce? \raggedright\url{
         https://web.archive.org/web/20230529115945/https://lukaszgrygiel.com/edukacja-finansowa-dzieci-i-mlodziezy/}
     \bibitem{edukacjafinansowamlodziezy} Bank Pekao, Raport Banku Pekao: „Dziecięcy świat finansów - jak rynek finansowy odpowiada na potrzeby najmłodszych klientów”. \raggedright\url{
         https://www.pekao.com.pl/o-banku/aktualnosci/d4e423aa-0ba4-4bde-8a0a-7ff3a17a9793/raport-banku-pekao-dzieciecy-swiat-finansow-jak-rynek-finansowy-odpowiada-na-potrzeby-najmodszych-klientow.html}
     \bibitem{portfelpolakawpandemii} Krajowy Rejestr Długów, Portfel statystycznego Polaka w pandemii \raggedright\url{
         https://krd.pl/centrum-prasowe/raporty/2022/portfel-statystycznego-polaka-w-pandemii}
-    \bibitem{budget} The Balance, Understanding Budgeting \& Personal Finance\raggedright\url{
-        https://www.thebalancemoney.com/personal-finance-budget-4802696}
-    \bibitem{mintbudget} www.mint.intuit.com, Budgeting 101 \raggedright\url{
-        https://mint.intuit.com/blog/category/budgeting/}
-    \bibitem{mint} Inuit inc., Mint \raggedright\url{
-        https://mint.intuit.com/}
-    \bibitem{goodbudget} Dayspring Partners, Goodbudget \raggedright\url{
-        https://goodbudget.com/}
     \bibitem{koszty2010-22} Warsaw Enterprise Institute, [RAPORT] Żegnajcie niskie ceny? Koszty życia i poziom cen w Polsce na tle krajów UE w latach 2010–2022 \raggedright\url{
         https://wei.org.pl/2022/aktualnosci/wiktorwojciechowski/raport-zegnajcie-niskie-ceny-koszty-zycia-i-poziom-cen-w-polsce-na-tle-krajow-ue-w-latach-2010-2022/}
     \bibitem{weiinflacja} Warsaw Enterprise Institute, [RAPORT] Jak inflacja zubaża Polaków? \raggedright\url{
         https://wei.org.pl/2023/publikacje/raporty/mateusz-benedyk/raport-jak-inflacja-zubaza-polakow/}
+    \bibitem{o24_budzetowanie} Opcje24, Budzetowanie \raggedright\url{
+        https://www.opcje24h.pl/budzetowanie-przewodnik-planowanie-budzetu/}
+    \bibitem{iwućbudżet} /marciniwuc.com, Budżet domowy krok po kroku \raggedright\url{
+        https://marciniwuc.com/budzet-domowy-krok-po-kroku/}
     \bibitem{ingbudżet} ING Bank Śląski, Jak zapanować nad budżetem domowym? \raggedright\url{
         https://spolecznosc.ing.pl/-/Blog/Jak-zapanowa\%C4\%87-nad-bud\%C5\%BCetem-domowym/ba-p/3968}
+    \bibitem{budget} The Balance, Understanding Budgeting \& Personal Finance\raggedright\url{
+        https://www.thebalancemoney.com/personal-finance-budget-4802696}
+    \bibitem{mintbudget} www.mint.intuit.com, Budgeting 101 \raggedright\url{
+        https://mint.intuit.com/blog/category/budgeting/}
+    \bibitem{pozytywnewzmocnienie} Simply Scholar, Ltd., Positive Reinforcement: What Is It and How Does It Work? \raggedright\url{
+        https://www.simplypsychology.org/positive-reinforcement.html}
+        \bibitem{gamifikacja} Westhill Consulting, Gamifikacja – jak mechanizmy ze świata gier wspierają menedżerów i pracowników? \raggedright\url{
+            https://www.westhill.pl/gamifikacja/}
+    \bibitem{multitenant} Frederick Chong, Gianpaolo Carraro, and Roger Wolter, Microsoft Corporation, Multi‐Tenant Data Architecture \raggedright\url{
+        https://ramblingsofraju.com/wp-content/uploads/2016/08/Multi-Tenant-Data-Architecture.pdf}
+
+    %Evaluated solutions
+    \bibitem{santandercentrum24} Santander, Centrum24.pl \raggedright\url{
+        https://www.centrum24.pl/}
+    \bibitem{mint} Inuit inc., Mint \raggedright\url{
+        https://mint.intuit.com/}
+    \bibitem{mintrecenzja} Ryan McGregor, Mint Budgeting App: How to Setup and Use a Budget (BEST WAY) \raggedright\url{
+        https://www.youtube.com/watch?v=rQ_5v3BUBqQ}
+    \bibitem{mintwycofanie} theverge.com, Mint is shutting down, and it’s pushing users toward Credit Karma \raggedright\url{
+        https://mint.intuit.com/blog/mint-app-news/intuit-credit-karma-welcomes-minters/}
+    \bibitem{goodbudget} Dayspring Partners, Goodbudget \raggedright\url{
+        https://goodbudget.com/}
+    \bibitem{porownanieaplikacji1} https://www.cnbc.com/select/best-free-budgeting-tools/ \raggedright\url{
+        https://www.cnbc.com/select/best-free-budgeting-tools}
+    \bibitem{porownanieaplikacji2} https://www.forbes.com/advisor/banking/best-budgeting-apps/ \raggedright\url{
+        https://www.forbes.com/advisor/banking/best-budgeting-apps/}
+    \bibitem{porownanieaplikacji3} https://www.tomsguide.com/best-picks/best-budgeting-apps \raggedright\url{
+        https://www.tomsguide.com/best-picks/best-budgeting-apps}
+    \bibitem{porownanieaplikacji4} https://www.investopedia.com/best-budgeting-apps-5085405 \raggedright\url{
+        https://www.investopedia.com/best-budgeting-apps-5085405}
+    \bibitem{porownanieaplikacji5} https://www.nerdwallet.com/article/finance/best-budget-apps \raggedright\url{
+        https://www.nerdwallet.com/article/finance/best-budget-apps}
+    \bibitem{tiller} Tiller Inc., Tiller \raggedright\url{
+        https://www.tillerhq.com/}
+
+    %Metodologies
+    \bibitem{MOSCOW} Product Plan, MOSCOW Prioritetization \raggedright\url{
+        https://www.productplan.com/glossary/moscow-prioritization/}
+    \bibitem{MatrycaEisenhowera}Praca.pl, Matryca Eisenhowera - czym jest, zasada, prioryteryzacja zadań \raggedright\url{
+        https://www.praca.pl/poradniki/rynek-pracy/matryca-eisenhowera-czym-jest,zasada,prioryteryzacja-zadan_pr-2012.html}
+    \bibitem{MVP} Wikipedia, Minimal Viable Product \raggedright\url{
+        https://en.wikipedia.org/wiki/Minimum_viable_product}
+    \bibitem{Kanban} Lean Action Plan, Kanban – układ nerwowy sterowania produkcją w koncepcji Lean Manufacturing \raggedright\url{
+        https://leanactionplan.pl/kanban/}
+    \bibitem{LEAN} Wikipedia, Lean software development \raggedright\url{
+        https://pl.wikipedia.org/wiki/Lean_software_development}
+    \bibitem{Model Przyrostowy} Wikipedia, Model Przyrostowy \raggedright\url{
+        https://pl.wikipedia.org/wiki/Model_przyrostowy}
+    
+    %Standards
+    \bibitem{ISO 8601} NASA.gov, A summary of the international standard date and time notation \raggedright\url{
+        https://fits.gsfc.nasa.gov/iso-time.html}
+    \bibitem{CSV} Y. Shafranovich, SolidMatrix Technologies, Inc., Common Format and MIME Type for Comma-Separated Values (CSV) Files \raggedright\url{
+        https://www.rfc-editor.org/rfc/rfc4180}
+    \bibitem{JSON} json.org, Introducing JSON \raggedright\url{
+        https://www.json.org/json-en.html}
+    \bibitem{refleksja} Uniwersytet w Białymstoku Wydział Informatyki Justyna Korycińska, Programowanie refleksyjne \raggedright\url{
+        http://ii.uwb.edu.pl/rudnicki/wp-content/uploads/2016/02/P25.pdf}
+    \bibitem{CSRF} OWASP foundation, Cross-Site Request Forgery Prevention Cheat Sheet \raggedright\url{
+        https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html}
         
+    %Tools and technologies
+    \bibitem{SQLite} sqlite.org, SQLite \raggedright\url{
+        https://www.sqlite.org/index.html}
+    \bibitem{DBBrowser} sqlitebrowser.org, DB Browser for SQLite \raggedright\url{
+        https://sqlitebrowser.org}
+    \bibitem{SQL} wikipedia.org, SQL - Structured Query Language \raggedright\url{
+        https://en.wikipedia.org/wiki/SQL}
+    \bibitem{PostgreSQL} postgresql.org, PostgreSQL \raggedright\url{
+        https://www.postgresql.org/}
+    \bibitem{pgAdmin} pgadmin.org, pgAdmin \raggedright\url{
+        https://www.pgadmin.org/}
+    \bibitem{Docker} docker.com, Docker \raggedright\url{
+        https://www.docker.com/}
+    \bibitem{Python} python.org, Python \raggedright\url{
+        https://www.python.org/}
+    \bibitem{Trello} Atlassian, Trello.com \raggedright\url{
+        https://trello.com/}
+    \bibitem{StarUML} MKLabs Co.,Ltd, StarUML \raggedright\url{
+        https://staruml.io/}
+    \bibitem{LaTeX} The LaTeX Project \raggedright\url{
+        https://www.latex-project.org/}
+    \bibitem{googledocs} Google Docs \raggedright\url{
+        https://docs.google.com/}
+        
+    %Database visualization tool used for Budgeter - used DBSchema for Righten
+    %\bibitem{DataGrip} JetBrains, DataGrip \raggedright\url{
+    %    https://www.jetbrains.com/datagrip/}
+    \bibitem{VSCode} Microsoft, Visual Studio Code \raggedright\url{
+        https://code.visualstudio.com/}
+    \bibitem{GIT} git-scm.com, git \raggedright\url{
+        https://git-scm.com/}
+    \bibitem{GitHub} https://github.com/ \raggedright\url{
+        https://github.com/}
+    \bibitem{GITBudgeterApp} github.com MarcinNowak94, DatabaseShenanigans \raggedright\url{
+        https://github.com/MarcinNowak94/DatabaseShenanigans}
+    \bibitem{GITBudgeterDoc} github.com MarcinNowak94, budgeter \raggedright\url{
+        https://github.com/MarcinNowak94/budgeter}
+    \bibitem{GITRighten} github.com MarcinNowak94, Righten \raggedright\url{
+        https://github.com/MarcinNowak94/Righten}
+    \bibitem{JavaScript} Mozilla, JavaScript \raggedright\url{
+        https://developer.mozilla.org/en-US/docs/Web/javascript}
+    \bibitem{Bootstrap} getbootstrap.com, Bootstrap \raggedright\url{
+        https://getbootstrap.com/}
+    \bibitem{Django} Django Software Foundation, Django \raggedright\url{
+        https://www.djangoproject.com/}
+    \bibitem{Flask} flask.palletsprojects.com, Flask \raggedright\url{
+        https://flask.palletsprojects.com/en/3.0.x/}
+    \bibitem{Flask-Login} https://pypi.org/project/Flask-Login/, Flask-Login \raggedright\url{
+        https://pypi.org/project/Flask-Login/}
+    \bibitem{WTForms} wtforms.readthedocs.io, WTForms \raggedright\url{
+        https://wtforms.readthedocs.io/en/3.1.x/}
+    \bibitem{jinja} jinja.palletsprojects.com, Jinja \raggedright\url{
+        https://jinja.palletsprojects.com/en/3.1.x/}
+    \bibitem{chart.js} www.chartjs.org, Chart.js \raggedright\url{
+        https://www.chartjs.org/}
 \end{thebibliography}
 
 % 3.11.Spis rysunków
@@ -516,6 +2705,95 @@ ręczna kategoryzacja, [ręczny?] import danych,}
 \listoftables
 \lstlistoflistings
 
+% 3.13.Ewentualne załączniki
+\newpage\null
+
+\newpage
+% https://www.wsti.pl/dla-studenta/ukonczenie-studiow/informatyka/zasady-skladania-prac-dyplomowych/
+% requirement 1: Oświadczenie o tym, że przedłożona praca została przygotowana samodzielnie
+\begin{flushright}
+    {Katowice, dnia ........................}
+\end{flushright}
+
+\smallskip
+
+\begin{flushleft}
+    {Imię, nazwisko: Nowak Marcin}\\
+    {Kierunek:       Informatyka}\\
+    {NR Albumu:      08255}\\
+\end{flushleft}
+
+
+\medskip
+\begin{center}
+    \begin{onehalfspace}
+        \textsc{\LARGE{OŚWIADCZENIE}}\\
+    \end{onehalfspace}
+\end{center}
+\medskip
+
+
+{Oświadczam, że przedłożoną inżynierską pracę dyplomową wykonaną w Wyższej 
+Szkole Technologii Informatycznych w Katowicach na kierunku Informatyka 
+opracowała(e)m samodzielnie i nienaruszyła(e)m praw autorskich innych osób, 
+które chronione są przepisami ustawy z dnia 4 lutego 1994 roku o prawie 
+autorskim i prawach pokrewnych. Jednocześnie oświadczam, że przedłożona praca 
+nie była nigdzie wcześniej publikowana i oceniana.}
+
+
+
+\bigskip
+\bigskip
+\begin{flushright}
+    {Podpis studenta}
+\end{flushright}
+
+\newpage\null
+
+\newpage
+% https://www.wsti.pl/dla-studenta/ukonczenie-studiow/informatyka/zasady-skladania-prac-dyplomowych/
+% requirement 2: oświadczenie, że treść zawarta na załączonym pendrive jest identyczna z egzemplarzem wydrukowanym
+\begin{flushright}
+    {Katowice, dnia ........................}
+\end{flushright}
+
+\smallskip
+
+\begin{flushleft}
+    {Imię, nazwisko: Nowak Marcin}\\
+    {Kierunek:       Informatyka}\\
+    {NR Albumu:      08255}\\
+\end{flushleft}
+
+
+\medskip
+\begin{center}
+    \begin{onehalfspace}
+        \textsc{\LARGE{OŚWIADCZENIE}}\\
+    \end{onehalfspace}
+\end{center}
+\medskip
+
+{Oświadczam, że praca inżynierska p.t.:}\\
+\begin{center}
+\textbf{Projekt i implementacja aplikacji wspomagającej zarządzanie budżetem domowym}\\
+\end{center}
+{zapisana na załączonym nośniku elektronicznym, jest zgodna z treścią zawartą w 
+wydrukowanej wersji pracy przedstawionej do oceny.}
+
+{Oświadczam, że przedłożona praca dyplomowa jest zatwierdzona 
+przez promotora.}
+
+
+
+\bigskip
+\bigskip
+\begin{flushright}
+    {Podpis studenta}
+\end{flushright}
+
+
+\end{large}
 \end{document}
 
 % Phase 2: Bachelors thesis ----------------------------------------------------
@@ -527,9 +2805,8 @@ ręczna kategoryzacja, [ręczny?] import danych,}
 % http://siminskionline.pl/seminarium-inzynierskie/struktura-pracy-inzynierskiej/
 % 3.1. Wstęp <-[sections moved here: Motywacja, cel i plan działania]
 % 3.2. Charakterystyka/analiza problemu
+% 3.3. Analiza istniejących rozwiązań
+% 3.4. Koncepcja własnego rozwiązania (2-5 stron)
 % 3.10.Bibliografia
 % 3.11.Spis rysunków
 % 3.12.Spis tabel
-
-
-%#TODO: rate this feature

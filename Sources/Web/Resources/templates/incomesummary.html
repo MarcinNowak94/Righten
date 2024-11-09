@@ -1,0 +1,133 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="IncomeOverTime"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="IncomeTypesOverTime"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <div class="card card-style mb-2">
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative;">
+                        <canvas id="IncomeSummary"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-10, col-sm-6">
+            <H3>Income Summary</H3>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Source</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Times</th>
+                        <th scope="col">First</th>
+                        <th scope="col">Last</th>
+                        <th scope="col">Duration (days)</th>
+                        <th scope="col">Minimum</th>
+                        <th scope="col">Average</th>
+                        <th scope="col">Maximum</th>
+                        <th scope="col">Common</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in Summary %}
+                            <tr>
+                                <td>{{entry.Source}}</td>
+                                <td>{{entry.Type}}</td>
+                                <td>{{entry.Amount}}</td>
+                                <td>{{entry.Times}}</td>
+                                <td>{{entry.First}}</td>
+                                <td>{{entry.Last}}</td>
+                                <td>{{entry.Duration}}</td>
+                                <td>{{entry.Minimum}}</td>
+                                <td>{{entry.Average}}</td>
+                                <td>{{entry.Maximum}}</td>
+                                <td>{{entry.Common}}</td>
+                            </tr>
+                    {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    {% block javascript %}
+    <script>
+        let IncomeTypechart = JSON.parse({{ IncomeTypechart | tojson }})
+        let MonthlyIncome = JSON.parse({{ MonthlyIncome | tojson }})
+        let IncomeTypesByTimeDataset = JSON.parse({{ IncomeTypesByTimeDataset | tojson }})
+
+        let IncomeSummarychart = new Chart(document.getElementById("IncomeSummary"), {
+                type: 'pie',
+                data: IncomeTypechart,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Income summary"
+                        }
+                    }
+                }
+            })
+
+        let IncomeOverTime = new Chart(document.getElementById("IncomeOverTime"), {
+            type: "line",
+            data: {
+                datasets: [{
+                    label: "Income",
+                    data: MonthlyIncome,
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Income over time"
+                    }
+                }
+            }
+        })
+
+        let IncomeTypesOverTime = new Chart(document.getElementById("IncomeTypesOverTime"), {
+            type: "line",
+            data: {
+                datasets: IncomeTypesByTimeDataset
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Income types over time"
+                    }
+                }
+            }
+        })
+
+    </script>
+    {% endblock %}
+{% endblock %}
