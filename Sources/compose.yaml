@@ -23,9 +23,9 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER:      postgres # The PostgreSQL user (useful to connect to the database)
-      POSTGRES_PASSWORD:  postgres # The PostgreSQL password (useful to connect to the database)
-      POSTGRES_DB:        RightenDB # The PostgreSQL default database (automatically created at first launch
+      POSTGRES_USER:      ${POSTGRES_USER}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASS}
+      POSTGRES_DB:        ${POSTGRES_DB} # Default database name (automatically created at first launch)
     #Share catalog with container to persist data
     volumes:
       - ./Database/RightenDB/:/var/lib/postgresql/data/
@@ -37,9 +37,8 @@ services:
     container_name:       pgadmin4_container
     restart:              always
     environment:
-      #Cardinal sin #1: Thou shall not devulge your password. Done for sake of clarity
-      PGADMIN_DEFAULT_EMAIL: admin@righten.com
-      PGADMIN_DEFAULT_PASSWORD: testpass
+      PGADMIN_DEFAULT_EMAIL:    ${PG_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASS}
     ports:
       - "80:80"
     #Persistent server configuration
