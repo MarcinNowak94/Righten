@@ -36,7 +36,7 @@ def get_request_data() -> json:
         "sourceport": request.environ["REMOTE_PORT"],
         "method": request.method,
         "server": request.server,
-        "ful_path": request.full_path                    
+        "fullpath": request.full_path                    
     }
 
 def get_current_user_ID() -> str:
@@ -298,6 +298,7 @@ def createpiechartdataset(
     for label, value in data:
         if addperc is True:
             # Some datasets contain negative values
+            # FIXME: Crashes when there is no data in Type field
             label+=" "+str(round((abs(value)/total)*100))+"%"
         labels.append(label)
         values.append(value)
@@ -317,7 +318,7 @@ def redirect_url(default='index') -> str:
     1. 'next' argument in request
     2. referrer
     3. provided site
-    4. default site - index    
+    4. default site - index
     As per https://stackoverflow.com/questions/14277067/redirect-back-in-flask
     """
     return request.args.get('next') or \
@@ -389,6 +390,8 @@ def login():
                 errors["User is active"]=False
             if not check_password(usr, form.password.data):
                 errors["Password is valid"]=False
+            if get_current_user_ID() is not None:
+                errors["User already logged in during session"]=False
 
         if not errors:
             user = User()
@@ -679,23 +682,47 @@ def passwordchange():
 
 # Summaries and visualizations -------------------------------------------------
 
-@app.route("/incomesummary")
+@app.route("/incomesummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def incomesummary():
-    IncomeSummarydata = db.session.query(IncomeSummaryByType.columns.Type,
-                                         IncomeSummaryByType.columns.Amount).\
-                                filter_by(UserID=current_user.uuid).all()
+    form=MonthRange()
+    minmonth=db.session.query(MonthlyIncome.columns.Month).\
+                        order_by(MonthlyIncome.columns.Month.asc()).\
+                                filter_by(UserID=current_user.uuid).first()[0]
+    maxmonth=db.session.query(MonthlyIncome.columns.Month).\
+                        order_by(MonthlyIncome.columns.Month.desc()).\
+                                filter_by(UserID=current_user.uuid).first()[0]
+
+    #TODO: Change to months
+    if request.method == "POST" and form.validate_on_submit():
+        minmonth = form.minmonth.data
+        maxmonth = form.maxmonth.data
+    
+    IncomeSummarydata = db.session.query(MonthlyIncomeByType.columns.Type,
+                                         func.sum(MonthlyIncomeByType.columns.Amount)).\
+                                filter_by(UserID=current_user.uuid).\
+                                filter(MonthlyIncomeByType.columns.Month>=minmonth,
+                                        MonthlyIncomeByType.columns.Month<=maxmonth).\
+                                order_by(MonthlyIncomeByType.columns.Amount.desc()).\
+                                group_by(MonthlyIncomeByType.columns.Type).\
+                                all()
     summary = db.session.query(IncomeSummary).\
                                 filter_by(UserID=current_user.uuid).all()
     IncomeOverTime = db.session.query(
                                     MonthlyIncome.columns.Month,
-                                    MonthlyIncome.columns.Amount).\
-                                filter_by(UserID=current_user.uuid).all()
+                                    MonthlyIncome.coflumns.Amount).\
+                                filter_by(UserID=current_user.uuid).\
+                                filter(MonthlyIncome.columns.Month>=minmonth,
+                                        MonthlyIncome.columns.Month<=maxmonth).\
+                                all()
     IncomeTypesByTime = db.session.query(
                                 MonthlyIncomeByType.columns.Month,
                                 MonthlyIncomeByType.columns.Amount,
                                 MonthlyIncomeByType.columns.Type).\
-                                filter_by(UserID=current_user.uuid).all()
+                                filter_by(UserID=current_user.uuid).\
+                                filter(MonthlyIncomeByType.columns.Month>=minmonth,
+                                        MonthlyIncomeByType.columns.Month<=maxmonth).\
+                                all()
     
     IncomeTypechart=createpiechartdataset(IncomeSummarydata, addperc=True)
     IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
@@ -710,7 +737,8 @@ def incomesummary():
                            IncomeTypechart=json.dumps(IncomeTypechart, cls=DecimalEncoder),
                            MonthlyIncome=json.dumps(monthlyincomedata, cls=DecimalEncoder),
                            IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset, cls=DecimalEncoder),
-                           Summary=summary
+                           Summary=summary,
+                           form=form
                            )
 
 @app.route("/billssummary")
@@ -721,8 +749,8 @@ def billssummary():
     bills_types = db.session.query(BillsSummary.columns.Medium,
                                            BillsSummary.columns.Amount).\
                                             filter_by(UserID=current_user.uuid).\
-                                            order_by(BillsSummary.columns.Amount.desc())\
-                                                .all()
+                                            order_by(BillsSummary.columns.Amount.desc()).\
+                                            all()
     monthly_bills = db.session.query(MonthlyBills.columns.Month,
                                           MonthlyBills.columns.Amount).\
                                 filter_by(UserID=current_user.uuid).all()

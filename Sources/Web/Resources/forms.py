@@ -16,6 +16,45 @@ def user_valid(form, field):
     if usr is None:
         raise ValidationError("User %s is not valid!"%(field.data))
 
+# Based on validators.py EqualTo
+class BiggerThan:
+    """
+    Compares the values of two fields.
+
+    :param fieldname:
+        The name of the other field to compare to.
+    :param message:
+        Error message to raise in case of a validation error. Can be
+        interpolated with `%(other_label)s` and `%(other_name)s` to provide a
+        more helpful error.
+    """
+
+    def __init__(self, fieldname, message=None):
+        self.fieldname = fieldname
+        self.message = message
+
+    def __call__(self, form, field):
+        try:
+            other = form[self.fieldname]
+        except KeyError as exc:
+            raise ValidationError(
+                field.gettext("Invalid field name '%s'.") % self.fieldname
+            ) from exc
+        if field.data > other.data:
+            return
+
+        d = {
+            "other_label": hasattr(other, "label")
+            and other.label.text
+            or self.fieldname,
+            "other_name": self.fieldname,
+        }
+        message = self.message
+        if message is None:
+            message = field.gettext("Field must be bigger than %(other_name)s.")
+
+        raise ValidationError(message % d)
+
 def get_PasswordField_protytpe(
         label: str, 
         placeholder: str,
@@ -325,6 +364,84 @@ class PasswordResetGenerateTokenForm(FlaskForm):
         )
     submit = SubmitField("Submit")
 
+# FIXME: filter dates by UserID
+class MonthRange_WIP(FlaskForm):
+    """Month range for summaries
+
+    Arguments:
+        :FlaskForm: -- base class
+    """
+
+    with app.app_context():
+        db_months = db.session.query(MonthlyExpendituresbyType.columns.Month).\
+                                    order_by(MonthlyExpendituresbyType.columns.Month).\
+                                    distinct()
+                                        #filter_by(UserID=current_user.uuid)
+        monthsoptions=[]
+        first_month=str(db_months[0][0])
+        last_month=str(db_months[db_months.count()-1][0])
+        for Month in db_months:
+            monthsoptions.append(str(Month[0]))
+    minmonth = SelectField("Min month", validators=[DataRequired()],
+                    choices = monthsoptions,
+                    default = last_month)
+    maxmonth = SelectField("Max month", validators=[DataRequired(),
+                                    BiggerThan(fieldname = "minmonth")],
+                    choices = monthsoptions,
+                    default = last_month)
+
+class MonthRange(FlaskForm):
+    """Month range for summaries
+
+    Arguments:
+        :FlaskForm: -- base class
+    """
+
+    minmonth = StringField("Start date", 
+                        validators=[
+                            DataRequired(),
+                            Regexp("((?:19|20)\\d\\d)-(0?[1-9]|1[012])", 
+                                message="Date must be in format: YYYY-MM")
+                            ],
+                        # TODO: Get default via argument or initialize properly
+                        default=str(date.today().isoformat())[:7]) 
+    maxmonth = StringField("End date", 
+                        validators=[
+                            DataRequired(),
+                            Regexp("((?:19|20)\\d\\d)-(0?[1-9]|1[012])", 
+                                message="Date must be in format: YYYY-MM"),
+                            BiggerThan(fieldname = "minmonth")
+                            ],
+                        # TODO: Get default via argument or initialize properly
+                        default=str(date.today().isoformat())[:7])
+    submit=SubmitField("Submit")
+
+class DateRange(FlaskForm):
+    """Date range for summaries
+
+    Arguments:
+        :FlaskForm: -- base class
+    """
+
+    mindate = StringField("Start date", 
+                        validators=[
+                            DataRequired(),
+                            Regexp("((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])", 
+                                message="Date must be in format: YYYY-MM-DD")
+                            ],
+                        # TODO: Get default via argument or initialize properly
+                        default=date.today().isoformat()) 
+    maxdate = StringField("End date", 
+                        validators=[
+                            DataRequired(),
+                            Regexp("((?:19|20)\\d\\d)-(0?[1-9]|1[012])-([12][0-9]|3[01]|0?[1-9])", 
+                                message="Date must be in format: YYYY-MM-DD"),
+                            BiggerThan(fieldname = "mindate")
+                            ],
+                        # TODO: Get default via argument
+                        default=date.today().isoformat())
+    submit=SubmitField("Submit")
+
 # FIXME: filter products by UserID
 class ProductVisualizationForm(FlaskForm):
     """Product summary visualization form, decides which products data are 
@@ -417,11 +534,11 @@ class MonthInputForm(FlaskForm):
                                     order_by(MonthlyExpendituresbyType.columns.Month).\
                                     distinct()
                                         #filter_by(UserID=current_user.uuid)
-        last_month = "2024-09" #TODO: FIX
         monthsoptions=[]
+        last_month=str(db_months[db_months.count()-1][0])
         for Month in db_months:
             monthsoptions.append(str(Month[0]))
     months = SelectField("Month", validators=[DataRequired()],
                     choices = monthsoptions,
-                    default = last_month)                   
+                    default = last_month)
     submit = SubmitField("Submit")

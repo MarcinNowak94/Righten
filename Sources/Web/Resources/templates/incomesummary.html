@@ -3,6 +3,48 @@
 {% block content %}
 <div class="container">
     <div class="row">
+        <form action="" method="POST">
+            {{ form.csrf_token() }}
+            <fieldset class="form-group">
+                <legend class="mb-4">Data time range</legend>
+                <div class="row form-group">
+                    <div class="col form-group">
+                        {{ form.minmonth.label(class="form-control-label") }}
+                        {% if form.minmonth.errors %}
+                            {{ form.minmonth(class="form-control form-control-sm is-invalid") }}
+                            {% for error in form.minmonth.errors %}
+                                <div class="invalid-feedback">
+                                    <span>{{error}}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ form.minmonth(class="form-control form-control-sm") }}
+                        {% endif %}
+                    </div>
+                    <div class="col form-group">
+                        {{ form.maxmonth.label(class="form-control-label") }}
+                        {% if form.maxmonth.errors %}
+                            {{ form.maxmonth(class="form-control form-control-sm is-invalid") }}
+                            {% for error in form.maxmonth.errors %}
+                                <div class="invalid-feedback">
+                                    <span>{{error}}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ form.maxmonth(class="form-control form-control-sm") }}
+                        {% endif %}
+                    </div>
+                    <div class="col form-group">
+                        {{ form.submit(class="btn btn-success", value="Submit")}}
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+    <br></br>
+
+    <div class="row">
         <div class="col-xs-10, col-sm-6">
             <div class="card card-style mb-2">
                 <div class="card-body">
@@ -35,9 +77,11 @@
         </div>
     </div>
 
+    <br></br>
+
     <div class="row">
         <div class="col-xs-10, col-sm-6">
-            <H3>Income Summary</H3>
+            <H3>Total income Summary</H3>
             <table class="table">
                 <thead class="thead-dark">
                     <tr>

@@ -6,20 +6,24 @@
         <form action="" method="POST">
             {{ form.csrf_token() }}
             <fieldset class="form-group">
+                <legend class="mb-4">Summarize month</legend>
                 <div class="row form-group">
-                    {{ form.months.label(class="form-control-label") }}
-                    {% if form.months.errors %}
-                        {{ form.months(class="form-control form-control-sm is-invalid") }}
-                        {% for error in form.months.errors %}
-                            <div class="invalid-feedback">
-                                <span>{{error}}</span>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        {{ form.months(class="form-control form-control-sm") }}
-                    {% endif %}
-                
-                    {{ form.submit(class="btn btn-success", value="Submit")}}
+                    <div class="col form-group">
+                        {{ form.months.label(class="form-control-label") }}
+                        {% if form.months.errors %}
+                            {{ form.months(class="form-control form-control-sm is-invalid") }}
+                            {% for error in form.months.errors %}
+                                <div class="invalid-feedback">
+                                    <span>{{error}}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ form.months(class="form-control form-control-sm") }}
+                        {% endif %}
+                    </div>
+                    <div class="col form-group">
+                        {{ form.submit(class="btn btn-success", value="Submit")}}
+                    </div>
                 </div>
             </fieldset>
         </form>
