@@ -13,6 +13,7 @@ import uuid
 from Resources import db, app
 from Resources.models import *
 from Resources.forms import *
+from Resources.getdata import *
 from Resources.__init__ import bcrypt
 
 class DecimalEncoder(json.JSONEncoder):
@@ -347,39 +348,38 @@ login_manager.session_protection="strong"
 class User(flask_login.UserMixin):
     pass
 
+def getuserdata(checkeduser):
+    if checkeduser is None:
+        return
+    userdbdata=getUser(checkeduser)
+    if userdbdata is not None:
+        #TODO: Check if whole userentry can be moved here
+        #possible issue: it can be na active session maintained for the duration of user interaction
+        #possible issue: user object containing password stored in memory  
+        user = User()
+        user.id = checkeduser
+        user.uuid = userdbdata.ID
+        return user
+    return
 # NICE-TO-HAVE: Load all user settings here
+# Used for UI single login for session
 @login_manager.user_loader
 def user_loader(checkeduser):
-    users=db.session.query(Users).all()
-    for user in users:
-        if checkeduser==user.Username:
-            #TODO: Check if whole userentry can be moved here
-            #possible issue: it can be na active session maintained for the duration of user interaction
-            #possible issue: user object containing password stored in memory  
-            currentuser = User()
-            currentuser.id = checkeduser
-            currentuser.uuid = user.ID
-            return currentuser
-    return
+    return getuserdata(checkeduser)
 
-# TODO: Optimize
+# Used for api key or basic authentication (auth required on every request)
 @login_manager.request_loader
 def request_loader(request):
-    users=db.session.query(Users).all()
-    user = request.form.get('email')
-    if user not in users:
-        return
+    checkeduser=request.form.get('email')
+    return getuserdata(checkeduser)
 
-    currentuser = User()
-    currentuser.id = user
-    return currentuser
-
+# TODO: Use native mechanisms, i.e.: user.is_active = 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         username = form.username.data
-        usr = db.session.query(Users).filter_by(Username=username).first()
+        usr = getUser(username)
         errors = {}
         
         # Silent check tree
