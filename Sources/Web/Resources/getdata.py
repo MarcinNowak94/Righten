@@ -110,35 +110,36 @@ def getTimeRangeDate(
                     end = end if end else None
                     )
 
-def getsummaryByTypeGrouped(
+#TODO: use getSummaryByColumn add only grouping
+def getSummaryByColumnGrouped(
         table: Table,
         userID: str,
-        range: RangeMonth
+        range: RangeMonth,
+        column: str
     ) -> list:
-    """Returns IncomeSummary for specified user in specified timeframe
+    """Returns grouped summary by specified column for specified user in specified timeframe
 
     Arguments:
         :table: -- Table for which data is requested
         :userID: -- UserID
         :range: -- Timeframe for which data to provide
+        :column: -- Column by wich data should be grouped
 
     Returns:
-        List containing summary of income by type in specified timeframe
+        List containing summary by column in specified timeframe
     """
     
     with app.app_context():
-        # NICE-TO-HAVE: Refactor query if possible or abstract as function
-        IncomeSummarydata = db.session.query(
-                                        table.columns.Type,
-                                         func.sum(table.columns.Amount)).\
-                                filter_by(UserID=userID).\
-                                filter(
-                                    table.columns.Month>=range.beginning,
-                                    table.columns.Month<=range.end).\
-                                order_by(table.columns.Amount.desc()).\
-                                group_by(table.columns.Type).\
-                                all()
-        return IncomeSummarydata
+        return db.session.query(
+                            table.columns[column],
+                            func.sum(table.columns.Amount)).\
+                        filter_by(UserID=userID).\
+                        filter(
+                            table.columns.Month>=range.beginning,
+                            table.columns.Month<=range.end).\
+                        order_by(table.columns.Amount.asc()).\
+                        group_by(table.columns[column]).\
+                        all()
 
 def getDataFromTableforUser(
         table: Table,
@@ -185,28 +186,30 @@ def getMonthlySummaryRange(
                             all()
         return summary
 
-def getMonthlyTypeSummaryRange(
+def getMonthlySummaryByColumn(
         table: Table,
         userID: str,
-        range: RangeMonth
+        range: RangeMonth,
+        column: str
     ) -> list:
-    """Returns any monthly summary type table data for specified user in specified timeframe
+    """Returns any monthly summary by column table data for specified user in specified timeframe
 
     Arguments:
         :table: -- Table for which data is requested
         :userID: -- UserID
         :range: -- Timeframe for which data to provide
+        :column: -- Column by wich data should be grouped
 
     Returns:
-        List containing summary of types in specified timeframe
+        List containing summary by column in specified timeframe
     """
     
     with app.app_context():
         summary = db.session.query(
                                 table.columns.Month,
                                 table.columns.Amount,
-                                table.columns.Type
-                                ).\
+                                table.columns[column],
+                            ).\
                             filter_by(UserID=userID).\
                             filter(
                                 table.columns.Month>=range.beginning,

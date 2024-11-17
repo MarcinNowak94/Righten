@@ -679,26 +679,37 @@ def passwordchange():
     return render_template('passwordchange.html', title="Password reset", form=form)
 
 # Summaries and visualizations -------------------------------------------------
+# NICE-TO-HAVE: Repork summary as generic function reffered to via eg. url_for('summary', table='Income')
 
+# NICE-TO-HAVE: Stacked year graph
 @app.route("/incomesummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def incomesummary():
     form=MonthRange()
     range=getTimeRangeMonth(MonthlyIncome, current_user.uuid)
+    # TODO: initialize properly inside class, this is quick and dirty way
+    if request.method == "GET":
+        form.minmonth.data = range.beginning
+        form.maxmonth.data = range.end
 
     if request.method == "POST" and form.validate_on_submit():
         range.beginning = form.minmonth.data
         range.end = form.maxmonth.data
     
-    IncomeSummarydata = getsummaryByTypeGrouped(MonthlyIncomeByType, current_user.uuid, range)
     summary = getDataFromTableforUser(IncomeSummary, current_user.uuid)
+    IncomeSummarydata = getSummaryByColumnGrouped(
+                            MonthlyIncomeByType,
+                            current_user.uuid,
+                            range,
+                            "Type")
     
     IncomeOverTime = getMonthlySummaryRange(MonthlyIncome, current_user.uuid, range)
-    IncomeTypesByTime = getMonthlyTypeSummaryRange(MonthlyIncomeByType, current_user.uuid, range)
+    IncomeTypesByTime = getMonthlySummaryByColumn(MonthlyIncomeByType, current_user.uuid, range, "Type")
     
     IncomeTypechart=createpiechartdataset(IncomeSummarydata, addperc=True)
     IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
 
+    #TODO: Start chart at 0 - negative income is not an acceptable input
     monthlyincomedata = []
     for month, amount in IncomeOverTime:
         monthlyincomedata.append({"x": month, "y": amount})
@@ -713,28 +724,34 @@ def incomesummary():
                            form=form
                            )
 
-@app.route("/billssummary")
+@app.route("/billssummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def billssummary():
-    summary = db.session.query(BillsSummary).\
-                                filter_by(UserID=current_user.uuid).all()
-    bills_types = db.session.query(BillsSummary.columns.Medium,
-                                           BillsSummary.columns.Amount).\
-                                            filter_by(UserID=current_user.uuid).\
-                                            order_by(BillsSummary.columns.Amount.desc()).\
-                                            all()
-    monthly_bills = db.session.query(MonthlyBills.columns.Month,
-                                          MonthlyBills.columns.Amount).\
-                                filter_by(UserID=current_user.uuid).all()
-    bill_types_per_month = db.session.query(MonthlyBillsByMedium.columns.Month,
-                                          MonthlyBillsByMedium.columns.Amount,
-                                          MonthlyBillsByMedium.columns.Medium).\
-                                filter_by(UserID=current_user.uuid).all()
+    form=MonthRange()
+    range=getTimeRangeMonth(MonthlyBills, current_user.uuid)
+    # TODO: initialize properly inside class, this is quick and dirty way
+    if request.method == "GET":
+        form.minmonth.data = range.beginning
+        form.maxmonth.data = range.end
+
+    if request.method == "POST" and form.validate_on_submit():
+        range.beginning = form.minmonth.data
+        range.end = form.maxmonth.data
     
-    bills_type_chart = createpiechartdataset(bills_types, addperc=True)
-    bills_types_data = createchartdataset(bill_types_per_month)
+    summary = getDataFromTableforUser(BillsSummary, current_user.uuid)
+    BillsSummarydata = getSummaryByColumnGrouped(
+                            MonthlyBillsByMedium,
+                            current_user.uuid,
+                            range,
+                            "Medium")
+    BillsOverTime = getMonthlySummaryRange(MonthlyBills, current_user.uuid, range)
+    BillsTypesByTime = getMonthlySummaryByColumn(MonthlyBillsByMedium, current_user.uuid, range, "Medium")
+    
+    
+    bills_type_chart = createpiechartdataset(BillsSummarydata, addperc=True)
+    bills_types_data = createchartdataset(BillsTypesByTime)
     monthly_bills_data = []
-    for month, amount in monthly_bills:
+    for month, amount in BillsOverTime:
         monthly_bills_data.append({"x": month, "y":amount})
 
     log_site_opened()
@@ -743,7 +760,8 @@ def billssummary():
                            BillsTypechart=json.dumps(bills_type_chart, cls=DecimalEncoder),
                            MonthlyBillsData=json.dumps(monthly_bills_data, cls=DecimalEncoder),
                            BillsTypesData=json.dumps(bills_types_data, cls=DecimalEncoder),
-                           Summary=summary
+                           Summary=summary,
+                           form=form
                            )
 
 @app.route("/expendituressummary")
