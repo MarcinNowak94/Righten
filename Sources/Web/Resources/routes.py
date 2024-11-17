@@ -679,7 +679,9 @@ def passwordchange():
     return render_template('passwordchange.html', title="Password reset", form=form)
 
 # Summaries and visualizations -------------------------------------------------
-# NICE-TO-HAVE: Repork summary as generic function reffered to via eg. url_for('summary', table='Income')
+# NICE-TO-HAVE: Repork incomesummary, billssummary, expendituressummary as 
+# generic summary function reffered to via eg. url_for('summary', table='Income').
+# Needs to be extensible to let them develop separately in future (as expenditures did) 
 
 # NICE-TO-HAVE: Stacked year graph
 @app.route("/incomesummary", methods=['GET', 'POST'])
@@ -764,32 +766,42 @@ def billssummary():
                            form=form
                            )
 
-@app.route("/expendituressummary")
+@app.route("/expendituressummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def expendituressummary():
-    expenditures_summary = db.session.query(TypeSummary.columns.Type,
-                                             TypeSummary.columns.Amount).\
-                                        filter_by(UserID=current_user.uuid).\
-                                        order_by(TypeSummary.columns.Amount.desc()).all()
-    ExpendituresOverTime = db.session.query(MonthlyExpenditures.columns.Month,
-                                            MonthlyExpenditures.columns.Amount).\
-                        filter_by(UserID=current_user.uuid).all()
-    TopTypeExpendituresData = db.session.query(
-                                Top10ProductTypesMonthly.columns.Month,
-                                Top10ProductTypesMonthly.columns.Sum,
-                                Top10ProductTypesMonthly.columns.Type).\
-                        filter_by(UserID=current_user.uuid).all()
-    TopProductsChartData = db.session.query(
-                                Top10ProductsMonthly.columns.Month,
-                                Top10ProductsMonthly.columns.Sum,
-                                Top10ProductsMonthly.columns.Product).\
-                        filter_by(UserID=current_user.uuid).all()
-    SpendingTargetValue = (db.session.query(UserSettings).\
-                       filter_by(UserID=current_user.uuid,
-                                 Setting="SpendingTarget").\
-                        first()).Value
+    form=MonthRange()
+    range=getTimeRangeMonth(MonthlyExpenditures, current_user.uuid)
+    # TODO: initialize properly inside class, this is quick and dirty way
+    if request.method == "GET":
+        form.minmonth.data = range.beginning
+        form.maxmonth.data = range.end
 
-    expenditures_summary_chart = createpiechartdataset(expenditures_summary, addperc=True)
+    if request.method == "POST" and form.validate_on_submit():
+        range.beginning = form.minmonth.data
+        range.end = form.maxmonth.data
+    
+    ExpendituresSummarydata = getSummaryByColumnGrouped(
+                                MonthlyExpendituresbyType,
+                                current_user.uuid,
+                                range,
+                                "Type")
+    ExpendituresOverTime = getMonthlySummaryRange(
+                                MonthlyExpenditures,
+                                current_user.uuid,
+                                range)
+    TopTypeExpendituresData = getMonthlyTopExpenditures(
+                                Top10ProductTypesMonthly,
+                                current_user.uuid,
+                                range,
+                                "Type")
+    TopProductsChartData = getMonthlyTopExpenditures(
+                                Top10ProductsMonthly,
+                                current_user.uuid,
+                                range,
+                                "Product")
+    SpendingTargetValue = (getUserSetting(current_user.uuid, "SpendingTarget")).Value
+
+    expenditures_summary_chart = createpiechartdataset(ExpendituresSummarydata, addperc=True)
     TopTypeExpenditures=createchartdataset(TopTypeExpendituresData, "true")
     TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
     MonthlyExpendituresData=[]
@@ -809,7 +821,8 @@ def expendituressummary():
                            ExpendituresSet=json.dumps(ExpendituresSet, cls=DecimalEncoder),
                            ExpendituresSummaryChart=json.dumps(expenditures_summary_chart, cls=DecimalEncoder),
                            TopTypeExpenditures=json.dumps(TopTypeExpenditures, cls=DecimalEncoder),
-                           TopProductsExpenditures=json.dumps(TopProductsExpenditures, cls=DecimalEncoder)
+                           TopProductsExpenditures=json.dumps(TopProductsExpenditures, cls=DecimalEncoder),
+                           form=form
                            )
 
 # NICE-TO-HAVE: Add stacked year graph to show trend

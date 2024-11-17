@@ -198,7 +198,7 @@ def getMonthlySummaryByColumn(
         :table: -- Table for which data is requested
         :userID: -- UserID
         :range: -- Timeframe for which data to provide
-        :column: -- Column by wich data should be grouped
+        :column: -- Column by wich tables differ
 
     Returns:
         List containing summary by column in specified timeframe
@@ -215,4 +215,36 @@ def getMonthlySummaryByColumn(
                                 table.columns.Month>=range.beginning,
                                 table.columns.Month<=range.end).\
                             all()
+        return summary
+
+def getMonthlyTopExpenditures(
+        table: Table,   #TODO: Accept only Top10ProductsMonthly and Top10ProductTypesMonthly
+        userID: str,
+        range: RangeMonth,
+        column: str     #TODO: Base column on table
+    ) -> list:
+    """Returns monthly data for expenditures for top 10 products or types for specified user in specified timeframe
+
+    Arguments:
+        :table: -- Table for which data is requested
+        :userID: -- UserID
+        :range: -- Timeframe for which data to provide
+        :column: -- Column by wich table differ
+
+    Returns:
+        List containing summary of expenditures for top 10 products or types
+    """
+    
+    with app.app_context():
+        summary = db.session.query(
+                                table.columns.Month,
+                                table.columns.Sum,  #TODO: Change to amount in database to unify data and merge with getMonthlySummaryByColumn()
+                                table.columns[column]
+                            ).\
+                            filter_by(UserID=userID).\
+                            filter(
+                                table.columns.Month>=range.beginning,
+                                table.columns.Month<=range.end).\
+                            all()
+        
         return summary
