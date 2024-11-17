@@ -84,10 +84,22 @@ views = {
     "Statistics" : Statistics
 }
 
-def create_schema_for_user(userUUID):
-    with app.app_context():
-        # Schema must begin with letter - UUIDs are alphanumeric
-        query = "CREATE SCHEMA u"+userUUID+" TEMPLATE public;" #FIXME: Fix, chat hallucinating
-        connection = db.engine.connect()
-        connection.execute(query)
-        connection.close()
+# TODO: add proper type validation - has to be 'YYYY-MM' or better yet datetime 'YYYY-MM-01' 
+class RangeMonth:
+    def __init__(
+            self, 
+            beginning: str, 
+            end: str
+            ):
+        self.beginning = beginning
+        self.end = end
+
+# TODO: add proper type validation - has to be 'YYYY-MM-DD'
+class RangeDate:
+    def __init__(
+            self, 
+            beginning: str, 
+            end: str
+            ):
+        self.beginning = beginning
+        self.end = end

@@ -351,7 +351,7 @@ class User(flask_login.UserMixin):
 def getuserdata(checkeduser):
     if checkeduser is None:
         return
-    userdbdata=getUser(checkeduser)
+    userdbdata=getUserbyName(checkeduser)
     if userdbdata is not None:
         #TODO: Check if whole userentry can be moved here
         #possible issue: it can be na active session maintained for the duration of user interaction
@@ -379,7 +379,7 @@ def login():
     form = LoginForm()
     if request.method == "POST" and form.validate_on_submit():
         username = form.username.data
-        usr = getUser(username)
+        usr = getUserbyName(username)
         errors = {}
         
         # Silent check tree
@@ -460,7 +460,7 @@ def unauthorized_handler():
         )
     return redirect(url_for('index'))
 
-# NICE-TO-HAVE: Refactoring
+# NICE-TO-HAVE: Refactor - move all settings to user entry
 @app.route('/settings', methods=['GET', 'POST'])
 @flask_login.login_required
 def settings():
@@ -468,23 +468,21 @@ def settings():
     changeerror=None
     settingschanged=[]
 
-    userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
+    userentry = getUserbyID(current_user.uuid)
     # Settings must be separate to update them separately
-    priority = db.session.query(UserSettings).\
-                            filter_by(
-                                Setting="ProductPriorityTarget",
-                                UserID=current_user.uuid).\
-                            first()
-    spending = db.session.query(UserSettings).\
-                            filter_by(
-                                Setting="SpendingTarget",
-                                UserID=current_user.uuid).\
-                            first()
-    savings = db.session.query(UserSettings).\
-                            filter_by(
-                                Setting="SavingsTarget",
-                                UserID=current_user.uuid).\
-                            first()
+    priority = getUserSetting(
+                    checkeduser=current_user.uuid,
+                    setting="ProductPriorityTarget"
+                    )
+                            
+    spending = getUserSetting(
+                    checkeduser=current_user.uuid,
+                    setting="SpendingTarget"
+                    )
+    savings = getUserSetting(
+                    checkeduser=current_user.uuid,
+                    setting="SavingsTarget"
+                    )
 
     form=SettingsForm(
         productprioritytarget=Decimal(priority.Value),
@@ -664,7 +662,7 @@ def passwordchange():
     form = PasswordChangeForm()
     
     if request.method == "POST" and form.validate_on_submit():
-        userentry = db.one_or_404(db.select(Users).filter_by(ID=current_user.uuid))
+        userentry = getUserbyID(current_user.uuid)
         isvalidpassword=check_password(userentry, form.password.data)
         if not isvalidpassword:
             flash("Password incorrect", "danger")
@@ -686,43 +684,17 @@ def passwordchange():
 @flask_login.login_required
 def incomesummary():
     form=MonthRange()
-    minmonth=db.session.query(MonthlyIncome.columns.Month).\
-                        order_by(MonthlyIncome.columns.Month.asc()).\
-                                filter_by(UserID=current_user.uuid).first()[0]
-    maxmonth=db.session.query(MonthlyIncome.columns.Month).\
-                        order_by(MonthlyIncome.columns.Month.desc()).\
-                                filter_by(UserID=current_user.uuid).first()[0]
+    range=getTimeRangeMonth(MonthlyIncome, current_user.uuid)
 
-    #TODO: Change to months
     if request.method == "POST" and form.validate_on_submit():
-        minmonth = form.minmonth.data
-        maxmonth = form.maxmonth.data
+        range.beginning = form.minmonth.data
+        range.end = form.maxmonth.data
     
-    IncomeSummarydata = db.session.query(MonthlyIncomeByType.columns.Type,
-                                         func.sum(MonthlyIncomeByType.columns.Amount)).\
-                                filter_by(UserID=current_user.uuid).\
-                                filter(MonthlyIncomeByType.columns.Month>=minmonth,
-                                        MonthlyIncomeByType.columns.Month<=maxmonth).\
-                                order_by(MonthlyIncomeByType.columns.Amount.desc()).\
-                                group_by(MonthlyIncomeByType.columns.Type).\
-                                all()
-    summary = db.session.query(IncomeSummary).\
-                                filter_by(UserID=current_user.uuid).all()
-    IncomeOverTime = db.session.query(
-                                    MonthlyIncome.columns.Month,
-                                    MonthlyIncome.coflumns.Amount).\
-                                filter_by(UserID=current_user.uuid).\
-                                filter(MonthlyIncome.columns.Month>=minmonth,
-                                        MonthlyIncome.columns.Month<=maxmonth).\
-                                all()
-    IncomeTypesByTime = db.session.query(
-                                MonthlyIncomeByType.columns.Month,
-                                MonthlyIncomeByType.columns.Amount,
-                                MonthlyIncomeByType.columns.Type).\
-                                filter_by(UserID=current_user.uuid).\
-                                filter(MonthlyIncomeByType.columns.Month>=minmonth,
-                                        MonthlyIncomeByType.columns.Month<=maxmonth).\
-                                all()
+    IncomeSummarydata = getsummaryByTypeGrouped(MonthlyIncomeByType, current_user.uuid, range)
+    summary = getDataFromTableforUser(IncomeSummary, current_user.uuid)
+    
+    IncomeOverTime = getMonthlySummaryRange(MonthlyIncome, current_user.uuid, range)
+    IncomeTypesByTime = getMonthlyTypeSummaryRange(MonthlyIncomeByType, current_user.uuid, range)
     
     IncomeTypechart=createpiechartdataset(IncomeSummarydata, addperc=True)
     IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
