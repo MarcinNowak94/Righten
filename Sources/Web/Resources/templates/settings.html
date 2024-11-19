@@ -53,6 +53,36 @@
             </div>
 
             <div class="col form-group">
+                {{ form.productsdisplaylimit.label(class = "form-control-label") }}
+                
+                {% if form.productsdisplaylimit.errors %}
+                    {{ form.productsdisplaylimit(class = "form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                    {% for error in form.productsdisplaylimit.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.productsdisplaylimit(class = "form-control form-control-sm") }}
+                {% endif %}
+            </div>
+
+            <div class="col form-group">
+                {{ form.producttypesdisplaylimit.label(class = "form-control-label") }}
+                
+                {% if form.producttypesdisplaylimit.errors %}
+                    {{ form.producttypesdisplaylimit(class = "form-control form-control-sm is-invalid") }}
+                    <div class="invalid-feedback">
+                    {% for error in form.producttypesdisplaylimit.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.producttypesdisplaylimit(class = "form-control form-control-sm") }}
+                {% endif %}
+            </div>
+
+            <div class="col form-group">
                 {{ form.accountactive.label(class = "form-control-label") }}
                 {{ form.accountactive }}
             </div>

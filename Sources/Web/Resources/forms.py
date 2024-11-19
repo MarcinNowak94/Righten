@@ -284,6 +284,14 @@ class SettingsForm(FlaskForm):
                         label = "Savings target",
                         validators = [InputRequired()],
                         default = 1000)
+    productsdisplaylimit = IntegerField(
+                        label = "Products display limit",
+                        validators = [InputRequired()],
+                        default = 10)
+    producttypesdisplaylimit = IntegerField(
+                        label = "Product types display limit",
+                        validators = [InputRequired()],
+                        default = 10)
     accountactive = BooleanField(
                         label = "Account active",
                         default = False)
@@ -460,7 +468,7 @@ class ProductVisualizationForm(FlaskForm):
                                         #filter_by(UserID=current_user.uuid)
         top10_user_products = db.session.query(ProductSummary.columns.Product).\
                                         order_by(ProductSummary.columns.Times).\
-                                        limit(10)
+                                        limit(10) #TODO: Populate from limit
     choices = []
     for product in user_products:
         choices.append(product[0])
@@ -476,7 +484,7 @@ class ProductVisualizationForm(FlaskForm):
                               else user_products_count
                         )
                     ],
-                default = 10)
+                default = 10) #TODO: Fill in from ProductsDisplayLimit user setting 
     products = SelectMultipleField(
                     choices = choices,
                     default = top10_user_products)

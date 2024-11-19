@@ -198,7 +198,9 @@ def createuser(user: Users) -> bool:
     settings={
         "ProductPriorityTarget":	33,
         "SpendingTarget":	3000,
-        "SavingsTarget":	100
+        "SavingsTarget":	100,
+        "ProductsDisplayLimit": 10,
+        "ProductTypesDisplayLimit": 10
     }
 
     success = False
@@ -471,26 +473,37 @@ def settings():
     userentry = getUserbyID(current_user.uuid)
     # Settings must be separate to update them separately
     priority = getUserSetting(
-                    checkeduser=current_user.uuid,
+                    userID=current_user.uuid,
                     setting="ProductPriorityTarget"
                     )
                             
     spending = getUserSetting(
-                    checkeduser=current_user.uuid,
+                    userID=current_user.uuid,
                     setting="SpendingTarget"
                     )
     savings = getUserSetting(
-                    checkeduser=current_user.uuid,
+                    userID=current_user.uuid,
                     setting="SavingsTarget"
+                    )
+    ProductsDisplayLimit = getUserSetting(
+                    userID=current_user.uuid,
+                    setting="ProductsDisplayLimit"
+                    )
+    ProductTypesDisplayLimit = getUserSetting(
+                    userID=current_user.uuid,
+                    setting="ProductTypesDisplayLimit"
                     )
 
     form=SettingsForm(
         productprioritytarget=Decimal(priority.Value),
         spendingtarget=Decimal(spending.Value),
         savingstarget=Decimal(savings.Value),
-        accountactive=bool(userentry.isActive)
+        accountactive=bool(userentry.isActive),
+        productsdisplaylimit=int(ProductsDisplayLimit.Value),
+        producttypesdisplaylimit=int(ProductTypesDisplayLimit.Value)
     )
     
+    # TODO: Refactor all as one separate function, next step - figure out a way to do it as one general loop
     if request.method == "POST" and form.validate_on_submit():
         #TODO: redirect to confirmation screen with password confirmation
         #Only active user can get here
@@ -573,6 +586,52 @@ def settings():
             except Exception as error:
                 db.session.flush()
                 flash("Savings target not updated", "danger")
+                result="Failure"
+                changeerror=error
+            pass
+            
+            change["result"] = result
+            change["error"] = changeerror
+            settingschanged.append(change)
+        
+        if form.productsdisplaylimit.data and form.productsdisplaylimit.data!=Decimal(ProductsDisplayLimit.Value):
+            change = {}
+            change["setting"] = "Products display limit"
+            change["oldvalue"] = ProductsDisplayLimit.Value
+            change["newvalue"] = form.productsdisplaylimit.data
+            
+            ProductsDisplayLimit.Value=str(form.productsdisplaylimit.data)
+            try:
+                db.session.commit()
+                flash("Products display limit updated", "success")
+                result="Success"
+            except Exception as error:
+                db.session.flush()
+                flash("Products display limit not updated", "danger")
+                result="Failure"
+                changeerror=error
+            pass
+            
+            change["result"] = result
+            change["error"] = changeerror
+            settingschanged.append(change)
+        
+        ProductTypesDisplayLimit=getUserSetting(current_user.uuid, "ProductTypesDisplayLimit")
+        producttypesdisplaylimit=int(ProductTypesDisplayLimit.Value)
+        if form.producttypesdisplaylimit.data and form.producttypesdisplaylimit.data!=Decimal(ProductTypesDisplayLimit.Value):
+            change = {}
+            change["setting"] = "Products display limit"
+            change["oldvalue"] = ProductTypesDisplayLimit.Value
+            change["newvalue"] = form.producttypesdisplaylimit.data
+            
+            ProductTypesDisplayLimit.Value=str(form.producttypesdisplaylimit.data)
+            try:
+                db.session.commit()
+                flash("Products types display limit updated", "success")
+                result="Success"
+            except Exception as error:
+                db.session.flush()
+                flash("Products types display limit not updated", "danger")
                 result="Failure"
                 changeerror=error
             pass
@@ -955,7 +1014,7 @@ def finances():
 @app.route("/productssummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def productssummary():
-    limit = 10
+    limit = int((getUserSetting(current_user.uuid, "ProductsDisplayLimit")).Value)
     selected_products=[]
 
     form = ProductVisualizationForm()
@@ -1011,7 +1070,7 @@ def productssummary():
 @app.route("/producttypessummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def producttypessummary():
-    limit = 10
+    limit = int((getUserSetting(current_user.uuid, "ProductTypesDisplayLimit")).Value)
     selected_types=[]
 
     form = TypeVisualizationForm()
@@ -1064,6 +1123,7 @@ def producttypessummary():
                         )
 
 #TODO: fill in
+#TODO: Add current month bills pie chart
 @app.route("/month", methods=["GET", "POST"])
 @flask_login.login_required
 def month():
