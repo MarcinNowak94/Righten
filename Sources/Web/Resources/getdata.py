@@ -164,7 +164,7 @@ def getMonthRangeDataFromTableforUser(
         userID: str,
         range: RangeMonth
     ) -> list:
-    """Returns data from specified table for specified user
+    """Returns data from specified table for specified user and specified date range
 
     Arguments:
         :table: -- Table for which data is requested
@@ -273,3 +273,33 @@ def getMonthlyTopExpenditures(
                             all()
         
         return summary
+
+def getMonthlyBilanceSummaryforUser(
+        table: Table,
+        userID: str,
+        range: RangeMonth,
+        column: str     #TODO: Base column on table
+    ) -> list:
+    """Returns data from specified table for specified user
+
+    Arguments:
+        :table: -- Table for which data is requested
+        :userID: -- UserID        
+        :range: -- Timeframe for which data to provide
+        :column: -- Column by wich table differ
+
+    Returns:
+        Table data summary for table by specified column in specified range for specified user
+    """
+
+    with app.app_context():
+        return db.session.query(
+                                table.columns[column],
+                                db.func.round(db.func.sum(table.columns.Amount))).\
+                            filter_by(UserID=userID).\
+                            filter(
+                                table.columns.Month>=range.beginning,
+                                table.columns.Month<=range.end).\
+                            group_by(table.columns[column]).\
+                            all()
+

@@ -851,7 +851,7 @@ def spending():
     PriorityTarget = int((getUserSetting(current_user.uuid, "ProductPriorityTarget")).Value)
     
     SpendingTarget = int((getUserSetting(current_user.uuid, "SpendingTarget")).Value)
-    
+
     MonthlySpendingData=[]
     CashPercentageData=[]
     MonthlyPossibleSavingsData=[]
@@ -888,29 +888,36 @@ def spending():
                            )
 
 # NICE-TO-HAVE: green color above SavingsTarget 
-@app.route("/finances")
+@app.route("/finances", methods=['GET', 'POST'])
 @flask_login.login_required
 def finances():
+    form=MonthRange()
+    range=getTimeRangeMonth(MonthlyBilance, current_user.uuid)
+    # TODO: initialize properly inside class, this is quick and dirty way
+    if request.method == "GET":
+        form.minmonth.data = range.beginning
+        form.maxmonth.data = range.end
+
+    if request.method == "POST" and form.validate_on_submit():
+        range.beginning = form.minmonth.data
+        range.end = form.maxmonth.data
     # NICE-TO-HAVE: Add statistic type, and get only financial here
-    StatisticData = db.session.query(Statistics).\
-                        filter_by(UserID=current_user.uuid).all()
-    BilanceData = db.session.query(MonthlyBilanceSingle.columns.Month,
-                                   MonthlyBilanceSingle.columns.Amount).\
-                        filter_by(UserID=current_user.uuid).all()
-    BilanceSources = db.session.query(MonthlyBilance.columns.Month,
-                                      MonthlyBilance.columns.Amount,
-                                      MonthlyBilance.columns.Source).\
-                        filter_by(UserID=current_user.uuid).all()
-    BilanceTotal = db.session.query(MonthlyBilance.columns.Source,
-                                  db.func.round(db.func.sum(MonthlyBilance.columns.Amount))).\
-                                    filter_by(UserID=current_user.uuid)\
-                                    .group_by(MonthlyBilance.columns.Source).all()
-    SavingsTargetData = (db.session.query(UserSettings).\
-                       filter_by(UserID=current_user.uuid,
-                                 Setting="SavingsTarget").\
-                        first()).Value
+    StatisticData = getDataFromTableforUser(Statistics, current_user.uuid)
+    BilanceData = getMonthlySummaryRange(
+                    MonthlyBilanceSingle,
+                    current_user.uuid,
+                    range)
+
+    BilanceSources = getMonthlySummaryByColumn(
+                        MonthlyBilance,
+                        current_user.uuid,
+                        range,
+                        "Source")
+    BilanceTotal = getMonthlyBilanceSummaryforUser(MonthlyBilance, current_user.uuid, range, "Source")
+     
+    SavingsTargetData = int((getUserSetting(current_user.uuid, "SpendingTarget")).Value)
     
-    BilanceSourcesData=createchartdataset(BilanceSources, "true")
+    BilanceSourcesData = createchartdataset(BilanceSources, "true")
 
     Bilance=[]
     Breakeven=[]
@@ -937,7 +944,8 @@ def finances():
                            BilanceTotalchart=json.dumps(BilanceTotalchart, cls=DecimalEncoder),
                            BilanceSourcesData=json.dumps(BilanceSourcesData, cls=DecimalEncoder),
                            BilanceData=json.dumps(BilanceSet, cls=DecimalEncoder),
-                           StatisticData=StatisticData
+                           StatisticData=StatisticData,
+                           form=form
                            )
 
 # Nice-TO-HAVE: Add panels:
