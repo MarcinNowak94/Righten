@@ -1011,43 +1011,56 @@ def finances():
 # - Product priority over time
 # - spending by Product (move from expenditures?)
 # - Top 10 low priority product spending Calculate (Amount*(100-priority))
+# TODO: Calculate all data within specified timeframe - requires moving whole db ProductSummary view logic to getdata.py (hard)
 @app.route("/productssummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def productssummary():
-    limit = int((getUserSetting(current_user.uuid, "ProductsDisplayLimit")).Value)
-    selected_products=[]
+    form = ProductVisualizationForm() # Extends MonthRange
+    range = getTimeRangeMonth(MonthlyProducts, current_user.uuid)
+    # TODO: initialize properly inside class, this is quick and dirty way
+    if request.method == "GET":
+        form.minmonth.data = range.beginning
+        form.maxmonth.data = range.end
 
-    form = ProductVisualizationForm()
+    limit = int((getUserSetting(current_user.uuid, "ProductsDisplayLimit")).Value)
+    selected_products = []
+    
     if request.method == "POST" and form.validate_on_submit():
         limit = form.limit.data
         selected_products = form.products.data
+        range.beginning = form.minmonth.data
+        range.end = form.maxmonth.data
 
-    top_products=db.session.query(ProductSummary.columns.Product,
-                                  ProductSummary.columns.Amount).\
-                            filter_by(UserID=current_user.uuid).\
-                            order_by(ProductSummary.columns.Times.desc()).\
-                            limit(limit).all()
-
-    selection_products_list=(product for product, amount in top_products)
+    top_products = getTopNProductOrTypesforUser(
+                        ProductSummary,
+                        current_user.uuid,
+                        "Product",
+                        limit
+                        )
+    selection_products_list = (product for product, amount in top_products)
     selected_products.extend(selection_products_list)
-    form.products.default=selected_products # Set all displayed products as chosen
+    form.products.default = selected_products # Set all displayed products as chosen
 
-    chosen_products=db.session.query(ProductSummary.columns.Product,
-                                 ProductSummary.columns.Amount).\
-                            filter_by(UserID=current_user.uuid).\
-                            where(ProductSummary.columns.Product.in_(selected_products)).\
-                            order_by(ProductSummary.columns.Times.desc()).all()  
+    chosen_products = getSpecifiedProductsOrTypesforUser(
+                        ProductSummary,
+                        current_user.uuid,
+                        "Product",
+                        selected_products
+                        )
 
-    monthly_products = db.session.query(MonthlyProducts.columns.Month,
-                                       MonthlyProducts.columns.Amount,
-                                       MonthlyProducts.columns.Product,
-                                       ).\
-                        filter_by(UserID=current_user.uuid).\
-                        where(MonthlyProducts.columns.Product.in_(selected_products)).all()
-    products_table = db.session.query(ProductSummary).\
-                        filter_by(UserID=current_user.uuid).\
-                        where(ProductSummary.columns.Product.in_(selected_products)).\
-                        order_by(ProductSummary.columns.Times.desc()).all()
+    monthly_products = getMonthlySummarySubsetByColumn(
+                        MonthlyProducts,
+                        current_user.uuid,
+                        range,
+                        "Product",
+                        selected_products
+                        )
+    products_table = getDataSubsetFromTableforUser(
+                        ProductSummary,
+                        current_user.uuid,
+                        "Product",
+                        selected_products
+                        )
     
     # Combine top products and selected products data
     top_products_chart = createpiechartdataset(chosen_products, addperc=True)
@@ -1055,7 +1068,9 @@ def productssummary():
 
     params={
         "limit": limit,
-        "selectedproducts": selected_products
+        "selectedproducts": selected_products,
+        "minmonth": range.beginning,
+        "maxmonth": range.end
     }
 
     log_site_opened(params=params)

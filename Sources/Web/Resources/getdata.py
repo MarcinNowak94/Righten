@@ -159,6 +159,31 @@ def getDataFromTableforUser(
         data = db.session.query(table).filter_by(UserID=userID).all()
         return data
 
+def getDataSubsetFromTableforUser(
+        table: Table,
+        userID: str,
+        column: str,
+        list: list[str]
+    ) -> list:
+    """Returns data from specified table for specified user
+
+    Arguments:
+        :table: -- Table for which data is requested
+        :userID: -- UserID
+        :column: -- Column by wich tables differ
+        :list: -- List of values for which data should be provided
+
+    Returns:
+        Data from table by column in specified timeframe for specified list 
+    """
+
+    with app.app_context():
+        data = db.session.query(table).\
+                            filter_by(UserID=userID).\
+                            where(table.columns[column].in_(list)).\
+                            all()
+        return data
+
 def getMonthRangeDataFromTableforUser(
         table: Table,
         userID: str,
@@ -233,12 +258,46 @@ def getMonthlySummaryByColumn(
         summary = db.session.query(
                                 table.columns.Month,
                                 table.columns.Amount,
-                                table.columns[column],
+                                table.columns[column]
                             ).\
                             filter_by(UserID=userID).\
                             filter(
                                 table.columns.Month>=range.beginning,
                                 table.columns.Month<=range.end).\
+                            all()
+        return summary
+
+def getMonthlySummarySubsetByColumn(
+        table: Table,
+        userID: str,
+        range: RangeMonth,
+        column: str,
+        list: list[str]
+    ) -> list:
+    """Returns any monthly summary by column table data for specified user in specified timeframe
+
+    Arguments:
+        :table: -- Table for which data is requested
+        :userID: -- UserID
+        :range: -- Timeframe for which data to provide
+        :column: -- Column by wich tables differ
+        :list: -- List of values for which data should be provided
+
+    Returns:
+        List containing summary by column in specified timeframe for specified list 
+    """
+    
+    with app.app_context():
+        summary = db.session.query(
+                                table.columns.Month,
+                                table.columns.Amount,
+                                table.columns[column]
+                            ).\
+                            filter_by(UserID=userID).\
+                            filter(
+                                table.columns.Month>=range.beginning,
+                                table.columns.Month<=range.end).\
+                            where(table.columns[column].in_(list)).\
                             all()
         return summary
 
@@ -303,3 +362,56 @@ def getMonthlyBilanceSummaryforUser(
                             group_by(table.columns[column]).\
                             all()
 
+def getTopNProductOrTypesforUser(
+        table: Table,
+        userID: str,
+        column: str,     #TODO: Base column on table
+        limit: int=0
+    ) -> list:
+    """Returns N records from specified summary table for specified user by specified column
+
+    Arguments:
+        :table: -- Table for which data is requested
+        :userID: -- UserID
+        :column: -- Column name to pick
+        :limit: -- Return only specified amount of records
+
+    Returns:
+        List of specified data from table 
+    """
+
+    with app.app_context():
+        data = db.session.query(table.columns[column],
+                                  table.columns.Amount).\
+                            filter_by(UserID=userID).\
+                            order_by(table.columns.Times.desc()).\
+                            limit(limit).\
+                            all()
+        return data
+
+def getSpecifiedProductsOrTypesforUser(
+        table: Table,
+        userID: str,
+        column: str,     #TODO: Base column on table
+        list: list[str]
+    ) -> list:
+    """Returns data from specified summary table for specified user and specified column content
+
+    Arguments:
+        :table: -- Table for which data is requested
+        :userID: -- UserID
+        :column: -- Column name to pick
+        :list: -- List of values for which data should be provided
+
+    Returns:
+        List of specified data from table
+    """
+
+    with app.app_context():
+        data = db.session.query(table.columns[column],
+                                  table.columns.Amount).\
+                            filter_by(UserID=userID).\
+                            order_by(table.columns.Times.desc()).\
+                            where(table.columns[column].in_(list)).\
+                            all()
+        return data

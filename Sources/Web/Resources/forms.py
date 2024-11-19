@@ -451,12 +451,12 @@ class DateRange(FlaskForm):
     submit=SubmitField("Submit")
 
 # FIXME: filter products by UserID
-class ProductVisualizationForm(FlaskForm):
+class ProductVisualizationForm(MonthRange):
     """Product summary visualization form, decides which products data are 
     selected from database to be visualized
 
     Arguments:
-        :FlaskForm: -- base class
+        :MonthRange: -- base class
     """
 
     with app.app_context():
@@ -488,7 +488,7 @@ class ProductVisualizationForm(FlaskForm):
     products = SelectMultipleField(
                     choices = choices,
                     default = top10_user_products)
-    submit = SubmitField("Submit")
+    # MonthRange already has Submit
 
 # FIXME: filter types by UserID
 class TypeVisualizationForm(FlaskForm):
