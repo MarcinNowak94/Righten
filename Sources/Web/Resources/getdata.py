@@ -159,6 +159,31 @@ def getDataFromTableforUser(
         data = db.session.query(table).filter_by(UserID=userID).all()
         return data
 
+def getMonthRangeDataFromTableforUser(
+        table: Table,
+        userID: str,
+        range: RangeMonth
+    ) -> list:
+    """Returns data from specified table for specified user
+
+    Arguments:
+        :table: -- Table for which data is requested
+        :userID: -- UserID
+        :range: -- Timeframe for which data to provide
+
+    Returns:
+        Data in specified range from table
+    """
+
+    with app.app_context():
+        data = db.session.query(table).\
+                            filter_by(UserID=userID).\
+                            filter(
+                                table.columns.Month>=range.beginning,
+                                table.columns.Month<=range.end).\
+                            all()
+        return data
+
 def getMonthlySummaryRange(
         table: Table,
         userID: str,

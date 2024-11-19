@@ -826,18 +826,32 @@ def expendituressummary():
                            )
 
 # NICE-TO-HAVE: Add stacked year graph to show trend
-@app.route("/spending")
+# NICE-TO-HAVE: Add averages per Bills and Expenditures for specified timeframe
+@app.route("/spending", methods=['GET', 'POST'])
 @flask_login.login_required
 def spending():
-    Spending = db.session.query(MonthlySpending).\
-                        filter_by(UserID=current_user.uuid).all()
+    form=MonthRange()
+    range=getTimeRangeMonth(MonthlyBills, current_user.uuid)
+    # TODO: initialize properly inside class, this is quick and dirty way
+    if request.method == "GET":
+        form.minmonth.data = range.beginning
+        form.maxmonth.data = range.end
+
+    if request.method == "POST" and form.validate_on_submit():
+        range.beginning = form.minmonth.data
+        range.end = form.maxmonth.data
+    
+    Spending = getMonthRangeDataFromTableforUser(
+                    MonthlySpending,
+                    current_user.uuid,
+                    range
+                    )
+    
     # All settings are stored as text, thus type cast to int
-    PriorityTarget = int((db.session.query(UserSettings).\
-        filter_by(UserID=current_user.uuid, Setting="ProductPriorityTarget").\
-        first()).Value)
-    SpendingTarget = int((db.session.query(UserSettings).\
-        filter_by(UserID=current_user.uuid, Setting="SpendingTarget").\
-        first()).Value)
+    PriorityTarget = int((getUserSetting(current_user.uuid, "ProductPriorityTarget")).Value)
+    
+    SpendingTarget = int((getUserSetting(current_user.uuid, "SpendingTarget")).Value)
+    
     MonthlySpendingData=[]
     CashPercentageData=[]
     MonthlyPossibleSavingsData=[]
@@ -869,7 +883,8 @@ def spending():
                            TypePriorityData=json.dumps(TypePriorityData, cls=DecimalEncoder),
                            PriorityTargetData=json.dumps(PriorityTargetData, cls=DecimalEncoder),
                            SpendingTargetData=json.dumps(SpendingTargetData, cls=DecimalEncoder),
-                           total_possible_savings=round(total_possible_savings,2)
+                           total_possible_savings=round(total_possible_savings,2),
+                           form=form
                            )
 
 # NICE-TO-HAVE: green color above SavingsTarget 
