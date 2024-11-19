@@ -1017,13 +1017,13 @@ def finances():
 def productssummary():
     form = ProductVisualizationForm() # Extends MonthRange
     range = getTimeRangeMonth(MonthlyProducts, current_user.uuid)
+    limit = int((getUserSetting(current_user.uuid, "ProductsDisplayLimit")).Value)
+    selected_products = []
+
     # TODO: initialize properly inside class, this is quick and dirty way
     if request.method == "GET":
         form.minmonth.data = range.beginning
         form.maxmonth.data = range.end
-
-    limit = int((getUserSetting(current_user.uuid, "ProductsDisplayLimit")).Value)
-    selected_products = []
     
     if request.method == "POST" and form.validate_on_submit():
         limit = form.limit.data
@@ -1085,47 +1085,62 @@ def productssummary():
 @app.route("/producttypessummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def producttypessummary():
+    form=TypeVisualizationForm()
+    range=getTimeRangeMonth(MonthlyBilance, current_user.uuid)
     limit = int((getUserSetting(current_user.uuid, "ProductTypesDisplayLimit")).Value)
     selected_types=[]
 
-    form = TypeVisualizationForm()
+    # TODO: initialize properly inside class, this is quick and dirty way
+    if request.method == "GET":
+        form.minmonth.data = range.beginning
+        form.maxmonth.data = range.end
+
     if request.method == "POST" and form.validate_on_submit():
         limit = form.limit.data
         selected_types = form.types.data
+        range.beginning = form.minmonth.data
+        range.end = form.maxmonth.data
 
-    top_types=db.session.query(TypeSummary.columns.Type,
-                                 TypeSummary.columns.Amount).\
-                            filter_by(UserID=current_user.uuid).\
-                            order_by(TypeSummary.columns.Times.desc()).\
-                            limit(limit).all()
+    top_types = getTopNProductOrTypesforUser(
+                        TypeSummary,
+                        current_user.uuid,
+                        "Type",
+                        limit
+                        )
 
-    selection_types_list= (type for type, amount in top_types)
+    selection_types_list = (type for type, amount in top_types)
     selected_types.extend(selection_types_list)
     form.types.default=selected_types # Set all displayed types as chosen
 
-    chosen_types=db.session.query(TypeSummary.columns.Type,
-                                 TypeSummary.columns.Amount).\
-                            filter_by(UserID=current_user.uuid).\
-                            where(TypeSummary.columns.Type.in_(selected_types)).\
-                            order_by(TypeSummary.columns.Times.desc()).all()
+    chosen_types = getSpecifiedProductsOrTypesforUser(
+                        TypeSummary,
+                        current_user.uuid,
+                        "Type",
+                        selected_types
+                        )
 
-    monthly_types = db.session.query(MonthlyProductTypes.columns.Month,
-                                       MonthlyProductTypes.columns.Amount,
-                                       MonthlyProductTypes.columns.Type,
-                                       ).\
-                        filter_by(UserID=current_user.uuid).\
-                        where(MonthlyProductTypes.columns.Type.in_(selected_types)).all()
-    types_table = db.session.query(TypeSummary).\
-                        filter_by(UserID=current_user.uuid).\
-                        where(TypeSummary.columns.Type.in_(selected_types)).\
-                        order_by(TypeSummary.columns.Times.desc()).all()
+    monthly_types = getMonthlySummarySubsetByColumn(
+                        MonthlyProductTypes,
+                        current_user.uuid,
+                        range,
+                        "Type",
+                        selected_types
+                        )
+    types_table = getDataSubsetFromTableforUser(
+                        TypeSummary,
+                        current_user.uuid,
+                        "Type",
+                        selected_types
+                        )
     
     top_types_chart = createpiechartdataset(chosen_types, addperc=True)
     top_types_line = createchartdataset(monthly_types)
 
     params={
         "limit": limit,
-        "selectedtypes": selected_types
+        "selectedtypes": selected_types,
+        "minmonth": range.beginning,
+        "maxmonth": range.end
     }
 
     log_site_opened(params=params)

@@ -5,7 +5,7 @@ from datetime import date
 from Resources.models import *
 from Resources.logging_definition import logger
 
-# TODO: Make user setting or global application configuration
+# TODO: MIgrate to global application configuration
 MAX_VISUALIZATION_ITEMS=15
 
 def user_valid(form, field):
@@ -468,7 +468,7 @@ class ProductVisualizationForm(MonthRange):
                                         #filter_by(UserID=current_user.uuid)
         top10_user_products = db.session.query(ProductSummary.columns.Product).\
                                         order_by(ProductSummary.columns.Times).\
-                                        limit(10) #TODO: Populate from limit
+                                        limit(10) #TODO: Populate from user setting
     choices = []
     for product in user_products:
         choices.append(product[0])
@@ -491,7 +491,7 @@ class ProductVisualizationForm(MonthRange):
     # MonthRange already has Submit
 
 # FIXME: filter types by UserID
-class TypeVisualizationForm(FlaskForm):
+class TypeVisualizationForm(MonthRange):
     """Type summary visualization form, decides which types data are 
     selected from database to be visualized
 
@@ -507,7 +507,7 @@ class TypeVisualizationForm(FlaskForm):
                                         #filter_by(UserID=current_user.uuid)
         top10_user_types = db.session.query(TypeSummary.columns.Type).\
                                         order_by(TypeSummary.columns.Times).\
-                                        limit(10)
+                                        limit(10)  #TODO: Populate from user setting
     choices = []
     for type in user_types:
         choices.append(type[0])
@@ -522,12 +522,12 @@ class TypeVisualizationForm(FlaskForm):
                               if user_types_count > MAX_VISUALIZATION_ITEMS
                               else user_types_count
                         )
-                    ],
-                default = 10)
+                    ])
     types = SelectMultipleField(
                     choices = choices,
                     default = top10_user_types)
     submit = SubmitField("Submit")
+    # MonthRange already has Submit
 
 # FIXME: filter types by UserID
 class MonthInputForm(FlaskForm):

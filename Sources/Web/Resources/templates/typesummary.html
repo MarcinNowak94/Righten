@@ -7,35 +7,62 @@
             <form action="" method="POST">
                 {{ form.csrf_token() }}
                 <fieldset class="form-group">
-                        <div class="row form-group">
-                            {{ form.limit.label(class="form-control-label") }}
-                            {% if form.limit.errors %}
-                                {{ form.limit(class="form-control form-control-sm is-invalid") }}
-                                {% for error in form.limit.errors %}
-                                    <div class="invalid-feedback">
-                                        <span>{{error}}</span>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                {{ form.limit(class="form-control form-control-sm") }}
-                            {% endif %}
-                        </div>
-                        <div class="row form-group">
-                            {{ form.types.label(class="form-control-label") }}
-                            {% if form.types.errors %}
-                                {{ form.types(class="form-control form-control-sm is-invalid") }}
-                                {% for error in form.types.errors %}
-                                    <div class="invalid-feedback">
-                                        <span>{{error}}</span>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                {{ form.types(class="form-control form-control-sm") }}
-                            {% endif %}
-                        </div>
-                        <div class="row">
-                            {{ form.submit(class="btn btn-success", value="Check")}}
-                        </div>
+                    <div class="col form-group">
+                        {{ form.minmonth.label(class="form-control-label") }}
+                        {% if form.minmonth.errors %}
+                            {{ form.minmonth(class="form-control form-control-sm is-invalid") }}
+                            {% for error in form.minmonth.errors %}
+                                <div class="invalid-feedback">
+                                    <span>{{error}}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ form.minmonth(class="form-control form-control-sm") }}
+                        {% endif %}
+                    </div>
+                    <div class="col form-group">
+                        {{ form.maxmonth.label(class="form-control-label") }}
+                        {% if form.maxmonth.errors %}
+                            {{ form.maxmonth(class="form-control form-control-sm is-invalid") }}
+                            {% for error in form.maxmonth.errors %}
+                                <div class="invalid-feedback">
+                                    <span>{{error}}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ form.maxmonth(class="form-control form-control-sm") }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row form-group">
+                        {{ form.limit.label(class="form-control-label") }}
+                        {% if form.limit.errors %}
+                            {{ form.limit(class="form-control form-control-sm is-invalid") }}
+                            {% for error in form.limit.errors %}
+                                <div class="invalid-feedback">
+                                    <span>{{error}}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ form.limit(class="form-control form-control-sm") }}
+                        {% endif %}
+                    </div>
+                    <div class="row form-group">
+                        {{ form.types.label(class="form-control-label") }}
+                        {% if form.types.errors %}
+                            {{ form.types(class="form-control form-control-sm is-invalid") }}
+                            {% for error in form.types.errors %}
+                                <div class="invalid-feedback">
+                                    <span>{{error}}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {{ form.types(class="form-control form-control-sm") }}
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        {{ form.submit(class="btn btn-success", value="Check")}}
+                    </div>
                 </fieldset>
             </form>
         </div>
