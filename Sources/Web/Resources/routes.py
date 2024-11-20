@@ -1007,11 +1007,13 @@ def finances():
                            form=form
                            )
 
-# Nice-TO-HAVE: Add panels:
+# NICE-TO-HAVE: Refactor productssummary and producttypessummary into one view
+# NICE-TO-HAVE: Add panels:
 # - Product priority over time
 # - spending by Product (move from expenditures?)
 # - Top 10 low priority product spending Calculate (Amount*(100-priority))
 # TODO: Calculate all data within specified timeframe - requires moving whole db ProductSummary view logic to getdata.py (hard)
+# NICE-TO-HAVE: add Show outiers/Show uncommon control and ignore specific records 
 @app.route("/productssummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def productssummary():
@@ -1082,6 +1084,8 @@ def productssummary():
                         form=form
                         )
 
+# TODO: Calculate all data within specified timeframe - requires moving whole db ProductSummary view logic to getdata.py (hard)
+# NICE-TO-HAVE: add Show outiers/Show uncommon control and ignore specific records 
 @app.route("/producttypessummary", methods=['GET', 'POST'])
 @flask_login.login_required
 def producttypessummary():
@@ -1157,31 +1161,44 @@ def producttypessummary():
 @app.route("/month", methods=["GET", "POST"])
 @flask_login.login_required
 def month():
-    #Expenditures pie chart "SELECT * FROM Mont" 
+    #Expenditures pie chart "SELECT * FROM Month" 
     #MonthlyBilance table
     #Unnecessary productsBought(Group by Product)
     #MonthlySpending
-    #IDEA: Add month picker based on data from BIlance
     
     form = MonthInputForm()
-    chosenmonth="2024-09" #TODO: Populate dynamically str(datetime.now().year+"-"+datetime.now().month)
+    range = getTimeRangeMonth(MonthlyExpendituresbyType, current_user.uuid)
+    if request.method == "GET":
+        range.beginning = range.end # To get only one months data
+        chosenmonth = range.end
 
     if form.validate_on_submit():
-        chosenmonth = Type=form.months.data
+        range.beginning = range.end = form.months.data
+        chosenmonth = form.months.data
 
-    typespendingdata = db.session.query(MonthlyExpendituresbyType.columns.Type,
-                                    MonthlyExpendituresbyType.columns.Amount).\
-                            filter_by(UserID=current_user.uuid).\
-                            filter_by(Month=chosenmonth)
-    # TODO: Add net result
-    # TODO: Add possiblesavings
-    bilancedata = db.session.query(MonthlyBilance.columns.Source,
-                                    MonthlyBilance.columns.Amount).\
-                            filter_by(UserID=current_user.uuid).\
-                            filter_by(Month=chosenmonth)
-    unnecessaryproducts = db.session.query(UnnecessaryProductsBought).\
-                            filter_by(UserID=current_user.uuid).\
-                            filter_by(Month=chosenmonth)
+    typespendingdata = getSummaryByColumnGrouped(
+                        MonthlyExpendituresbyType,
+                        current_user.uuid,
+                        range,
+                        "Type"
+                        )
+    bilancedata = getMonthRangeDataFromTableforUser(
+                        MonthlyBilance,
+                        current_user.uuid,
+                        range
+                        )
+    netresult=0
+    for record in bilancedata:
+        netresult += record.Amount #NICE-TO-HAVE: sum in more pytonic way 
+
+    unnecessaryproducts = getMonthRangeDataFromTableforUser(
+                            UnnecessaryProductsBought,
+                            current_user.uuid,
+                            range)
+    
+    possiblesavings=0
+    for record in unnecessaryproducts:
+        possiblesavings += record.Amount #NICE-TO-HAVE: sum in more pytonic way 
     
     typespendingchart=createpiechartdataset(typespendingdata, addperc=True)
 
@@ -1191,6 +1208,8 @@ def month():
                            typespending=json.dumps(typespendingchart, cls=DecimalEncoder),
                            bilancedata=bilancedata,
                            unnecessaryproducts=unnecessaryproducts,
+                           possiblesavings=round(possiblesavings,2),
+                           netresult=round(netresult,2),
                            form=form)
 
 #Basic data display ------------------------------------------------------------
