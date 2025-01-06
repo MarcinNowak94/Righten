@@ -30,7 +30,7 @@ def getUserbyID(
         User record or 404 error
     """
     with app.app_context():
-        return db.one_or_404(db.select(Users).filter_by(ID=userID))
+        return db.one_or_404(db.session.query(Users).filter_by(ID=userID))
 
 def getUserSetting(
         userID: str,

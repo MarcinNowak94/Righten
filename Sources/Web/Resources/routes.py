@@ -194,30 +194,11 @@ def createuser(user: Users) -> bool:
         True if creation is successfull
     """
 
-    # NICE-TO-HAVE: Populate with statistical data from app or GUS 
-    settings={
-        "ProductPriorityTarget":	33,
-        "SpendingTarget":	3000,
-        "SavingsTarget":	100,
-        "ProductsDisplayLimit": 10,
-        "ProductTypesDisplayLimit": 10
-    }
-
     success = False
     success = addtodb(user, notify=True)
     operations={
         "UserCreation" : success
-    } 
-
-    for setting in settings:
-        usersetting = UserSettings(
-            UserID=user.ID,
-            Setting=setting,
-            Value=settings[setting]
-        )
-        # Notify = False or else every setting change generates separate notification
-        success = addtodb(usersetting, notify=False)
-        operations[setting]=success
+    }
 
     for operation in operations:
         if operations[operation] is False: 
@@ -551,37 +532,18 @@ def settings():
     changeerror=None
     settingschanged=[]
 
-    userentry = getUserbyID(current_user.uuid)
-    # Settings must be separate to update them separately
-    priority = getUserSetting(
-                    userID=current_user.uuid,
-                    setting="ProductPriorityTarget"
-                    )
-                            
-    spending = getUserSetting(
-                    userID=current_user.uuid,
-                    setting="SpendingTarget"
-                    )
-    savings = getUserSetting(
-                    userID=current_user.uuid,
-                    setting="SavingsTarget"
-                    )
-    ProductsDisplayLimit = getUserSetting(
-                    userID=current_user.uuid,
-                    setting="ProductsDisplayLimit"
-                    )
-    ProductTypesDisplayLimit = getUserSetting(
-                    userID=current_user.uuid,
-                    setting="ProductTypesDisplayLimit"
-                    )
+    # Function usage removed - if not done directly, settings are not commited to database
+    userentry = db.one_or_404(db.session.query(Users).filter_by(ID=current_user.uuid)) #getUserbyID(current_user.uuid)
+    
+    SpendingTargetValue = getUserbyID(current_user.uuid).SpendingTarget
 
     form=SettingsForm(
-        productprioritytarget=Decimal(priority.Value),
-        spendingtarget=Decimal(spending.Value),
-        savingstarget=Decimal(savings.Value),
+        productprioritytarget=Decimal(userentry.ProductPriorityTarget),
+        spendingtarget=Decimal(userentry.SpendingTarget),
+        savingstarget=Decimal(userentry.SavingsTarget),
         accountactive=bool(userentry.isActive),
-        productsdisplaylimit=int(ProductsDisplayLimit.Value),
-        producttypesdisplaylimit=int(ProductTypesDisplayLimit.Value)
+        productsdisplaylimit=int(userentry.ProductsDisplayLimit),
+        producttypesdisplaylimit=int(userentry.ProductTypesDisplayLimit)
     )
     
     # TODO: Refactor all as one separate function, next step - figure out a way to do it as one general loop
@@ -611,13 +573,13 @@ def settings():
             settingschanged.append(change)
         
         #Store only changed values
-        if form.productprioritytarget.data and form.productprioritytarget.data!=Decimal(priority.Value):
+        if form.productprioritytarget.data and form.productprioritytarget.data!=Decimal(userentry.ProductPriorityTarget):
             change = {}
             change["setting"] = "Priority target"
-            change["oldvalue"] = priority.Value
+            change["oldvalue"] = userentry.ProductPriorityTarget
             change["newvalue"] = form.productprioritytarget.data
 
-            priority.Value=form.productprioritytarget.data
+            userentry.ProductPriorityTarget=form.productprioritytarget.data
             try:
                 db.session.commit()
                 flash("Product priority target updated", "success")
@@ -632,13 +594,13 @@ def settings():
             change["error"] = changeerror
             settingschanged.append(change)
 
-        if form.spendingtarget.data and form.spendingtarget.data!=Decimal(spending.Value):
+        if form.spendingtarget.data and form.spendingtarget.data!=Decimal(userentry.SpendingTarget):
             change = {}
             change["setting"] = "Spending target"
-            change["oldvalue"] = spending.Value
+            change["oldvalue"] = userentry.SpendingTarget
             change["newvalue"] = form.spendingtarget.data
 
-            spending.Value=str(form.spendingtarget.data)
+            userentry.SpendingTarget=str(form.spendingtarget.data)
             try:
                 db.session.commit()
                 flash("Spending target updated", "success")
@@ -653,13 +615,13 @@ def settings():
             change["error"] = changeerror
             settingschanged.append(change)
 
-        if form.savingstarget.data and form.savingstarget.data!=Decimal(savings.Value):
+        if form.savingstarget.data and form.savingstarget.data!=Decimal(userentry.SavingsTarget):
             change = {}
             change["setting"] = "Savings target"
-            change["oldvalue"] = savings.Value
+            change["oldvalue"] = userentry.SavingsTarget
             change["newvalue"] = form.savingstarget.data
             
-            savings.Value=str(form.savingstarget.data)
+            userentry.SavingsTarget=str(form.savingstarget.data)
             try:
                 db.session.commit()
                 flash("Savings target updated", "success")
@@ -675,13 +637,13 @@ def settings():
             change["error"] = changeerror
             settingschanged.append(change)
         
-        if form.productsdisplaylimit.data and form.productsdisplaylimit.data!=Decimal(ProductsDisplayLimit.Value):
+        if form.productsdisplaylimit.data and form.productsdisplaylimit.data!=Decimal(userentry.ProductsDisplayLimit):
             change = {}
             change["setting"] = "Products display limit"
-            change["oldvalue"] = ProductsDisplayLimit.Value
+            change["oldvalue"] = userentry.ProductsDisplayLimit
             change["newvalue"] = form.productsdisplaylimit.data
             
-            ProductsDisplayLimit.Value=str(form.productsdisplaylimit.data)
+            userentry.ProductsDisplayLimit=str(form.productsdisplaylimit.data)
             try:
                 db.session.commit()
                 flash("Products display limit updated", "success")
@@ -697,15 +659,13 @@ def settings():
             change["error"] = changeerror
             settingschanged.append(change)
         
-        ProductTypesDisplayLimit=getUserSetting(current_user.uuid, "ProductTypesDisplayLimit")
-        producttypesdisplaylimit=int(ProductTypesDisplayLimit.Value)
-        if form.producttypesdisplaylimit.data and form.producttypesdisplaylimit.data!=Decimal(ProductTypesDisplayLimit.Value):
+        if form.producttypesdisplaylimit.data and form.producttypesdisplaylimit.data!=Decimal(userentry.ProductTypesDisplayLimit):
             change = {}
             change["setting"] = "Products display limit"
-            change["oldvalue"] = ProductTypesDisplayLimit.Value
+            change["oldvalue"] = userentry.ProductTypesDisplayLimit
             change["newvalue"] = form.producttypesdisplaylimit.data
             
-            ProductTypesDisplayLimit.Value=str(form.producttypesdisplaylimit.data)
+            userentry.ProductTypesDisplayLimit=str(form.producttypesdisplaylimit.data)
             try:
                 db.session.commit()
                 flash("Products types display limit updated", "success")
@@ -940,7 +900,7 @@ def expendituressummary():
                                 current_user.uuid,
                                 range,
                                 "Product")
-    SpendingTargetValue = (getUserSetting(current_user.uuid, "SpendingTarget")).Value
+    SpendingTargetValue = getUserbyID(current_user.uuid).SpendingTarget
 
     expenditures_summary_chart = createpiechartdataset(ExpendituresSummarydata, addperc=True)
     TopTypeExpenditures=createchartdataset(TopTypeExpendituresData, "true")
@@ -989,9 +949,9 @@ def spending():
                     )
     
     # All settings are stored as text, thus type cast to int
-    PriorityTarget = int((getUserSetting(current_user.uuid, "ProductPriorityTarget")).Value)
+    PriorityTarget = getUserbyID(current_user.uuid).ProductPriorityTarget
     
-    SpendingTarget = int((getUserSetting(current_user.uuid, "SpendingTarget")).Value)
+    SpendingTarget = getUserbyID(current_user.uuid).SpendingTarget
 
     MonthlySpendingData=[]
     CashPercentageData=[]
@@ -1060,7 +1020,7 @@ def finances():
     BilanceTotalAnnotated.append({"Label":"Expenditures","Value":BilanceTotal[0][1]})
     BilanceTotalAnnotated.append({"Label":"Bills","Value":BilanceTotal[0][2]})
      
-    SavingsTargetData = int((getUserSetting(current_user.uuid, "SpendingTarget")).Value)
+    SavingsTargetData = getUserbyID(current_user.uuid).SavingsTarget
     
     #BilanceSourcesData = createchartdataset(BilanceSources, "true")
 
@@ -1106,7 +1066,7 @@ def finances():
 def productssummary():
     form = ProductVisualizationForm() # Extends MonthRange
     range = getTimeRangeMonth(MonthlyProducts, current_user.uuid)
-    limit = int((getUserSetting(current_user.uuid, "ProductsDisplayLimit")).Value)
+    limit = getUserbyID(current_user.uuid).ProductsDisplayLimit
     selected_products = []
 
     # TODO: initialize properly inside class, this is quick and dirty way
@@ -1178,7 +1138,7 @@ def productssummary():
 def producttypessummary():
     form=TypeVisualizationForm()
     range=getTimeRangeMonth(MonthlyBilance, current_user.uuid)
-    limit = int((getUserSetting(current_user.uuid, "ProductTypesDisplayLimit")).Value)
+    limit = getUserbyID(current_user.uuid).ProductTypesDisplayLimit
     selected_types=[]
 
     # TODO: initialize properly inside class, this is quick and dirty way
