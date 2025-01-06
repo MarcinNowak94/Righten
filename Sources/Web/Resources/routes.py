@@ -271,6 +271,40 @@ def createchartdataset(dbdata: list, fill="false") -> list:
             )
     return dataset
 
+#FIXME: Temporary function, genralize it and refactor 
+def createchartdatasetMonthlyBilanceSummary(dbdata: list, fill="false") -> list:
+    """Formats provided sets od data into unified chart data set {date, value} 
+    with labels. To display data on the same graph dates in all sets are 
+    normalized meaning entrioes for missing dates are added with value 0."""
+    months=[]
+    sets={}
+
+    #Build distinct month list for labels and type dictionaries for data 
+    for Month, Amount, Type in dbdata:
+        if Month not in months: months.append(Month)
+        if Type not in sets: sets[Type]=[]
+
+    #Fill type dictionaries with amount or 0 
+    for Month, Amount, Type in dbdata:
+        for set in sets:
+            sets[set].append({"x": Month, "y": Amount if Type==set else 0})
+
+    dataset=[]
+    for set in sets:
+        dataset.append({"label": set, "data": sets[set], "fill": fill})
+
+    logger.debug(
+            "Created chart data set",
+            extra={
+                "action": "Chart dataset creation", 
+                "result": "Success",
+                "function": createchartdataset.__name__,
+                "user": get_current_user_ID(),
+                "request": get_request_data()
+                }
+            )
+    return dataset
+
 def createpiechartdataset(
         data: List[Dict[str, SupportsComplex]],
         value_descriptor="Amount",
@@ -305,6 +339,53 @@ def createpiechartdataset(
             label+=" "+str(round((abs(value)/total)*100))+"%"
         labels.append(label)
         values.append(value)
+
+    chartdata={
+        "labels": labels,
+        "datasets": [{
+            "label": value_descriptor,
+            "data": values
+        }]
+    }
+
+    return chartdata
+
+def createpiechartdatasethorizontal(
+        data: List[Dict[str, SupportsComplex]],
+        value_descriptor="Amount",
+        addperc=False
+        ):
+    """Creates data for jschart piechart
+
+    Arguments:
+        :data: -- Data to chart in form: [Label, value] 
+
+    Keyword Arguments:
+        :value_descriptor: -- Text displayed beside value on mouse hover (default: {"Amount"})
+        :addperc: -- Adds percentage to label (default: {False})
+
+    Returns:
+        JSON formatted jschart piechart data
+    """
+
+    labels=[]
+    values=[]
+    total=0
+    if addperc is True:
+        for row in data:
+            for column in row:
+                # Some datasets contain negative values
+                    total+=abs(column)
+        #sum=sum(value for label, value in data)
+
+    for row in data:
+        for column in row:
+            if addperc is True:
+                # Some datasets contain negative values
+                # FIXME: Crashes when there is no data in Type field
+                label+=" "+str(round((abs(column)/total)*100))+"%"
+            labels.append(label)
+            values.append(column)
 
     chartdata={
         "labels": labels,
@@ -747,7 +828,7 @@ def passwordchange():
 @flask_login.login_required
 def incomesummary():
     form=MonthRange()
-    range=getTimeRangeMonth(MonthlyIncome, current_user.uuid)
+    range=getTimeRangeMonth(MonthlyBilance, current_user.uuid)
     # TODO: initialize properly inside class, this is quick and dirty way
     if request.method == "GET":
         form.minmonth.data = range.beginning
@@ -764,7 +845,7 @@ def incomesummary():
                             range,
                             "Type")
     
-    IncomeOverTime = getMonthlySummaryRange(MonthlyIncome, current_user.uuid, range)
+    IncomeOverTime = getMonthlySummaryByColumn(MonthlyBilance, current_user.uuid, range, "Income")
     IncomeTypesByTime = getMonthlySummaryByColumn(MonthlyIncomeByType, current_user.uuid, range, "Type")
     
     IncomeTypechart=createpiechartdataset(IncomeSummarydata, addperc=True)
@@ -789,7 +870,7 @@ def incomesummary():
 @flask_login.login_required
 def billssummary():
     form=MonthRange()
-    range=getTimeRangeMonth(MonthlyBills, current_user.uuid)
+    range=getTimeRangeMonth(MonthlyBilance, current_user.uuid)
     # TODO: initialize properly inside class, this is quick and dirty way
     if request.method == "GET":
         form.minmonth.data = range.beginning
@@ -805,7 +886,7 @@ def billssummary():
                             current_user.uuid,
                             range,
                             "Medium")
-    BillsOverTime = getMonthlySummaryRange(MonthlyBills, current_user.uuid, range)
+    BillsOverTime = getMonthlySummaryByColumn(MonthlyBilance, current_user.uuid, range, "Bills")
     BillsTypesByTime = getMonthlySummaryByColumn(MonthlyBillsByMedium, current_user.uuid, range, "Medium")
     
     
@@ -829,7 +910,7 @@ def billssummary():
 @flask_login.login_required
 def expendituressummary():
     form=MonthRange()
-    range=getTimeRangeMonth(MonthlyExpenditures, current_user.uuid)
+    range=getTimeRangeMonth(MonthlyBilance, current_user.uuid)
     # TODO: initialize properly inside class, this is quick and dirty way
     if request.method == "GET":
         form.minmonth.data = range.beginning
@@ -844,10 +925,11 @@ def expendituressummary():
                                 current_user.uuid,
                                 range,
                                 "Type")
-    ExpendituresOverTime = getMonthlySummaryRange(
-                                MonthlyExpenditures,
+    ExpendituresOverTime = getMonthlySummaryByColumn(
+                                MonthlyBilance,
                                 current_user.uuid,
-                                range)
+                                range,
+                                "Expenditures")
     TopTypeExpendituresData = getMonthlyTopExpenditures(
                                 Top10ProductTypesMonthly,
                                 current_user.uuid,
@@ -890,7 +972,7 @@ def expendituressummary():
 @flask_login.login_required
 def spending():
     form=MonthRange()
-    range=getTimeRangeMonth(MonthlyBills, current_user.uuid)
+    range=getTimeRangeMonth(MonthlyBilance, current_user.uuid)
     # TODO: initialize properly inside class, this is quick and dirty way
     if request.method == "GET":
         form.minmonth.data = range.beginning
@@ -962,21 +1044,25 @@ def finances():
         range.end = form.maxmonth.data
     # NICE-TO-HAVE: Add statistic type, and get only financial here
     StatisticData = getDataFromTableforUser(Statistics, current_user.uuid)
-    BilanceData = getMonthlySummaryRange(
-                    MonthlyBilanceSingle,
+    BilanceData = getMonthlyBilanceValueFor(
+                    MonthlyBilance,
                     current_user.uuid,
-                    range)
+                    range,
+                    "Bilance")
 
-    BilanceSources = getMonthlySummaryByColumn(
+    BilanceSources = getMonthRangeDataFromTableforUser(
                         MonthlyBilance,
                         current_user.uuid,
-                        range,
-                        "Source")
+                        range)
     BilanceTotal = getMonthlyBilanceSummaryforUser(MonthlyBilance, current_user.uuid, range, "Source")
+    BilanceTotalAnnotated=[]
+    BilanceTotalAnnotated.append({"Label":"Income","Value":BilanceTotal[0][0]})
+    BilanceTotalAnnotated.append({"Label":"Expenditures","Value":BilanceTotal[0][1]})
+    BilanceTotalAnnotated.append({"Label":"Bills","Value":BilanceTotal[0][2]})
      
     SavingsTargetData = int((getUserSetting(current_user.uuid, "SpendingTarget")).Value)
     
-    BilanceSourcesData = createchartdataset(BilanceSources, "true")
+    #BilanceSourcesData = createchartdataset(BilanceSources, "true")
 
     Bilance=[]
     Breakeven=[]
@@ -996,12 +1082,13 @@ def finances():
     
     for set in sets:
         BilanceSet.append({"label": set, "data": sets[set]})
-    BilanceTotalchart=createpiechartdataset(BilanceTotal, addperc=True)
+   
+    BilanceTotalchart=createpiechartdataset(BilanceTotalAnnotated, addperc=True)
     log_site_opened()
     return render_template("financialposture.html",
                            title="Finances",
                            BilanceTotalchart=json.dumps(BilanceTotalchart, cls=DecimalEncoder),
-                           BilanceSourcesData=json.dumps(BilanceSourcesData, cls=DecimalEncoder),
+                           BilanceSourcesData=json.dumps(BilanceSources),#BilanceSourcesData, cls=DecimalEncoder),
                            BilanceData=json.dumps(BilanceSet, cls=DecimalEncoder),
                            StatisticData=StatisticData,
                            form=form

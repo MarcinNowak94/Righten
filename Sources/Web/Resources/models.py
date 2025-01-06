@@ -27,10 +27,7 @@ with app.app_context():
     #Views
     ExpendituresEnriched = Table("ExpendituresEnriched", db.metadata, autoload_with=db.engine)
     MonthlyBilance = Table("MonthlyBilance", db.metadata, autoload_with=db.engine)
-    MonthlyBills = Table("MonthlyBills", db.metadata, autoload_with=db.engine)
-    MonthlyExpenditures = Table("MonthlyExpenditures", db.metadata, autoload_with=db.engine)
     MonthlyExpendituresbyType = Table("MonthlyExpendituresbyType", db.metadata, autoload_with=db.engine)
-    MonthlyIncome = Table("MonthlyIncome", db.metadata, autoload_with=db.engine)
     MonthlyProducts = Table("MonthlyProducts", db.metadata, autoload_with=db.engine)
     MonthlyCommonProducts = Table("MonthlyCommonProducts", db.metadata, autoload_with=db.engine)
     MonthlyProductTypes = Table("MonthlyProductTypes", db.metadata, autoload_with=db.engine)
@@ -43,7 +40,6 @@ with app.app_context():
     MonthlyBillsByMedium = Table("MonthlyBillsByMedium", db.metadata, autoload_with=db.engine)
     Top10ProductTypesMonthly = Table("Top10ProductTypesMonthly", db.metadata, autoload_with=db.engine)
     Top10ProductsMonthly = Table("Top10ProductsMonthly", db.metadata, autoload_with=db.engine)
-    MonthlyBilanceSingle = Table("MonthlyBilanceSingle", db.metadata, autoload_with=db.engine)
     MonthlySpending = Table("MonthlySpending", db.metadata, autoload_with=db.engine)
     UnnecessaryProductsBought = Table("UnnecessaryProductsBought", db.metadata, autoload_with=db.engine)
     Statistics = Table("Statistics", db.metadata, autoload_with=db.engine)
@@ -62,10 +58,7 @@ tables = {
 views = {
     "ExpendituresEnriched" : ExpendituresEnriched,
     "MonthlyBilance" : MonthlyBilance,
-    "MonthlyBills" : MonthlyBills,
-    "MonthlyExpenditures" : MonthlyExpenditures,
-    "MonthlyExpendituresbyType": MonthlyExpendituresbyType, 
-    "MonthlyIncome" : MonthlyIncome,
+    "MonthlyExpendituresbyType": MonthlyExpendituresbyType,
     "MonthlyProducts" : MonthlyProducts,
     "MonthlyCommonProducts" : MonthlyCommonProducts,
     "MonthlyProductTypes" : MonthlyProductTypes,
@@ -78,7 +71,6 @@ views = {
     "MonthlyBillsByMedium" : MonthlyBillsByMedium,
     "Top10ProductTypesMonthly" : Top10ProductTypesMonthly,
     "Top10ProductsMonthly" : Top10ProductsMonthly,
-    "MonthlyBilanceSingle" : MonthlyBilanceSingle,
     "MonthlySpending" : MonthlySpending,
     "UnnecessaryProductsBought" : UnnecessaryProductsBought,
     "Statistics" : Statistics

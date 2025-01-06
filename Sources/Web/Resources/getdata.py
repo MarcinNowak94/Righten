@@ -353,13 +353,14 @@ def getMonthlyBilanceSummaryforUser(
 
     with app.app_context():
         return db.session.query(
-                                table.columns[column],
-                                db.func.round(db.func.sum(table.columns.Amount))).\
+                                db.func.round(db.func.sum(table.columns.Income)),
+                                db.func.round(db.func.sum(table.columns.Expenditures)),
+                                db.func.round(db.func.sum(table.columns.Bills))
+                            ).\
                             filter_by(UserID=userID).\
                             filter(
                                 table.columns.Month>=range.beginning,
                                 table.columns.Month<=range.end).\
-                            group_by(table.columns[column]).\
                             all()
 
 def getTopNProductOrTypesforUser(
@@ -415,3 +416,33 @@ def getSpecifiedProductsOrTypesforUser(
                             where(table.columns[column].in_(list)).\
                             all()
         return data
+
+def getMonthlyBilanceValueFor(
+        table: Table,
+        userID: str,
+        range: RangeMonth,
+        column: str
+    ) -> list:
+    """Returns specified column from MonthlySummary table  table data for specified user in specified timeframe
+
+    Arguments:
+        :table: -- Table for which data is requested
+        :userID: -- UserID
+        :range: -- Timeframe for which data to provide
+        :column: -- Column by wich tables differ
+
+    Returns:
+        List containing summary by column (as Amount) in specified timeframe
+    """
+    
+    with app.app_context():
+        summary = db.session.query(
+                                table.columns.Month,
+                                table.columns[column].label("Amount")
+                            ).\
+                            filter_by(UserID=userID).\
+                            filter(
+                                table.columns.Month>=range.beginning,
+                                table.columns.Month<=range.end).\
+                            all()
+        return summary
