@@ -535,8 +535,6 @@ def settings():
     # Function usage removed - if not done directly, settings are not commited to database
     userentry = db.one_or_404(db.session.query(Users).filter_by(ID=current_user.uuid)) #getUserbyID(current_user.uuid)
     
-    SpendingTargetValue = getUserbyID(current_user.uuid).SpendingTarget
-
     form=SettingsForm(
         productprioritytarget=Decimal(userentry.ProductPriorityTarget),
         spendingtarget=Decimal(userentry.SpendingTarget),

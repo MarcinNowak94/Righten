@@ -22,7 +22,6 @@ with app.app_context():
     Products = Base.classes.Products
     Expenditures = Base.classes.Expenditures
     Users = Base.classes.Users
-    UserSettings = Base.classes.UserSettings
 
     #Views
     ExpendituresEnriched = Table("ExpendituresEnriched", db.metadata, autoload_with=db.engine)
@@ -51,8 +50,7 @@ tables = {
     "ProductTypes": ProductTypes,
     "Products" : Products,
     "Expenditures" : Expenditures,
-    "Users" : Users,
-    "UserSettings" : UserSettings
+    "Users" : Users
 }
 
 views = {

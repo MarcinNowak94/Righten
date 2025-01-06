@@ -32,27 +32,6 @@ def getUserbyID(
     with app.app_context():
         return db.one_or_404(db.session.query(Users).filter_by(ID=userID))
 
-def getUserSetting(
-        userID: str,
-        setting: str #TODO: Change to enum
-        ):
-    """Returns chosen setting for specified user ID from database
-
-    Arguments:
-        :userID: -- User ID to check
-        :setting: -- User setting to get
-
-    Returns:
-        User record or 404 error
-    """
-    with app.app_context():
-        return db.one_or_404(
-                    db.session.query(UserSettings).\
-                        filter_by(
-                            Setting=setting,
-                            UserID=userID)
-                    )
-
 # TODO: Abstract so only one range fucntion can be used
 def getTimeRangeMonth(
         table: Table,
