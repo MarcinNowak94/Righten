@@ -803,16 +803,19 @@ def incomesummary():
                             range,
                             "Type")
     
-    IncomeOverTime = getMonthlySummaryByColumn(MonthlyBilance, current_user.uuid, range, "Income")
-    IncomeTypesByTime = getMonthlySummaryByColumn(MonthlyIncomeByType, current_user.uuid, range, "Type")
-    
+    IncomeTypesByTime = getMonthlySummaryByColumn(MonthlyIncomeByType, current_user.uuid, range, "Type") 
     IncomeTypechart=createpiechartdataset(IncomeSummarydata, addperc=True)
     IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
 
+    BilanceData = getMonthRangeDataFromTableforUser(
+                        MonthlyBilance,
+                        current_user.uuid,
+                        range)
+
     #TODO: Start chart at 0 - negative income is not an acceptable input
     monthlyincomedata = []
-    for month, amount in IncomeOverTime:
-        monthlyincomedata.append({"x": month, "y": amount})
+    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+        monthlyincomedata.append({"x": Month, "y": Income})
 
     log_site_opened()
     return render_template("incomesummary.html",
@@ -844,15 +847,17 @@ def billssummary():
                             current_user.uuid,
                             range,
                             "Medium")
-    BillsOverTime = getMonthlySummaryByColumn(MonthlyBilance, current_user.uuid, range, "Bills")
     BillsTypesByTime = getMonthlySummaryByColumn(MonthlyBillsByMedium, current_user.uuid, range, "Medium")
-    
     
     bills_type_chart = createpiechartdataset(BillsSummarydata, addperc=True)
     bills_types_data = createchartdataset(BillsTypesByTime)
+    BilanceData = getMonthRangeDataFromTableforUser(
+                    MonthlyBilance,
+                    current_user.uuid,
+                    range)
     monthly_bills_data = []
-    for month, amount in BillsOverTime:
-        monthly_bills_data.append({"x": month, "y":amount})
+    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+        monthly_bills_data.append({"x": Month, "y": Bills})
 
     log_site_opened()
     return render_template("billssummary.html",
@@ -883,11 +888,6 @@ def expendituressummary():
                                 current_user.uuid,
                                 range,
                                 "Type")
-    ExpendituresOverTime = getMonthlySummaryByColumn(
-                                MonthlyBilance,
-                                current_user.uuid,
-                                range,
-                                "Expenditures")
     TopTypeExpendituresData = getMonthlyTopExpenditures(
                                 Top10ProductTypesMonthly,
                                 current_user.uuid,
@@ -906,9 +906,14 @@ def expendituressummary():
     MonthlyExpendituresData=[]
     SpendingTarget=[]
     
-    for Month, Amount in ExpendituresOverTime:
-        MonthlyExpendituresData.append({"x":Month,"y":Amount})
+    BilanceData = getMonthRangeDataFromTableforUser(
+                    MonthlyBilance,
+                    current_user.uuid,
+                    range)
+    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+        MonthlyExpendituresData.append({"x": Month, "y": Expenditures})
         SpendingTarget.append({"x":Month,"y":SpendingTargetValue})
+        #TODO: add savings rate
     
     ExpendituresSet=[]
     ExpendituresSet.append({"label": "Exenditures", "data": MonthlyExpendituresData})
@@ -1002,10 +1007,6 @@ def finances():
         range.end = form.maxmonth.data
     # NICE-TO-HAVE: Add statistic type, and get only financial here
     StatisticData = getDataFromTableforUser(Statistics, current_user.uuid)
-    BilanceData = getMonthRangeDataFromTableforUser(
-                    MonthlyBilance,
-                    current_user.uuid,
-                    range)
 
     BilanceTotal= getMonthlyBilanceSummaryforUser(
                         MonthlyBilance,
@@ -1013,6 +1014,10 @@ def finances():
                         range)
     SavingsTargetData = getUserbyID(current_user.uuid).SavingsTarget
     
+    BilanceData = getMonthRangeDataFromTableforUser(
+                    MonthlyBilance,
+                    current_user.uuid,
+                    range)
     bilance=[]
     Breakeven=[]
     BilanceSet=[]
@@ -1233,14 +1238,31 @@ def month():
                         range,
                         "Type"
                         )
-    bilancedata = getMonthRangeDataFromTableforUser(
-                        MonthlyBilance,
-                        current_user.uuid,
-                        range
-                        )
+    
     netresult=0
-    for record in bilancedata:
-        netresult += record.Amount #NICE-TO-HAVE: sum in more pytonic way 
+    BilanceData = getMonthRangeDataFromTableforUser(
+                    MonthlyBilance,
+                    current_user.uuid,
+                    range)
+    income=[]
+    expenditures=[]
+    bills=[]
+    BilanceSourcesData=[]
+    BilanceSources = {
+        "Income": income,
+        "Expenditures": expenditures,
+        "Bills": bills
+    }
+
+    #Adding breakeven line 
+    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+        income.append({"x":Month,"y":Income})
+        expenditures.append({"x":Month,"y":Expenditures})
+        bills.append({"x":Month,"y":Bills})
+        netresult+=Bilance
+
+    for source in BilanceSources:
+        BilanceSourcesData.append({"label": source, "data": BilanceSources[source]})
 
     unnecessaryproducts = getMonthRangeDataFromTableforUser(
                             UnnecessaryProductsBought,
@@ -1257,7 +1279,7 @@ def month():
     return render_template("month.html",
                            title="Month summary",
                            typespending=json.dumps(typespendingchart, cls=DecimalEncoder),
-                           bilancedata=bilancedata,
+                           bilancedata=BilanceSourcesData,
                            unnecessaryproducts=unnecessaryproducts,
                            possiblesavings=round(possiblesavings,2),
                            netresult=round(netresult,2),

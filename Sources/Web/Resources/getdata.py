@@ -340,7 +340,7 @@ def getMonthlyBilanceSummaryforUser(
                                 table.columns.Month>=range.beginning,
                                 table.columns.Month<=range.end).\
                             all()
-        #FIXME: Terrible hack, also some elements are not in order
+        # Compatibility with createpiechartdataset
         summary = [
                 ["Income", data[0][0]],
                 ["Expenditures", data[0][1]],
