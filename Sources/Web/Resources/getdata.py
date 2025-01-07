@@ -315,8 +315,7 @@ def getMonthlyTopExpenditures(
 def getMonthlyBilanceSummaryforUser(
         table: Table,
         userID: str,
-        range: RangeMonth,
-        column: str     #TODO: Base column on table
+        range: RangeMonth
     ) -> list:
     """Returns data from specified table for specified user
 
@@ -331,7 +330,7 @@ def getMonthlyBilanceSummaryforUser(
     """
 
     with app.app_context():
-        return db.session.query(
+        data = db.session.query(
                                 db.func.round(db.func.sum(table.columns.Income)),
                                 db.func.round(db.func.sum(table.columns.Expenditures)),
                                 db.func.round(db.func.sum(table.columns.Bills))
@@ -341,6 +340,13 @@ def getMonthlyBilanceSummaryforUser(
                                 table.columns.Month>=range.beginning,
                                 table.columns.Month<=range.end).\
                             all()
+        #FIXME: Terrible hack, also some elements are not in order
+        summary = [
+                ["Income", data[0][0]],
+                ["Expenditures", data[0][1]],
+                ["Bills", data[0][2]]
+            ]
+        return summary
 
 def getTopNProductOrTypesforUser(
         table: Table,

@@ -1002,51 +1002,57 @@ def finances():
         range.end = form.maxmonth.data
     # NICE-TO-HAVE: Add statistic type, and get only financial here
     StatisticData = getDataFromTableforUser(Statistics, current_user.uuid)
-    BilanceData = getMonthlyBilanceValueFor(
+    BilanceData = getMonthRangeDataFromTableforUser(
                     MonthlyBilance,
                     current_user.uuid,
-                    range,
-                    "Bilance")
+                    range)
 
-    BilanceSources = getMonthRangeDataFromTableforUser(
+    BilanceTotal= getMonthlyBilanceSummaryforUser(
                         MonthlyBilance,
                         current_user.uuid,
                         range)
-    BilanceTotal = getMonthlyBilanceSummaryforUser(MonthlyBilance, current_user.uuid, range, "Source")
-    BilanceTotalAnnotated=[]
-    BilanceTotalAnnotated.append({"Label":"Income","Value":BilanceTotal[0][0]})
-    BilanceTotalAnnotated.append({"Label":"Expenditures","Value":BilanceTotal[0][1]})
-    BilanceTotalAnnotated.append({"Label":"Bills","Value":BilanceTotal[0][2]})
-     
     SavingsTargetData = getUserbyID(current_user.uuid).SavingsTarget
     
-    #BilanceSourcesData = createchartdataset(BilanceSources, "true")
-
-    Bilance=[]
+    bilance=[]
     Breakeven=[]
     BilanceSet=[]
     SavingsTarget=[]
     sets = {
-        "Bilance": Bilance,
+        "Bilance": bilance,
         "Breakeven": Breakeven,
         "Savings Target": SavingsTarget
+        #TODO: Add savings rate here
         }
-    
+    income=[]
+    expenditures=[]
+    bills=[]
+    BilanceSourcesData=[]
+    BilanceSources = {
+        "Income": income,
+        "Expenditures": expenditures,
+        "Bills": bills
+    }
+
     #Adding breakeven line 
-    for Month, Amount in BilanceData:
-        Bilance.append({"x":Month,"y":Amount})
+    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+        bilance.append({"x":Month,"y":Bilance})
         Breakeven.append({"x":Month,"y":0})
         SavingsTarget.append({"x":Month,"y":SavingsTargetData})
-    
+        income.append({"x":Month,"y":Income})
+        expenditures.append({"x":Month,"y":Expenditures})
+        bills.append({"x":Month,"y":Bills})
+
     for set in sets:
         BilanceSet.append({"label": set, "data": sets[set]})
+    for source in BilanceSources:
+        BilanceSourcesData.append({"label": source, "data": BilanceSources[source]})
    
-    BilanceTotalchart=createpiechartdataset(BilanceTotalAnnotated, addperc=True)
+    BilanceTotalchart=createpiechartdataset(BilanceTotal, addperc=True)
     log_site_opened()
     return render_template("financialposture.html",
                            title="Finances",
                            BilanceTotalchart=json.dumps(BilanceTotalchart, cls=DecimalEncoder),
-                           BilanceSourcesData=json.dumps(BilanceSources),#BilanceSourcesData, cls=DecimalEncoder),
+                           BilanceSourcesData=json.dumps(BilanceSourcesData, cls=DecimalEncoder),
                            BilanceData=json.dumps(BilanceSet, cls=DecimalEncoder),
                            StatisticData=StatisticData,
                            form=form
