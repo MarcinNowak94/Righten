@@ -20,7 +20,7 @@ load_dotenv(os.path.join(basepath, ".env"))
 
 app.config.from_prefixed_env() #Reads FLASK_* from .env and .flaskenv
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "sqlite:///P:\\Johny\\Projects\\Budgeter_personal\\Finances.sqlite3"#"sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3"
+    "sqlite:///P:\\Johny\\Projects\\Bazy Danych\\Personal\\Righten_personal\\Finances.sqlite3" #"sqlite:///E:\\Projects\\Git\\Righten\\Sources\\Database\\Righten_mock.sqlite3"
     if app.config["ENV"] == "development"
     else "postgresql+psycopg2://postgres:postgres@rightendb:5432/RightenDB"
     )

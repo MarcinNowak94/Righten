@@ -814,7 +814,8 @@ def incomesummary():
 
     #TODO: Start chart at 0 - negative income is not an acceptable input
     monthlyincomedata = []
-    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+    #FIXME: Duplicates logic from "/finances" (line ~1043)
+    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
         monthlyincomedata.append({"x": Month, "y": Income})
 
     log_site_opened()
@@ -856,7 +857,8 @@ def billssummary():
                     current_user.uuid,
                     range)
     monthly_bills_data = []
-    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+    #FIXME: Duplicates logic from "/finances" (line ~1043) and "/incomesummary" (line ~817)
+    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
         monthly_bills_data.append({"x": Month, "y": Bills})
 
     log_site_opened()
@@ -910,7 +912,8 @@ def expendituressummary():
                     MonthlyBilance,
                     current_user.uuid,
                     range)
-    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+    #FIXME: duplicate
+    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
         MonthlyExpendituresData.append({"x": Month, "y": Expenditures})
         SpendingTarget.append({"x":Month,"y":SpendingTargetValue})
         #TODO: add savings rate
@@ -1031,21 +1034,25 @@ def finances():
     income=[]
     expenditures=[]
     bills=[]
+    investments=[]
     BilanceSourcesData=[]
     BilanceSources = {
         "Income": income,
         "Expenditures": expenditures,
-        "Bills": bills
+        "Bills": bills,
+        "Investments": investments
     }
 
-    #Adding breakeven line 
-    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+    #Adding breakeven line
+    #FIXME duplicate
+    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
         bilance.append({"x":Month,"y":Bilance})
         Breakeven.append({"x":Month,"y":0})
         SavingsTarget.append({"x":Month,"y":SavingsTargetData})
         income.append({"x":Month,"y":Income})
         expenditures.append({"x":Month,"y":Expenditures})
         bills.append({"x":Month,"y":Bills})
+        investments.append({"x":Month,"y":Bills})
 
     for set in sets:
         BilanceSet.append({"label": set, "data": sets[set]})
@@ -1254,15 +1261,16 @@ def month():
         "Bills": bills
     }
 
-    #Adding breakeven line 
-    for UserID, Month, Income, Expenditures, Bills, Bilance, SavingsRate in BilanceData:
+    #Adding breakeven line
+    #FIXME: duplicate
+    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
         income.append({"x":Month,"y":Income})
         expenditures.append({"x":Month,"y":Expenditures})
         bills.append({"x":Month,"y":Bills})
         netresult+=Bilance
 
     for source in BilanceSources:
-        BilanceSourcesData.append({"label": source, "data": BilanceSources[source]})
+        BilanceSourcesData.append({"Source": source, "Amount": BilanceSources[source][0]["y"]})
 
     unnecessaryproducts = getMonthRangeDataFromTableforUser(
                             UnnecessaryProductsBought,
