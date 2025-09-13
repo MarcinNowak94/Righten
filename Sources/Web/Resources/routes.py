@@ -20,10 +20,10 @@ class DecimalEncoder(json.JSONEncoder):
   """Dumps decimal data in JSON format"""
   # As per: https://stackoverflow.com/questions/63278737/object-of-type-decimal-is-not-json-serializable
   
-  def default(self, obj):
-    if isinstance(obj, Decimal):
+def default(self, obj):
+  if isinstance(obj, Decimal):
       return str(obj)
-    return json.JSONEncoder.default(self, obj)
+  return json.JSONEncoder.default(self, obj)
 
 def get_request_data() -> json:
     """Returns request data formated as json"""
@@ -807,22 +807,17 @@ def incomesummary():
     IncomeTypechart=createpiechartdataset(IncomeSummarydata, addperc=True)
     IncomeTypesByTimeDataset=createchartdataset(IncomeTypesByTime)
 
-    BilanceData = getMonthRangeDataFromTableforUser(
-                        MonthlyBilance,
-                        current_user.uuid,
-                        range)
-
-    #TODO: Start chart at 0 - negative income is not an acceptable input
-    monthlyincomedata = []
-    #FIXME: Duplicates logic from "/finances" (line ~1043)
-    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
-        monthlyincomedata.append({"x": Month, "y": Income})
+    Bilance = getBilance(
+                    current_user.uuid,
+                    range
+                    )
 
     log_site_opened()
     return render_template("incomesummary.html",
                            title="Income",
                            IncomeTypechart=json.dumps(IncomeTypechart, cls=DecimalEncoder),
-                           MonthlyIncome=json.dumps(monthlyincomedata, cls=DecimalEncoder),
+                           #TODO: Start chart at 0 - negative income is not an acceptable input
+                           MonthlyIncome=json.dumps(Bilance["income"], cls=DecimalEncoder),
                            IncomeTypesByTimeDataset=json.dumps(IncomeTypesByTimeDataset, cls=DecimalEncoder),
                            Summary=summary,
                            form=form
@@ -848,24 +843,25 @@ def billssummary():
                             current_user.uuid,
                             range,
                             "Medium")
-    BillsTypesByTime = getMonthlySummaryByColumn(MonthlyBillsByMedium, current_user.uuid, range, "Medium")
+    BillsTypesByTime = getMonthlySummaryByColumn(
+                            MonthlyBillsByMedium,
+                            current_user.uuid,
+                            range,
+                            "Medium")
     
     bills_type_chart = createpiechartdataset(BillsSummarydata, addperc=True)
     bills_types_data = createchartdataset(BillsTypesByTime)
-    BilanceData = getMonthRangeDataFromTableforUser(
-                    MonthlyBilance,
+    
+    Bilance = getBilance(
                     current_user.uuid,
-                    range)
-    monthly_bills_data = []
-    #FIXME: Duplicates logic from "/finances" (line ~1043) and "/incomesummary" (line ~817)
-    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
-        monthly_bills_data.append({"x": Month, "y": Bills})
+                    range
+                    )
 
     log_site_opened()
     return render_template("billssummary.html",
                            title="Bills",
                            BillsTypechart=json.dumps(bills_type_chart, cls=DecimalEncoder),
-                           MonthlyBillsData=json.dumps(monthly_bills_data, cls=DecimalEncoder),
+                           MonthlyBillsData=json.dumps(Bilance["bills"], cls=DecimalEncoder),
                            BillsTypesData=json.dumps(bills_types_data, cls=DecimalEncoder),
                            Summary=summary,
                            form=form
@@ -900,27 +896,25 @@ def expendituressummary():
                                 current_user.uuid,
                                 range,
                                 "Product")
-    SpendingTargetValue = getUserbyID(current_user.uuid).SpendingTarget
 
     expenditures_summary_chart = createpiechartdataset(ExpendituresSummarydata, addperc=True)
     TopTypeExpenditures=createchartdataset(TopTypeExpendituresData, "true")
     TopProductsExpenditures=createchartdataset(TopProductsChartData, "true")
-    MonthlyExpendituresData=[]
-    SpendingTarget=[]
-    
-    BilanceData = getMonthRangeDataFromTableforUser(
-                    MonthlyBilance,
+        
+    savingstarget = getUserbyID(current_user.uuid).SavingsTarget
+    spendingtarget = getUserbyID(current_user.uuid).SpendingTarget
+    Bilance = getBilance(
                     current_user.uuid,
-                    range)
-    #FIXME: duplicate
-    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
-        MonthlyExpendituresData.append({"x": Month, "y": Expenditures})
-        SpendingTarget.append({"x":Month,"y":SpendingTargetValue})
-        #TODO: add savings rate
-    
-    ExpendituresSet=[]
-    ExpendituresSet.append({"label": "Exenditures", "data": MonthlyExpendituresData})
-    ExpendituresSet.append({"label": "Spending target", "data": SpendingTarget})
+                    range,
+                    savingstarget,
+                    spendingtarget)
+    #TODO: add savings rate
+    ExpendituresSet=(
+        {"label": "Exenditures", "data": Bilance["expenditures"]},
+        {"label": "Spending target", "data": Bilance["spendingtarget"]},
+        {"label": "Savings rate", "data": Bilance["savingsrate"]},
+        {"label": "Savings target", "data": Bilance["savingstarget"]}
+    )
     
     log_site_opened()
     return render_template("expendituressummary.html",
@@ -1011,61 +1005,19 @@ def finances():
     # NICE-TO-HAVE: Add statistic type, and get only financial here
     StatisticData = getDataFromTableforUser(Statistics, current_user.uuid)
 
-    BilanceTotal= getMonthlyBilanceSummaryforUser(
-                        MonthlyBilance,
-                        current_user.uuid,
-                        range)
-    SavingsTargetData = getUserbyID(current_user.uuid).SavingsTarget
-    
-    BilanceData = getMonthRangeDataFromTableforUser(
-                    MonthlyBilance,
+    savingstarget = getUserbyID(current_user.uuid).SavingsTarget
+    Bilance = getBilance(
                     current_user.uuid,
-                    range)
-    bilance=[]
-    Breakeven=[]
-    BilanceSet=[]
-    SavingsTarget=[]
-    sets = {
-        "Bilance": bilance,
-        "Breakeven": Breakeven,
-        "Savings Target": SavingsTarget
-        #TODO: Add savings rate here
-        }
-    income=[]
-    expenditures=[]
-    bills=[]
-    investments=[]
-    BilanceSourcesData=[]
-    BilanceSources = {
-        "Income": income,
-        "Expenditures": expenditures,
-        "Bills": bills,
-        "Investments": investments
-    }
-
-    #Adding breakeven line
-    #FIXME duplicate
-    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
-        bilance.append({"x":Month,"y":Bilance})
-        Breakeven.append({"x":Month,"y":0})
-        SavingsTarget.append({"x":Month,"y":SavingsTargetData})
-        income.append({"x":Month,"y":Income})
-        expenditures.append({"x":Month,"y":Expenditures})
-        bills.append({"x":Month,"y":Bills})
-        investments.append({"x":Month,"y":Bills})
-
-    for set in sets:
-        BilanceSet.append({"label": set, "data": sets[set]})
-    for source in BilanceSources:
-        BilanceSourcesData.append({"label": source, "data": BilanceSources[source]})
-   
-    BilanceTotalchart=createpiechartdataset(BilanceTotal, addperc=True)
+                    range,
+                    savingstarget)
+    
+    BilanceTotalchart=createpiechartdataset(Bilance["BilanceTotal"], addperc=True)
     log_site_opened()
     return render_template("financialposture.html",
                            title="Finances",
                            BilanceTotalchart=json.dumps(BilanceTotalchart, cls=DecimalEncoder),
-                           BilanceSourcesData=json.dumps(BilanceSourcesData, cls=DecimalEncoder),
-                           BilanceData=json.dumps(BilanceSet, cls=DecimalEncoder),
+                           BilanceSourcesData=json.dumps(Bilance["BilanceSources"], cls=DecimalEncoder),
+                           BilanceData=json.dumps(Bilance["BilanceSet"], cls=DecimalEncoder),
                            StatisticData=StatisticData,
                            form=form
                            )

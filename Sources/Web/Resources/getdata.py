@@ -2,7 +2,7 @@ from sqlalchemy import func
 
 from Resources import db, app
 from Resources.models import *
-
+from decimal import Decimal
 
 def getUserbyName(
         userName: str
@@ -431,3 +431,73 @@ def getMonthlyBilanceValueFor(
                                 table.columns.Month<=range.end).\
                             all()
         return summary
+
+bilanceTable=MonthlyBilance
+def getBilance(
+        userID: str,
+        range: RangeMonth,
+        savingsTarget=0,
+        spendingTarget=0
+    ) -> dict:
+    
+    BilanceTotal= getMonthlyBilanceSummaryforUser(
+                        bilanceTable,
+                        userID,
+                        range)
+    BilanceData = getMonthRangeDataFromTableforUser(
+                    bilanceTable,
+                    userID,
+                    range)
+    
+    bilance=[]
+    Breakeven=[]
+    savingstarget=[]
+    savingsrate=[]
+    BilanceSet= (
+        {"label": "Bilance", "data": bilance},
+        {"label": "Breakeven", "data": Breakeven},
+        {"label": "Savings Target", "data": savingstarget},
+        {"label": "Savings rate", "data": savingsrate}
+    )
+    
+    income=[]
+    expenditures=[]
+    bills=[]
+    investments=[]
+    BilanceSources = (
+        {"label": "Income", "data": income},
+        {"label": "Expenditures", "data": expenditures},
+        {"label": "Bills", "data": bills},
+        {"label": "Investments", "data": investments}
+    )
+    spendingtarget=[]
+    
+    #Adding breakeven line
+    #FIXME duplicate
+    for UserID, Month, Income, Expenditures, Bills, Investments, Bilance, SavingsRate in BilanceData:
+        bilance.append({"x":Month,"y":Bilance})
+        Breakeven.append({"x":Month,"y":0})
+        savingstarget.append({"x":Month,"y":savingsTarget})
+        income.append({"x":Month,"y":Income})
+        expenditures.append({"x":Month,"y":Expenditures})
+        bills.append({"x":Month,"y":Bills})
+        investments.append({"x":Month,"y":Investments})
+        savingsrate.append({"x":Month,"y":SavingsRate})
+        spendingtarget.append({"x":Month,"y":spendingTarget}) #TODO: add dynamically afterwards
+
+    Bilance = {
+        "BilanceSources": BilanceSources,
+        "BilanceSet": BilanceSet,
+        "BilanceTotal": BilanceTotal,
+        
+        "income": income,
+        "bills": bills,
+        "expenditures": expenditures,
+
+        "spendingtarget": spendingtarget,
+        "savingsrate": savingsrate,
+        "savingstarget": savingstarget
+    }
+
+    return Bilance
+    
